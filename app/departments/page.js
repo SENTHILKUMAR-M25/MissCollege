@@ -9,13 +9,14 @@ import {
   Search, X, ArrowRight, Users, BookOpen, FlaskConical,
   Trophy, ChevronRight, GraduationCap, Briefcase, Star
 } from 'lucide-react'
+import Image from 'next/image'
 
 const departments = [
   {
     id: 'social-work',
     name: 'Department of Social Work',
+    image: null,
     short: 'SW',
-    icon: '🤝',
     color: 'from-blue-600 to-cyan-500',
     category: 'Social Sciences',
     hod: 'Dr. Name Here',
@@ -35,11 +36,11 @@ const departments = [
   {
     id: 'computer-science',
     name: 'Department of Computer Science',
+    image: '/department/Computer-Science.jpg',
     short: 'CS',
-    icon: '💻',
     color: 'from-indigo-600 to-blue-500',
     category: 'Science & Technology',
-    hod: 'Dr. Name Here',
+    hod: 'Dr. A. Rajkumar',
     faculty: 10,
     students: 360,
     established: 1995,
@@ -54,11 +55,11 @@ const departments = [
   {
     id: 'commerce',
     name: 'Department of Commerce',
+    image: '/department/Commerce.jpg',
     short: 'COM',
-    icon: '📊',
     color: 'from-emerald-600 to-teal-500',
     category: 'Commerce & Management',
-    hod: 'Dr. Name Here',
+    hod: 'Prof. R. Kumar',
     faculty: 10,
     students: 400,
     established: 1980,
@@ -73,8 +74,8 @@ const departments = [
   {
     id: 'management',
     name: 'Department of Management Studies',
+    image: '/department/Management-Studies.jpg',
     short: 'MGT',
-    icon: '🎯',
     color: 'from-amber-500 to-orange-500',
     category: 'Commerce & Management',
     hod: 'Dr. Name Here',
@@ -91,8 +92,8 @@ const departments = [
   {
     id: 'english',
     name: 'Department of English',
+    image: '/department/English.jpg',
     short: 'ENG',
-    icon: '📚',
     color: 'from-pink-600 to-rose-500',
     category: 'Arts & Humanities',
     hod: 'Dr. Name Here',
@@ -109,8 +110,8 @@ const departments = [
   {
     id: 'psychology',
     name: 'Department of Psychology',
+    image: '/department/Psychology.jpg',
     short: 'PSY',
-    icon: '🧠',
     color: 'from-violet-600 to-purple-500',
     category: 'Social Sciences',
     hod: 'Dr. Name Here',
@@ -127,8 +128,8 @@ const departments = [
   {
     id: 'pg-diploma',
     name: 'PG Diploma Programmes',
+    image: '/department/Diploma.png',
     short: 'PGD',
-    icon: '🎓',
     color: 'from-slate-600 to-gray-500',
     category: 'Professional Programmes',
     hod: 'Dr. Name Here',
@@ -397,22 +398,50 @@ function DeptCard({ dept, onClick }) {
     <div onClick={onClick}
       className="group bg-white rounded-2xl border border-neutral-gray shadow-soft hover:shadow-elevated transition-all duration-300 overflow-hidden cursor-pointer">
 
-      {/* Card top */}
-      <div className={`bg-gradient-to-br ${dept.color} p-5 relative overflow-hidden`}>
-        <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />
-        <div className="flex items-start justify-between">
-          <span className="text-4xl">{dept.icon}</span>
-          <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
-            {dept.category}
-          </span>
+      {/* Card top – image banner or gradient fallback */}
+      {dept.image ? (
+        <div className="relative h-44 overflow-hidden">
+          <Image
+            src={dept.image}
+            alt={dept.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+          {/* Gradient overlay */}
+          <div className={`absolute inset-0 bg-gradient-to-t bg-black/90 opacity-70`} />
+          {/* Labels on top of image */}
+          <div className="absolute inset-0 p-4 flex flex-col justify-between">
+            <div className="flex items-start justify-between">
+              <span className="bg-black/30 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
+                {dept.category}
+              </span>
+            </div>
+            <div>
+              <p className="text-white/80 text-xs font-semibold">Est. {dept.established}</p>
+              <h3 className="text-white font-black text-base leading-tight mt-0.5 drop-shadow" style={{ fontFamily: 'Syne, sans-serif' }}>
+                {dept.name}
+              </h3>
+            </div>
+          </div>
         </div>
-        <div className="mt-3">
-          <p className="text-white/70 text-xs font-semibold">Est. {dept.established}</p>
-          <h3 className="text-white font-black text-base leading-tight mt-0.5" style={{ fontFamily: 'Syne, sans-serif' }}>
-            {dept.name}
-          </h3>
+      ) : (
+        <div className={`bg-gradient-to-br ${dept.color} p-5 relative overflow-hidden`}>
+          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />
+          <div className="flex items-start justify-between">
+            <span className="text-4xl">{dept.icon}</span>
+            <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
+              {dept.category}
+            </span>
+          </div>
+          <div className="mt-3">
+            <p className="text-white/70 text-xs font-semibold">Est. {dept.established}</p>
+            <h3 className="text-white font-black text-base leading-tight mt-0.5" style={{ fontFamily: 'Syne, sans-serif' }}>
+              {dept.name}
+            </h3>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Card body */}
       <div className="p-5">

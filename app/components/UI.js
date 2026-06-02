@@ -13,7 +13,7 @@ export function Section({ children, className = '', id = '' }) {
   )
 }
 
-export function SectionTitle({ title, subtitle, align = 'center' }) {
+export function SectionTitle({ title,  align = 'center' }) {
   const alignClass = {
     left: 'text-left',
     center: 'text-center',
@@ -29,7 +29,6 @@ export function SectionTitle({ title, subtitle, align = 'center' }) {
       className={`mb-12 ${alignClass}`}
     >
       <h2 className="text-4xl sm:text-5xl font-bold text-primary-navy mb-4">{title}</h2>
-      {subtitle && <p className="text-lg text-gray-600 max-w-2xl">{subtitle}</p>}
     </motion.div>
   )
 }

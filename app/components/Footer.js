@@ -14,7 +14,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/logo.png" alt="MISS College Logo" fill className="object-contain" />
+                <Image src="/logo.png" alt="MISS College Logo" fill className="object-contain bg-white" />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-white text-sm">MISS</span>
@@ -154,40 +154,27 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start space-x-2">
                 <MapPin size={18} className="text-secondary-gold mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300 text-sm">Madurai, Tamil Nadu, India</span>
+                <span className="text-gray-300 text-sm"><a href="https://maps.app.goo.gl/M4sBXbA8c8S4VRn56" target="_blank" rel="noopener noreferrer">
+                  No 9, Alagar Koil Road, Madurai - 625 002.
+                </a></span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone size={18} className="text-secondary-gold" />
-                <a href="tel:+914527777777" className="text-gray-300 hover:text-secondary-gold transition-colors text-sm">
-                  +91 452 777 7777
+                <a href="tel:0452-2537142" className="text-gray-300 hover:text-secondary-gold transition-colors text-sm">
+                  0452-2537142
                 </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={18} className="text-secondary-gold" />
-                <a href="mailto:info@misscollege.edu.in" className="text-gray-300 hover:text-secondary-gold transition-colors text-sm">
-                  info@misscollege.edu.in
+                <a href="mailto:principal@misscollege.edu.in" className="text-gray-300 hover:text-secondary-gold transition-colors text-sm">
+                  principal@misscollege.edu.in
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Newsletter Subscription */}
-        <div className="py-8 border-y border-gray-700">
-          <div className="max-w-md">
-            <h4 className="font-bold text-white mb-3">Subscribe to Newsletter</h4>
-            <form className="flex space-x-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-secondary-gold"
-              />
-              <button className="px-4 py-2 bg-secondary-gold text-primary-navy rounded-lg font-semibold hover:bg-secondary-emerald transition-colors text-sm">
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
+       
 
         {/* Bottom Footer */}
         <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
@@ -204,7 +191,7 @@ export default function Footer() {
             <Link href="/accessibility" className="text-gray-400 hover:text-secondary-gold transition-colors">
               Accessibility
             </Link>
-            <Link href="/sitemap" className="text-gray-400 hover:text-secondary-gold transition-colors">
+            <Link href="https://maps.app.goo.gl/M4sBXbA8c8S4VRn56" target='_blank' className="text-gray-400 hover:text-secondary-gold transition-colors">
               Sitemap
             </Link>
           </div>

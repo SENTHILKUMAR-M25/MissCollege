@@ -34,7 +34,7 @@ export default function Events() {
       href: '#',
     },
     {
-      title: 'Founder\'s Day Celebration',
+      title: "Founder's Day Celebration",
       date: 'July 10, 2026',
       time: '11:00 AM',
       location: 'Auditorium',

@@ -44,6 +44,8 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
   const [step, setStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
+  const [applicationId, setApplicationId] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [form, setForm] = useState({
     // Personal
@@ -100,13 +102,32 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
   function next() { if (validate()) setStep(s => s + 1) }
   function back() { setStep(s => s - 1) }
 
-  function submit() {
-    if (validate()) setSubmitted(true)
+  async function submit() {
+    if (!validate()) return
+    
+    setIsSubmitting(true)
+    try {
+      const appId = `MISS-${Date.now().toString().slice(-6)}`
+      setApplicationId(appId)
+      setSubmitted(true)
+    } catch (error) {
+      console.error('Submission error:', error)
+      setErrors({ submit: 'Failed to submit application. Please try again.' })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function reset() {
-    setStep(0); setSubmitted(false); setErrors({})
-    setForm({ firstName: '', lastName: '', dob: '', gender: '', phone: '', email: '', address: '', city: '', state: '', tenthBoard: '', tenthPercent: '', twelfthBoard: '', twelfthPercent: '', twelfthStream: '', entranceScore: '', courseSlug: preselectedCourse?.slug || '', academicYear: '2026-27', category: '', scholarship: false, hostel: false, message: '' })
+    setStep(0)
+    setSubmitted(false)
+    setErrors({})
+    setApplicationId('')
+    setForm({
+      firstName: '', lastName: '', dob: '', gender: '', phone: '', email: '', address: '', city: '', state: '',
+      tenthBoard: '', tenthPercent: '', twelfthBoard: '', twelfthPercent: '', twelfthStream: '', entranceScore: '',
+      courseSlug: preselectedCourse?.slug || '', academicYear: '2026-27', category: '', scholarship: false, hostel: false, message: '',
+    })
   }
 
   return (
@@ -178,7 +199,7 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
                       <p className="text-slate-500 text-sm mb-2">Your application for <strong>{selectedCourse?.name}</strong> has been received.</p>
                       <p className="text-slate-500 text-sm mb-6">We'll contact you at <strong>{form.email}</strong> within 2–3 working days.</p>
                       <div className="bg-neutral-light rounded-xl p-4 text-left text-sm space-y-1 mb-6 max-w-xs mx-auto">
-                        <p className="text-slate-500">Application ID: <span className="font-bold text-primary-navy">MISS-{Date.now().toString().slice(-6)}</span></p>
+                        <p className="text-slate-500">Application ID: <span className="font-bold text-primary-navy">{applicationId}</span></p>
                         <p className="text-slate-500">Academic Year: <span className="font-bold text-primary-navy">{form.academicYear}</span></p>
                         <p className="text-slate-500">Course: <span className="font-bold text-primary-navy">{selectedCourse?.name}</span></p>
                       </div>
@@ -437,9 +458,10 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
                   ) : (
                     <button
                       onClick={submit}
-                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-secondary-emerald text-white text-sm font-bold hover:bg-green-700 transition-colors"
+                      disabled={isSubmitting}
+                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-secondary-emerald text-white text-sm font-bold hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <CheckCircle size={15} /> Submit
+                      <CheckCircle size={15} /> {isSubmitting ? 'Submitting...' : 'Submit'}
                     </button>
                   )}
                 </div>

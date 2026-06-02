@@ -124,72 +124,111 @@ export default function Admissions() {
       <Section>
         <Container>
           <SectionTitle
-            title="Eligibility Criteria"
-            subtitle="Check if you meet the requirements"
+            title="Admission Eligibility"
+            subtitle="Programme-wise eligibility criteria"
           />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-2xl font-bold text-primary-navy mb-6">Undergraduate Programs</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">12th pass or equivalent qualification</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Minimum 50% aggregate marks (45% for SC/ST)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Valid entrance exam score</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Age limit: 21 years (for general category)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Indian citizen or NRI/OCI</span>
-                </li>
-              </ul>
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-2xl font-bold text-primary-navy mb-6">Postgraduate Programs</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Bachelor's degree from recognized university</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Minimum 50% aggregate (45% for SC/ST)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Valid entrance exam / CAT / GATE score</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">Relevant academic background</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary-blue font-bold mt-1">✓</span>
-                  <span className="text-gray-700">No age limit</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
+          {/* UG Table */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }} viewport={{ once: true }} className="mb-10">
+            <h3 className="text-xl font-black text-primary-navy mb-4 flex items-center gap-2"
+              style={{ fontFamily: 'Syne, sans-serif' }}>
+              <span className="w-2 h-6 rounded-full bg-primary-blue inline-block" />
+              Under Graduate Programmes
+            </h3>
+            <div className="overflow-x-auto rounded-xl border border-neutral-gray shadow-soft">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-primary-blue text-white">
+                    <th className="px-5 py-3 text-left font-semibold w-12">S.No</th>
+                    <th className="px-5 py-3 text-left font-semibold">Course</th>
+                    <th className="px-5 py-3 text-left font-semibold">Eligibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { no: 1, course: 'B.S.W – Social Work', eligibility: 'Should have passed in H.S.C.' },
+                    { no: 2, course: 'B.Com', eligibility: 'As per G.O.Ms.No.175 dt.11.05.2017. Candidate should have studied Commerce / Accountancy in HSC. 20% reserved for vocational stream.' },
+                    { no: 3, course: 'B.Com – Computer Applications', eligibility: 'Should have passed in H.S.C.' },
+                    { no: 4, course: 'B.Sc – Computer Science', eligibility: 'Should have passed in H.S.C. with 10+2 pattern. Candidate should have studied Mathematics with Physics as one of the subjects at +2 level.' },
+                    { no: 5, course: 'B.Sc – Information Technology', eligibility: 'Should have passed in H.S.C. with 10+2 pattern. Candidate should have studied Mathematics at +2 level.' },
+                    { no: 6, course: 'B.B.A.', eligibility: 'As per G.O.Ms.No.175 dt.11.05.2017. Candidate should have studied Commerce / Accountancy in HSC. 20% reserved for vocational stream.' },
+                    { no: 7, course: 'B.A – English', eligibility: 'Should have passed in H.S.C.' },
+                    { no: 8, course: 'B.Sc – Psychology', eligibility: 'Should have passed in H.S.C.' },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-neutral-light'}>
+                      <td className="px-5 py-4 text-slate-500 font-semibold">{row.no}</td>
+                      <td className="px-5 py-4 font-bold text-primary-navy whitespace-nowrap">{row.course}</td>
+                      <td className="px-5 py-4 text-slate-600">{row.eligibility}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+
+          {/* PG Table */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }} viewport={{ once: true }} className="mb-10">
+            <h3 className="text-xl font-black text-primary-navy mb-4 flex items-center gap-2"
+              style={{ fontFamily: 'Syne, sans-serif' }}>
+              <span className="w-2 h-6 rounded-full bg-secondary-emerald inline-block" />
+              Post Graduate Programmes
+            </h3>
+            <div className="overflow-x-auto rounded-xl border border-neutral-gray shadow-soft">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-secondary-emerald text-white">
+                    <th className="px-5 py-3 text-left font-semibold w-12">S.No</th>
+                    <th className="px-5 py-3 text-left font-semibold">Course</th>
+                    <th className="px-5 py-3 text-left font-semibold">Eligibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="bg-white">
+                    <td className="px-5 py-4 text-slate-500 font-semibold">1</td>
+                    <td className="px-5 py-4 font-bold text-primary-navy whitespace-nowrap">M.S.W. – Social Work (Aided &amp; Self Finance)</td>
+                    <td className="px-5 py-4 text-slate-600">A Pass in any Degree of MKU or other University as equivalent thereto.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+
+          {/* PG Diploma Table */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }} viewport={{ once: true }}>
+            <h3 className="text-xl font-black text-primary-navy mb-4 flex items-center gap-2"
+              style={{ fontFamily: 'Syne, sans-serif' }}>
+              <span className="w-2 h-6 rounded-full bg-secondary-gold inline-block" />
+              Post Graduate Diploma Programmes
+            </h3>
+            <div className="overflow-x-auto rounded-xl border border-neutral-gray shadow-soft">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-secondary-gold text-primary-navy">
+                    <th className="px-5 py-3 text-left font-semibold w-12">S.No</th>
+                    <th className="px-5 py-3 text-left font-semibold">Course</th>
+                    <th className="px-5 py-3 text-left font-semibold">Eligibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { no: 1, course: 'PGDC – Counselling', eligibility: 'A Pass in any Degree of MKU or other University as equivalent thereto.' },
+                    { no: 2, course: 'PGDPMIR – Personnel Management & Industrial Relations', eligibility: 'A Pass in any Degree of MKU or other University as equivalent thereto.' },
+                    { no: 3, course: 'PGDCA – Computer Applications', eligibility: 'A Pass in any Degree of MKU or other University as equivalent thereto.' },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-neutral-light'}>
+                      <td className="px-5 py-4 text-slate-500 font-semibold">{row.no}</td>
+                      <td className="px-5 py-4 font-bold text-primary-navy">{row.course}</td>
+                      <td className="px-5 py-4 text-slate-600">{row.eligibility}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+
         </Container>
       </Section>
 
@@ -270,7 +309,7 @@ export default function Admissions() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white text-white hover:bg-white hover:text-primary-navy"
+                  className="border-white text-white hover:bg-white hover:text-black transition-all"
                 >
                   Download Prospectus
                 </Button>

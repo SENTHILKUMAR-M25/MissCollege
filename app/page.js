@@ -22,22 +22,26 @@ export default function Home() {
     {
       name: 'Computer Science',
       description: 'Modern computing and technology education',
+      image: '/department/Computer-Science.jpg',
       href: '/departments#computer-science',
     },
     {
       name: 'Commerce',
       description: 'Business and commerce expertise',
+      image: '/department/Commerce.jpg',
       href: '/departments#commerce',
     },
     {
-      name: 'Science',
-      description: 'Advanced scientific research and learning',
-      href: '/departments#science',
+      name: 'English',
+      description: 'Language, literature and communication skills',
+      image: '/department/English.jpg',
+      href: '/departments#english',
     },
     {
-      name: 'Humanities',
-      description: 'Liberal arts and social sciences',
-      href: '/departments#humanities',
+      name: 'Management Studies',
+      description: 'Business leadership and strategic thinking',
+      image: '/department/Management-Studies.jpg',
+      href: '/departments#management',
     },
   ]
 
@@ -290,45 +294,9 @@ export default function Home() {
         </Container>
       </Section>
 
-      {/* Announcements */}
-      <Section>
-        <Container>
-          <SectionTitle
-            title="Latest Announcements"
-            subtitle="Stay updated with recent news and announcements"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {announcements.map((news, index) => (
-              <NewsCard key={index} {...news} index={index} />
-            ))}
-          </div>
-          <div className="text-center">
-            <Link href="/events">
-              <Button variant="primary">View All News</Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
+      
 
-      {/* Upcoming Events */}
-      <Section className="bg-neutral-light">
-        <Container>
-          <SectionTitle
-            title="Upcoming Events"
-            subtitle="Join us for exciting events and activities"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {upcomingEvents.map((event, index) => (
-              <EventCard key={index} {...event} index={index} />
-            ))}
-          </div>
-          <div className="text-center">
-            <Link href="/events">
-              <Button variant="primary">View Calendar</Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
+      
 
       {/* Testimonials Section */}
       <Section>
@@ -367,32 +335,7 @@ export default function Home() {
         </Container>
       </Section>
 
-      {/* Recruiters Section */}
-      <Section className="bg-neutral-light">
-        <Container>
-          <SectionTitle
-            title="Our Recruiters"
-            subtitle="Leading companies trust MISS College graduates"
-          />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-lg p-6 flex items-center justify-center h-24 shadow-soft hover:shadow-medium transition-all"
-              >
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-blue">TCS</div>
-                  <p className="text-xs text-gray-600 mt-1">Partner</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </Container>
-      </Section>
+     
 
       {/* Call to Action */}
       <Section className="bg-gradient-to-r from-primary-navy via-primary-blue to-secondary-emerald text-white">

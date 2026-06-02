@@ -25,6 +25,7 @@ const menuItems = [
     label: 'Academics',
     href: '/academics',
     submenu: [
+      { label: 'Faculty & Staff', href: '/faculty' },
       { label: 'Undergraduate Programmes', href: '/academics#undergraduate' },
       { label: 'Postgraduate Programmes', href: '/academics#postgraduate' },
       { label: 'Diploma Courses', href: '/academics#diploma' },

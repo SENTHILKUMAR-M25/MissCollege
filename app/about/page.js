@@ -64,31 +64,54 @@ function ProfileDropdownCard({ item, index }) {
 
 export default function About() {
   const timelineEvents = [
-    { year: '1980', description: 'MISS College founded with vision of educational excellence' },
-    { year: '1985', description: 'First postgraduate program launched' },
-    { year: '1995', description: 'NAAC accreditation achieved' },
-    { year: '2005', description: 'Research centers established' },
-    { year: '2015', description: 'Campus expansion and new facilities' },
-    { year: '2020', description: 'Digital transformation and online education' },
-    { year: '2025', description: 'ISO certification and international partnerships' },
+    { year: '1969', description: 'Founded on 2nd October in a small house with 4 students' },
+    { year: '2007', description: 'Accredited with B++ by NAAC' },
+    { year: '2009', description: 'Achieved Autonomous status' },
+    { year: '2014', description: 'Re-accredited with \'A\' Grade by NAAC; UGC Community College Diploma launched' },
+    { year: '2016', description: 'Extension of Autonomy granted' },
+    { year: '2019', description: 'Re-Accredited with "B+" Grade in the third cycle' },
+    { year: 'Present', description: 'Establishing a 100-bedded Sports Hostel in Naickenpatti village' },
   ]
 
   const aboutAccordion = [
     {
-      title: 'Our Vision',
-      content: 'To be a world-class institution for higher education, research, and innovation that develops capable and compassionate leaders for sustainable development.',
+      title: 'Vision',
+      content: 'Madurai Institute of Social Sciences, as a learning organization, strives to educate and develop Human Resources to serve mankind and to establish global peace and prosperity.',
     },
     {
-      title: 'Our Mission',
-      content: 'To provide quality education that empowers students with knowledge, skills, and values; conduct research that advances human knowledge; and serve society through community engagement.',
+      title: 'Mission',
+      content: 'Providing Quality Education at affordable cost by designing academic agenda in tune with the changing needs of the society, scanning the external environment through strategic planning, building faculty power in tune with the modern trend in teaching, interacting creatively with the Government and civil society, promoting applied and action research on governance and community problems and establishing System Management.',
     },
     {
       title: 'Core Values',
-      content: 'Integrity, Excellence, Innovation, Inclusivity, Sustainability, and Student-Centric Learning',
+      content: (
+        <ul className="list-decimal pl-5 space-y-2">
+          <li>The worth and dignity of individual with inherent quality of humanity</li>
+          <li>Excellence through unveiling the knowledge</li>
+          <li>Upholding the spirit of nationalism, global peace and prosperity</li>
+          <li>Communal harmony assimilated with cultural heritage</li>
+          <li>The competency derived out of serving the downtrodden and all sections in the society</li>
+          <li>Handholding for upliftment</li>
+          <li>Development of professional and personal self</li>
+        </ul>
+      ),
     },
     {
-      title: 'Accreditations',
-      content: 'NAAC Grade A, ISO 9001:2015 certified, NBA accredited programs, and recognized by UGC.',
+      title: 'Goal',
+      content: 'To develop human resources to serve mankind and establish global peace and prosperity.',
+    },
+    {
+      title: 'Objectives',
+      content: (
+        <ul className="list-decimal pl-5 space-y-2">
+          <li>To develop worthy citizens with high moral values, deep, professional knowledge, sharpened skills and positive frame of mind.</li>
+          <li>To impart education in accordance with the changing needs of society</li>
+          <li>To inculcate scientific temper in the minds of the students</li>
+          <li>To provide opportunity to the students to have a closer linkage with the civil society</li>
+          <li>To sensitize the student community on the social realties and to prepare them to adequately respond to those realities.</li>
+          <li>To offer field relevant courses and increase the employability of the students.</li>
+        </ul>
+      ),
     },
   ]
 
@@ -110,6 +133,7 @@ export default function About() {
           <div className="flex flex-wrap gap-4 justify-center">
             {[
               { label: 'History', href: '#history' },
+              { label: 'Milestones', href: '#milestones' },
               { label: 'Founder', href: '#founder' },
               { label: 'Management', href: '#management' },
               { label: 'Vision & Mission', href: '#vision' },
@@ -134,26 +158,93 @@ export default function About() {
             title="Our History"
             subtitle="A Journey of Academic Excellence"
           />
+          
+          <div className="max-w-4xl mx-auto text-gray-700 leading-relaxed space-y-6 mb-16">
+            <p>
+              <strong className="text-primary-navy font-bold">Dr. (Capt).D.V.P Raja</strong> - The Founder of Madurai Institute of Social Sciences had a visionary idea of setting up an Educational Institution in the Southern part of Tamil Nadu with a view to train young men and women in “Scientific Humanism”. With the assistance and cooperation of like-minded dignitaries, it was started in a small house at 21, Beasant road, Chokkikulam, Madurai on <strong className="text-primary-blue">2nd October 1969</strong>, on the birthday centenary of Gandhiji, the Father of our Nation, with an enrolment of 4 students. Now the college has more than 1000 students housed in a large building on a beautiful campus on Alagarkoil road, Madurai.
+            </p>
+            <p>
+              It began as a Post Graduate College with a view of meeting the long-felt need of southern districts of Tamil Nadu. Changing educational climates provided challenges that Dr. (Capt).D.V.P.Raja always met with commitment and dedication. The dynamism of the institution is displayed in all its aspects particularly in the manner in which MISS has evolved in response to societal needs and aspirations.
+            </p>
+            <div className="bg-white p-6 rounded-xl shadow-soft border-l-4 border-primary-blue">
+              <p className="mb-4">
+                The ever-vibrating mind of the founder conceived an innovative way of fulfilling the vision and mission of the institute. The result is the formation of <strong className="text-primary-navy">nineteen centers</strong>, a unique brain-child of the founder, to instill the spirit of service into the minds of the students.
+              </p>
+              <p>
+                In order to uphold the value of the precept that action is better than preaching, the teaching-learning process in this institute is extended outside the classroom to Ground Zero through these centers, acting as a bridge between the classroom and community.
+              </p>
+            </div>
+          </div>
+
           <Timeline events={timelineEvents} />
         </Container>
       </Section>
 
-      {/* Founder Section */}
-      <Section id="founder" className="bg-neutral-light">
+      {/* Milestones Section */}
+      <Section id="milestones" className="bg-neutral-light">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <SectionTitle title="Milestones of the Institute" />
+          <div className="bg-white rounded-xl shadow-soft overflow-hidden border border-neutral-gray max-w-4xl mx-auto">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-primary-navy text-white">
+                    <th className="p-4 font-semibold w-1/3">Year</th>
+                    <th className="p-4 font-semibold">Name of the Course</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700 divide-y divide-gray-100">
+                  {[
+                    { year: '1970-1971', course: 'M.S.W - Social Work' },
+                    { year: '1979-1980', course: 'PGDPMIR - Personnel Management & Industrial Relations' },
+                    { year: '1984-1985', course: 'PGDC - Counselling' },
+                    { year: '1989-1990', course: 'M. Phil in Social Work' },
+                    { year: '1991-1992', course: 'Ph.D. in Social Work' },
+                    { year: '1991-1992', course: 'M.HRM - Human Resource Management' },
+                    { year: '1998-1999', course: 'B.Sc - Computer Science' },
+                    { year: '1998-1999', course: 'PGDCA - Computer Applications' },
+                    { year: '1999-2000', course: 'M. Sc - Master of Computer Sciences' },
+                    { year: '1999-2000', course: 'B.Com - Computer Applications' },
+                    { year: '2005-2006', course: 'B.S.W - Social Work' },
+                    { year: '2007-2008', course: 'M.S.W - Social Work' },
+                    { year: '2008-2009', course: 'B.Com' },
+                    { year: '2008-2009', course: 'B.Sc - Information Technology' },
+                    { year: '2009-2010', course: 'B.B.A.' },
+                    { year: '2010-2011', course: 'B.A. - English' },
+                    { year: '2011-2012', course: 'M.B.A - Master of Business Administration' },
+                    { year: '2015-2016', course: 'M. Phil in Management Studies' },
+                    { year: '2017-2018', course: 'B. Sc Psychology' },
+                  ].map((item, i) => (
+                    <tr key={i} className="hover:bg-blue-50 transition-colors">
+                      <td className="p-4 font-bold text-primary-blue">{item.year}</td>
+                      <td className="p-4 font-medium">{item.course}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Founder Section */}
+      <Section id="founder" className="bg-white">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="h-96 bg-gradient-to-br from-primary-blue to-secondary-emerald rounded-xl flex items-center justify-center"
+              className="sticky top-24 bg-gradient-to-br from-primary-blue to-secondary-emerald rounded-xl flex flex-col items-center justify-center p-8 text-center text-white shadow-elevated"
             >
-              <div className="text-center text-white">
-                <div className="text-8xl mb-4">👨‍🎓</div>
-                <p className="font-bold text-lg">Founder</p>
-                <p className="text-sm">Dr. Name Here</p>
-              </div>
+              <div className="text-8xl mb-4 bg-white/20 p-6 rounded-full backdrop-blur-sm border border-white/30">👨‍🎓</div>
+              <h3 className="font-bold text-3xl mb-1">Dr. (Capt) D.V.P Raja</h3>
+              <p className="text-lg font-medium text-white/90 mb-4">Founder & Chairman</p>
+              <div className="w-16 h-1 bg-secondary-gold rounded-full mb-6"></div>
+              <p className="text-sm text-white/80 italic max-w-xs">
+                "Fighting throughout his life for the upliftment and betterment of society in general and the elderly in particular."
+              </p>
             </motion.div>
 
             <motion.div
@@ -161,17 +252,46 @@ export default function About() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
+              className="space-y-6 text-gray-700 leading-relaxed"
             >
-              <h2 className="text-4xl font-bold text-primary-navy mb-6">Our Founder's Vision</h2>
-              <p className="text-lg text-gray-600 mb-4">
-                Founded in 1980 by visionary educators, MISS College was established with a mission to provide world-class education accessible to deserving students from all backgrounds.
+              <h2 className="text-4xl font-bold text-primary-navy mb-6">Our Founder's Journey</h2>
+              
+              <p>
+                Born of agriculturist parents in a small town of Rajapalayam, <strong className="text-primary-navy">Dr. (Capt) D.V.P Raja</strong> is a self-made man of 80 years who has been fighting throughout his life for the upliftment and betterment of society in general and the elderly in particular.
               </p>
-              <p className="text-lg text-gray-600 mb-4">
-                The founder believed that education is the greatest equalizer and dedicated his life to building an institution that would serve as a beacon of academic excellence.
+
+              <div className="bg-white p-6 rounded-xl shadow-soft border-l-4 border-primary-blue">
+                <p className="mb-4">
+                  A turning point in his life occurred when he was just 10 years of age through a divine moment which blessed him with a meeting of one gentleman Nallakutralam Pillai, a renowned social worker of those days who proved to be a source of inspiration and sowed the seeds of social service into the tender mind and heart of a budding social activist.
+                </p>
+                <p>
+                  The candle thus lighted at age of ten was made to glow still brighter like the star of first magnitude in the firmament of social service by Rev.Fr. Bonhoure of St. Xavier’s College, Palayamkottai, Tirunelveli where Raja pursued his UG course in 1955 – 59. As the second source of inspiration he was instrumental in extending social service activities beyond a limited circle by elevating him to the level of General Secretary of Social Service Club.
+                </p>
+              </div>
+
+              <p>
+                That the true concept of social service is not confined to the four walls of a college campus but has to reach the last man in the society was taught to him by Prof. S. Ramanathan, an illustrious teacher and Dr. G.R. Damodaran, the Director & Founder of PSG Educational Institutions where Raja pursued PG Course in Social Work. They guided him in the right direction by encouraging him to do a microscopic analysis of the beggar problem in Tamil Nadu. The extensive survey of the problem was successfully completed when Raja completed Post Graduate Studies in Social Work in P.S.G College of Social Work.
               </p>
-              <p className="text-lg text-gray-600">
-                Today, his legacy continues through thousands of successful alumni who have made remarkable contributions to society.
+
+              <h3 className="text-2xl font-bold text-primary-navy mt-8 mb-4">Service to the Nation & Education</h3>
+              <p>
+                In the year 1962 when China attacked India, Emergency was declared. With a patriotic spirit, he joined the Indian Army and served as Captain during the Chinese (1962) and Pakistan (1965) wars. After emergency, he left military service just to establish a College of Social Work to inculcate the spirit of service in the minds of the youth.
               </p>
+              
+              <p className="font-semibold text-primary-blue">
+                In the year 1969 on 2nd October, coincident with the birth centenary day of Mahatma Gandhiji, the Father of the Nation, Madurai Institute of Social Sciences was founded and his long desire was fulfilled.
+              </p>
+              
+              <p>
+                He served as Principal of the College for more than 4 decades and moved with students so closely, accepting them as they are with their strengths and weaknesses.
+              </p>
+
+              <div className="bg-neutral-light p-6 rounded-xl mt-6">
+                <h4 className="font-bold text-primary-navy mb-2">The Legacy Continues</h4>
+                <p className="text-sm">
+                  Now Madurai Institute of Social Sciences is a multi-faculty college and research Centre. It achieved Autonomous status in 2009, was Re-accredited with ‘A’ Grade by NAAC in 2014, got extension of Autonomy in 2016, and was Re-Accredited with "B+" Grade in 2019. The college presently offers 4 Post Graduate, 8 Under Graduate, 3 Diploma, two M.Phil and Ph.D programmes. Our Founder-Chairman is instrumental behind the success of the college.
+                </p>
+              </div>
             </motion.div>
           </div>
         </Container>
@@ -301,10 +421,10 @@ export default function About() {
               {/* Quick stats */}
               <div className="grid grid-cols-2 gap-3 w-full">
                 {[
-                  { value: '1980', label: 'Est.' },
-                  { value: 'Grade A', label: 'NAAC' },
-                  { value: '45+', label: 'Years' },
-                  { value: '8000+', label: 'Students' },
+                  { value: '1969', label: 'Est.' },
+                  { value: 'Grade B+', label: 'NAAC' },
+                  { value: 'Autonomous', label: 'Status' },
+                  { value: '3.15 Acres', label: 'Campus' },
                 ].map((s) => (
                   <div key={s.label} className="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/10">
                     <p className="text-white font-bold text-lg leading-none">{s.value}</p>
@@ -324,69 +444,47 @@ export default function About() {
             >
               {[
                 {
-                  label: 'Establishment & Recognition',
-                  icon: '🏛️',
-                  value: 'Est. 1980',
-                  details: [
-                    { k: 'Founded', v: '1980' },
-                    { k: 'Type', v: 'Arts & Science College' },
-                    { k: 'Affiliation', v: 'Madurai Kamaraj University' },
-                    { k: 'Recognition', v: 'UGC, AICTE Approved' },
-                  ],
-                },
-                {
-                  label: 'Accreditation & Rankings',
-                  icon: '🏆',
-                  value: 'NAAC Grade A',
-                  details: [
-                    { k: 'NAAC', v: 'Grade A Accredited' },
-                    { k: 'ISO', v: '9001:2015 Certified' },
-                    { k: 'NIRF', v: 'Ranked Institution' },
-                    { k: 'NBA', v: 'Accredited Programs' },
-                  ],
-                },
-                {
-                  label: 'Academic Strength',
-                  icon: '📚',
-                  value: '12 Departments',
-                  details: [
-                    { k: 'Departments', v: '12' },
-                    { k: 'UG Programs', v: '18+' },
-                    { k: 'PG Programs', v: '10+' },
-                    { k: 'Research Centers', v: '5' },
-                  ],
-                },
-                {
-                  label: 'People & Community',
-                  icon: '👥',
-                  value: '8000+ Students',
-                  details: [
-                    { k: 'Total Students', v: '8,000+' },
-                    { k: 'Faculty Members', v: '150+' },
-                    { k: 'Non-Teaching Staff', v: '80+' },
-                    { k: 'Alumni Network', v: '50,000+' },
-                  ],
-                },
-                {
-                  label: 'Campus & Infrastructure',
+                  label: 'Institution Details',
                   icon: '🏫',
-                  value: '50 Acre Campus',
+                  value: 'Madurai, Urban',
                   details: [
-                    { k: 'Campus Area', v: '50 Acres' },
-                    { k: 'Location', v: 'Madurai, Tamil Nadu' },
-                    { k: 'Hostels', v: 'Boys & Girls' },
-                    { k: 'Labs & Libraries', v: 'World-Class' },
+                    { k: 'Name', v: 'Madurai Institute of Social Sciences' },
+                    { k: 'Address', v: 'Alagar koil Road, Madurai-625002, TN' },
+                    { k: 'District', v: 'Madurai' },
+                    { k: 'Location & Area', v: 'Urban / 3.15 Acres' },
                   ],
                 },
                 {
-                  label: 'Placements & Industry',
-                  icon: '💼',
-                  value: '95%+ Placements',
+                  label: 'Affiliation & Management',
+                  icon: '🏛️',
+                  value: 'Autonomous, Co-education',
                   details: [
-                    { k: 'Placement Rate', v: '95%+' },
-                    { k: 'Recruiting Companies', v: '200+' },
-                    { k: 'Avg. Package', v: '₹4.5 LPA' },
-                    { k: 'Highest Package', v: '₹18 LPA' },
+                    { k: 'Affiliated To', v: 'Madurai Kamaraj University' },
+                    { k: 'Management', v: 'Private, Govt. Aided' },
+                    { k: 'Category / Type', v: 'Co-education / Autonomous' },
+                    { k: 'Faculty Type', v: 'Multi Faculty' },
+                  ],
+                },
+                {
+                  label: 'Recognition & Accreditation',
+                  icon: '🏆',
+                  value: 'NAAC & UGC Recognized',
+                  details: [
+                    { k: 'NAAC 2009', v: "Accredited 'B++'" },
+                    { k: 'NAAC 2014', v: "Re-accredited 'A' Grade" },
+                    { k: 'NAAC 2019', v: "Re-accredited 'B+' Grade" },
+                    { k: 'UGC Recognition', v: '2(f), 12.B' },
+                  ],
+                },
+                {
+                  label: 'Courses Offered',
+                  icon: '🎓',
+                  value: 'Aided & Unaided Programs',
+                  details: [
+                    { k: 'Aided Programs', v: 'PG-1' },
+                    { k: 'Unaided UG & PG', v: 'UG-8, PG-4' },
+                    { k: 'Unaided Research', v: 'M.Phil-2, Ph.D.-1' },
+                    { k: 'Unaided Diploma', v: 'P.G. Diploma-3, Diploma-1' },
                   ],
                 },
               ].map((item, index) => (

@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="../app/assets/logo.png" />
+        <link rel="icon" href="/logo.png" />
         <meta name="theme-color" content="#0F172A" />
       </head>
       <body className="bg-neutral-white text-primary-navy">

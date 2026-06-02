@@ -3,6 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 
 export function GlassCard({ title, description, icon: Icon, href, index }) {
   return (
@@ -40,10 +41,24 @@ export function DepartmentCard({ name, description, image, href, index }) {
       viewport={{ once: true }}
       className="group rounded-xl overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300"
     >
-      <div className="relative h-48 bg-gradient-to-br from-primary-blue to-secondary-emerald overflow-hidden">
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-sm font-semibold text-center px-4">{name}</span>
+      {/* Image banner or gradient fallback */}
+      <div className="relative h-48 overflow-hidden">
+        {image ? (
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, 25vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-blue to-secondary-emerald" />
+        )}
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors" />
+        {/* Name label */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <span className="text-white font-bold text-base drop-shadow">{name}</span>
         </div>
       </div>
       <div className="p-6 bg-white">

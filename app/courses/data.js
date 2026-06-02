@@ -259,6 +259,466 @@ export const courses = [
     color: 'from-indigo-600 to-blue-500',
     icon: '🔬',
   },
+  {
+  slug: 'bsw-social-work',
+  name: 'B.S.W. Social Work',
+  degree: 'Bachelor of Social Work',
+  department: 'Social Work',
+  duration: '3 Years',
+  type: 'Undergraduate',
+  mode: 'Full-Time',
+  seats: 60,
+  fee: '₹28,000 / year',
+  eligibility: '12th in Any Stream (Min. 45%)',
+  affiliation: 'Madurai Kamaraj University',
+  accreditation: 'NAAC Grade A',
+  commencementYear: '2005-2006',
+  overview:
+    'The Bachelor of Social Work program prepares students for professional careers in social welfare, counseling, community development, and NGO management through field-based learning and practical exposure.',
+  highlights: [
+    'Field work training every semester',
+    'NGO internship opportunities',
+    'Community outreach programs',
+    'Professional counseling workshops',
+    'Social research exposure',
+    'Rural and urban camp activities',
+  ],
+  curriculum: [
+    {
+      semester: 'Semester I',
+      subjects: ['Introduction to Social Work', 'Sociology', 'Psychology', 'English', 'Communication Skills'],
+    },
+    {
+      semester: 'Semester II',
+      subjects: ['Human Growth & Development', 'Social Case Work', 'Economics', 'Field Work', 'Environmental Studies'],
+    },
+    {
+      semester: 'Semester III',
+      subjects: ['Community Organization', 'Social Welfare Administration', 'Counseling Basics', 'Field Work', 'Rural Development'],
+    },
+    {
+      semester: 'Semester IV',
+      subjects: ['Medical & Psychiatric Social Work', 'NGO Management', 'Women Empowerment', 'Field Work', 'Research Basics'],
+    },
+    {
+      semester: 'Semester V',
+      subjects: ['Human Rights', 'Youth Development', 'Disaster Management', 'Internship', 'Elective I'],
+    },
+    {
+      semester: 'Semester VI',
+      subjects: ['Project Work', 'Social Policy', 'Industrial Social Work', 'Elective II', 'Viva Voce'],
+    },
+  ],
+  faculty: [
+    { name: 'Dr. P. Jaya Kumar', designation: 'Head of Department', qualification: 'Ph.D. Social Work' },
+    { name: 'Prof. S. Mary', designation: 'Assistant Professor', qualification: 'MSW, NET' },
+  ],
+  careerProspects: [
+    'Social Worker',
+    'NGO Coordinator',
+    'Counselor',
+    'Community Development Officer',
+    'Human Resource Executive',
+    'Child Welfare Officer',
+  ],
+  topRecruiters: ['UNICEF', 'NGOs', 'Hospitals', 'Schools', 'CSR Organizations'],
+  color: 'from-rose-500 to-pink-500',
+  icon: '🤝',
+},
+
+{
+  slug: 'bcom-computer-applications',
+  name: 'B.Com. Computer Applications',
+  degree: 'Bachelor of Commerce',
+  department: 'Commerce',
+  duration: '3 Years',
+  type: 'Undergraduate',
+  mode: 'Full-Time',
+  seats: 70,
+  fee: '₹35,000 / year',
+  eligibility: '12th Commerce / Any Stream',
+  affiliation: 'Madurai Kamaraj University',
+  accreditation: 'NAAC Grade A',
+  commencementYear: '1999-2000',
+  overview:
+    'The B.Com Computer Applications program integrates commerce education with modern computer application skills and accounting technologies.',
+  highlights: [
+    'Accounting software training',
+    'Tally & GST practical sessions',
+    'Programming basics included',
+    'Industry-oriented curriculum',
+    'Commerce + IT integration',
+  ],
+  curriculum: [
+  {
+    semester: 'Semester I',
+    subjects: [
+      'Financial Accounting',
+      'Business Economics',
+      'Business Communication',
+      'Computer Fundamentals',
+      'English'
+    ],
+  },
+  {
+    semester: 'Semester II',
+    subjects: [
+      'Advanced Financial Accounting',
+      'Business Statistics',
+      'Programming in C',
+      'Office Automation',
+      'Environmental Studies'
+    ],
+  },
+  {
+    semester: 'Semester III',
+    subjects: [
+      'Corporate Accounting',
+      'Database Management Systems',
+      'Java Programming',
+      'Cost Accounting',
+      'Business Law'
+    ],
+  },
+  {
+    semester: 'Semester IV',
+    subjects: [
+      'Income Tax Law & Practice',
+      'Web Technologies',
+      'Computerized Accounting (Tally ERP)',
+      'Management Accounting',
+      'E-Commerce'
+    ],
+  },
+  {
+    semester: 'Semester V',
+    subjects: [
+      'GST & Indirect Taxation',
+      'Computer Networks',
+      'Financial Management',
+      'Software Engineering',
+      'Project Work'
+    ],
+  },
+  {
+    semester: 'Semester VI',
+    subjects: [
+      'Auditing',
+      'Entrepreneurship Development',
+      'Management Information Systems',
+      'Digital Banking',
+      'Major Project & Viva Voce'
+    ],
+  },
+],
+  faculty: [
+    { name: 'Prof. R. Kumar', designation: 'Head of Department', qualification: 'M.Com, M.Phil' },
+  ],
+  careerProspects: [
+    'Accountant',
+    'Tax Consultant',
+    'Bank Officer',
+    'ERP Executive',
+    'Financial Analyst',
+  ],
+  topRecruiters: ['HDFC', 'ICICI', 'TCS', 'Infosys'],
+  color: 'from-green-500 to-emerald-500',
+  icon: '💹',
+},
+
+{
+  slug: 'bsc-information-technology',
+  name: 'B.Sc. Information Technology',
+  degree: 'Bachelor of Science',
+  department: 'Computer Science',
+  duration: '3 Years',
+  type: 'Undergraduate',
+  mode: 'Full-Time',
+  seats: 60,
+  fee: '₹42,000 / year',
+  eligibility: '12th with Mathematics',
+  affiliation: 'Madurai Kamaraj University',
+  accreditation: 'NAAC Grade A',
+  commencementYear: '2008-2009',
+  overview:
+    'The B.Sc Information Technology program focuses on software technologies, networking, databases, and web development.',
+  highlights: [
+    'Modern computer labs',
+    'Cloud & web development training',
+    'Mini projects every semester',
+    'Industry internship support',
+  ],
+ curriculum: [
+  {
+    semester: 'Semester I',
+    subjects: [
+      'Fundamentals of Information Technology',
+      'Programming in C',
+      'Computer Organization',
+      'Mathematics for Computing',
+      'English Communication Skills'
+    ],
+  },
+  {
+    semester: 'Semester II',
+    subjects: [
+      'Data Structures',
+      'Digital Electronics',
+      'Object Oriented Programming with C++',
+      'Database Management Systems',
+      'Environmental Studies'
+    ],
+  },
+  {
+    semester: 'Semester III',
+    subjects: [
+      'Java Programming',
+      'Operating Systems',
+      'Computer Networks',
+      'Web Technologies',
+      'Software Engineering'
+    ],
+  },
+  {
+    semester: 'Semester IV',
+    subjects: [
+      'Python Programming',
+      'Data Communication & Networking',
+      'Advanced Database Systems',
+      'Mobile Application Development',
+      'Computer Graphics'
+    ],
+  },
+  {
+    semester: 'Semester V',
+    subjects: [
+      'Cloud Computing',
+      'Cyber Security',
+      'Internet of Things (IoT)',
+      'Data Analytics',
+      'Mini Project'
+    ],
+  },
+  {
+    semester: 'Semester VI',
+    subjects: [
+      'Artificial Intelligence',
+      'Machine Learning',
+      'Full Stack Development',
+      'Major Project',
+      'Professional Ethics & Entrepreneurship'
+    ],
+  },
+],
+  faculty: [
+    { name: 'Dr. A. Rajkumar', designation: 'Head of Department', qualification: 'Ph.D. Computer Science' },
+  ],
+  careerProspects: [
+    'Web Developer',
+    'Software Engineer',
+    'Database Administrator',
+    'System Analyst',
+  ],
+  topRecruiters: ['Zoho', 'Infosys', 'TCS', 'Wipro'],
+  color: 'from-cyan-500 to-blue-500',
+  icon: '🖥️',
+},
+
+{
+  slug: 'bba',
+  name: 'B.B.A.',
+  degree: 'Bachelor of Business Administration',
+  department: 'Management Studies',
+  duration: '3 Years',
+  type: 'Undergraduate',
+  mode: 'Full-Time',
+  seats: 60,
+  fee: '₹38,000 / year',
+  eligibility: '12th in Any Stream',
+  affiliation: 'Madurai Kamaraj University',
+  accreditation: 'NAAC Grade A',
+  commencementYear: '2009-2010',
+  overview:
+    'The BBA program develops leadership, entrepreneurship, marketing, finance, and management skills for future business professionals.',
+  highlights: [
+    'Industry-oriented learning',
+    'Business case studies',
+    'Entrepreneurship workshops',
+    'Management internships',
+  ],
+curriculum: [
+  {
+    semester: 'Semester I',
+    subjects: [
+      'Principles of Management',
+      'Business Communication',
+      'Financial Accounting',
+      'Business Economics',
+      'English'
+    ],
+  },
+  {
+    semester: 'Semester II',
+    subjects: [
+      'Organizational Behaviour',
+      'Business Mathematics',
+      'Marketing Management',
+      'Computer Applications in Business',
+      'Environmental Studies'
+    ],
+  },
+  {
+    semester: 'Semester III',
+    subjects: [
+      'Human Resource Management',
+      'Cost Accounting',
+      'Business Statistics',
+      'Business Law',
+      'Entrepreneurship Development'
+    ],
+  },
+  {
+    semester: 'Semester IV',
+    subjects: [
+      'Financial Management',
+      'Operations Management',
+      'Management Information Systems',
+      'Consumer Behaviour',
+      'Research Methodology'
+    ],
+  },
+  {
+    semester: 'Semester V',
+    subjects: [
+      'Strategic Management',
+      'International Business',
+      'Digital Marketing',
+      'Elective I',
+      'Mini Project'
+    ],
+  },
+  {
+    semester: 'Semester VI',
+    subjects: [
+      'Business Ethics & Corporate Governance',
+      'Leadership & Team Management',
+      'Elective II',
+      'Major Project',
+      'Viva Voce'
+    ],
+  },
+],
+  faculty: [
+    { name: 'Dr. R. Krishnan', designation: 'Head of Department', qualification: 'Ph.D. Management' },
+  ],
+  careerProspects: [
+    'HR Executive',
+    'Marketing Executive',
+    'Business Analyst',
+    'Entrepreneur',
+  ],
+  topRecruiters: ['HCL', 'Deloitte', 'Amazon', 'Reliance'],
+  color: 'from-orange-500 to-amber-500',
+  icon: '📈',
+},
+
+{
+  slug: 'bsc-psychology',
+  name: 'B.Sc. Psychology',
+  degree: 'Bachelor of Science',
+  department: 'Psychology',
+  duration: '3 Years',
+  type: 'Undergraduate',
+  mode: 'Full-Time',
+  seats: 40,
+  fee: '₹32,000 / year',
+  eligibility: '12th in Any Stream',
+  affiliation: 'Madurai Kamaraj University',
+  accreditation: 'NAAC Grade A',
+  commencementYear: '2018-2019',
+  overview:
+    'The B.Sc Psychology program explores human behavior, counseling, mental health, and psychological assessment techniques.',
+  highlights: [
+    'Counseling practical sessions',
+    'Mental health awareness activities',
+    'Psychology lab facilities',
+    'Field visits & case studies',
+  ],
+ curriculum: [
+  {
+    semester: 'Semester I',
+    subjects: [
+      'General Psychology',
+      'Human Development',
+      'Biological Basis of Behaviour',
+      'English Communication',
+      'Environmental Studies'
+    ],
+  },
+  {
+    semester: 'Semester II',
+    subjects: [
+      'Cognitive Psychology',
+      'Social Psychology',
+      'Research Methods in Psychology',
+      'Psychological Statistics',
+      'Computer Applications'
+    ],
+  },
+  {
+    semester: 'Semester III',
+    subjects: [
+      'Personality Psychology',
+      'Educational Psychology',
+      'Abnormal Psychology',
+      'Psychological Testing',
+      'Counselling Skills'
+    ],
+  },
+  {
+    semester: 'Semester IV',
+    subjects: [
+      'Health Psychology',
+      'Industrial Psychology',
+      'Developmental Psychology',
+      'Psychological Assessment',
+      'Field Work Practicum'
+    ],
+  },
+  {
+    semester: 'Semester V',
+    subjects: [
+      'Clinical Psychology',
+      'Organizational Behaviour',
+      'Positive Psychology',
+      'Community Psychology',
+      'Mini Project'
+    ],
+  },
+  {
+    semester: 'Semester VI',
+    subjects: [
+      'Counselling Psychology',
+      'Mental Health & Well-being',
+      'Rehabilitation Psychology',
+      'Major Project',
+      'Viva Voce'
+    ],
+  },
+],
+  faculty: [
+    { name: 'Dr. S. Priya', designation: 'Head of Department', qualification: 'Ph.D. Psychology' },
+  ],
+  careerProspects: [
+    'Counselor',
+    'Psychologist',
+    'HR Executive',
+    'Behavior Analyst',
+  ],
+  topRecruiters: ['Hospitals', 'Schools', 'NGOs', 'Counseling Centers'],
+  color: 'from-violet-500 to-fuchsia-500',
+  icon: '🧠',
+},
 ]
 
 export function getCourse(slug) {
