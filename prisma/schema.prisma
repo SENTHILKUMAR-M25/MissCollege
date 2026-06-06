@@ -1,0 +1,191 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  faculty   Faculty?
+  student   Student?
+  notices   Notice[]
+
+  @@index([email])
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  description String?
+  
+  courses     Course[]
+  subjects    Subject[]
+  faculty     Faculty[]
+  students    Student[]
+}
+
+model Course {
+  id           String     @id @default(uuid())
+  name         String
+  code         String     @unique
+  duration     String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  
+  students     Student[]
+}
+
+model Subject {
+  id           String     @id @default(uuid())
+  name         String
+  code         String     @unique
+  credits      Int
+  semester     Int
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  facultyId    String?
+  faculty      Faculty?   @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  
+  attendance      Attendance[]
+  internalMarks   InternalMark[]
+  semesterResults SemesterResult[]
+}
+
+model Faculty {
+  id           String     @id @default(uuid())
+  facultyId    String     @unique
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  designation  String
+  qualification String
+  phone        String?
+  accountStatus Boolean   @default(true)
+  
+  // Basic Details
+  gender       String?
+  dateOfBirth  DateTime?
+  profilePhoto String?
+  
+  // Contact Details
+  alternateNumber String?
+  address         String?
+  
+  // Professional Details
+  specialization  String?
+  experience      Int?
+  joiningDate     DateTime?
+  
+  // Academic Assignment
+  assignedSemesters String?
+  assignedSections  String?
+  
+  // Documents
+  resumeUrl                 String?
+  appointmentOrderUrl       String?
+  joiningLetterUrl          String?
+  eduCertificatesUrl        String?
+  experienceCertificatesUrl String?
+  aadharCardUrl             String?
+  panCardUrl                String?
+  idCardUrl                 String?
+  bankDetailsUrl            String?
+  relievingLetterUrl        String?
+
+  subjects     Subject[]
+  attendance   Attendance[]
+}
+
+model Student {
+  id             String     @id @default(uuid())
+  registerNumber String     @unique
+  userId         String     @unique
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId   String
+  department     Department @relation(fields: [departmentId], references: [id])
+  courseId       String
+  course         Course     @relation(fields: [courseId], references: [id])
+  semester       Int
+  section        String
+  phone          String?
+  admissionYear  Int
+  
+  attendance      Attendance[]
+  internalMarks   InternalMark[]
+  semesterResults SemesterResult[]
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  studentId String
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  facultyId String
+  faculty   Faculty          @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  date      DateTime         @db.Date
+  status    AttendanceStatus
+  
+  @@unique([studentId, subjectId, date])
+  @@index([studentId, date])
+}
+
+model InternalMark {
+  id        String  @id @default(uuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  mark      Float
+  examType  String
+  
+  @@unique([studentId, subjectId, examType])
+}
+
+model SemesterResult {
+  id        String  @id @default(uuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  grade     String
+  mark      Float
+  semester  Int
+  
+  @@unique([studentId, subjectId])
+}
+
+model Notice {
+  id             String   @id @default(uuid())
+  title          String
+  description    String
+  targetAudience String
+  createdBy      String
+  creator        User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
