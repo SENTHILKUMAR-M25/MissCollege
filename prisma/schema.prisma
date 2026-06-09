@@ -79,7 +79,8 @@ model Course {
   departmentId String
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-  students Student[]
+  students    Student[]
+  timetables  Timetable[]
 }
 
 model Subject {
@@ -326,17 +327,32 @@ model AssignmentSubmission {
   @@index([studentId])
 }
 
+model Period {
+  id           String   @id @default(uuid())
+  periodNumber Int      @unique
+  name         String
+  startTime    String
+  endTime      String
+  isBreak      Boolean  @default(false)
+  displayOrder Int      @default(0)
+
+  @@index([periodNumber])
+}
+
 model Timetable {
   id           String     @id @default(uuid())
   facultyId    String
   faculty      Faculty    @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   departmentId String
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  courseId     String?
+  course       Course?    @relation(fields: [courseId], references: [id], onDelete: Cascade)
   subjectId    String?
   subject      Subject?   @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   className    String
   section      String
   dayOfWeek    Int
+  periodNumber Int?
   startTime    String
   endTime      String
   classroom    String
@@ -344,8 +360,10 @@ model Timetable {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@index([facultyId, dayOfWeek, startTime])
-  @@index([classroom, dayOfWeek, startTime])
+  @@index([facultyId, dayOfWeek, periodNumber])
+  @@index([classroom, dayOfWeek, periodNumber])
+  @@index([departmentId, courseId, semester, section])
+  @@index([className, section, dayOfWeek, periodNumber])
 }
 
 model ClassAssignment {
