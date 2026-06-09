@@ -242,26 +242,26 @@ export default function StudentsClient({ students, departments, courses, stats }
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-2 bg-slate-800/60 border border-white/5 rounded-xl px-3 py-2 flex-1 min-w-48">
-          <Search size={15} className="text-slate-400 shrink-0" />
+      {/* Filters - single line */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-slate-800/60 border border-white/5 rounded-xl px-3 py-1.5 flex-1 min-w-0">
+          <Search size={14} className="text-slate-400 shrink-0" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, reg no, email…"
-            className="bg-transparent text-white text-sm placeholder:text-slate-500 outline-none flex-1" />
+            className="bg-transparent text-white text-xs placeholder:text-slate-500 outline-none flex-1 min-w-0" />
         </div>
-        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className={sel + " min-w-36"}>
-          <option value="All">All Departments</option>
+        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 whitespace-nowrap">
+          <option value="All">All Depts</option>
           {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
-        <select value={semFilter} onChange={e => setSemFilter(e.target.value)} className={sel}>
+        <select value={semFilter} onChange={e => setSemFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-24">
           <option value="All">All Sems</option>
           {SEMESTERS.map(s => <option key={s} value={s.toString()}>Sem {s}</option>)}
         </select>
-        <select value={secFilter} onChange={e => setSecFilter(e.target.value)} className={sel}>
-          <option value="All">All Sections</option>
+        <select value={secFilter} onChange={e => setSecFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-24">
+          <option value="All">All Secs</option>
           {SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={sel}>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-28">
           <option value="All">All Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
@@ -334,8 +334,9 @@ export default function StudentsClient({ students, departments, courses, stats }
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
             onClick={e => e.target === e.currentTarget && setModal(null)}>
-            <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
-              className="w-full max-w-3xl bg-slate-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+          <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-3xl bg-slate-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
 
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
                 <div className="flex items-center gap-3">

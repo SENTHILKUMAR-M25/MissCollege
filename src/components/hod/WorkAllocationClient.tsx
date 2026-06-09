@@ -643,8 +643,8 @@ export default function WorkAllocationClient({
 
       {/* ── Transfer Subject Modal ── */}
       {transferTarget && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setTransferTarget(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
             <h3 className="text-white font-bold">Transfer Subject</h3>
             <div>
               <label className="text-slate-400 text-xs mb-1.5 block">Transfer to Faculty</label>
@@ -669,8 +669,8 @@ export default function WorkAllocationClient({
 
       {/* ── Change Advisor Modal ── */}
       {changeAdvisorTarget && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setChangeAdvisorTarget(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
             <h3 className="text-white font-bold">Change Class Advisor</h3>
             <div>
               <label className="text-slate-400 text-xs mb-1.5 block">New Class Advisor</label>

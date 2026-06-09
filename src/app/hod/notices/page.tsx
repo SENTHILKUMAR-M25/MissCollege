@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma"
 import { requireHod } from "@/lib/permissions"
 import { redirect } from "next/navigation"
 import { Bell } from "lucide-react"
+import { getHodNotices } from "@/actions/notices"
 
 export default async function HodNoticesPage() {
   const user = await requireHod()
@@ -13,21 +14,8 @@ export default async function HodNoticesPage() {
 
   if (!me?.hodAssignments[0]) redirect("/unauthorized")
 
-  const notices = await prisma.notice.findMany({
-    where: {
-      OR: [
-        { targetAudience: "ALL" },
-        { targetAudience: "HOD" },
-        { targetAudience: "FACULTY" },
-        { departmentId: me.departmentId },
-      ],
-    },
-    include: {
-      creator: { select: { name: true, role: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 60,
-  })
+  const noticesResult = await getHodNotices(user.id)
+  const notices = noticesResult.success ? noticesResult.data : []
 
   const audienceColors: Record<string, string> = {
     ALL: "bg-slate-500/10 text-slate-400 border-slate-500/20",
@@ -66,7 +54,7 @@ export default async function HodNoticesPage() {
                     </span>
                   </div>
                   <p className="text-slate-500 text-xs mt-1">
-                    By {notice.creator?.name || "Admin"} ({notice.creator?.role}) • {new Date(notice.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    By {notice.creator?.name || "Admin"} • {new Date(notice.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
               </div>

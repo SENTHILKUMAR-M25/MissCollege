@@ -51,6 +51,7 @@ model Department {
   classAssignments ClassAssignment[]
   leaveRequests  LeaveRequest[]
   timetables     Timetable[]
+  sections       Section[]
 }
 
 model HodAssignment {
@@ -213,6 +214,7 @@ model Student {
   internalMarks   InternalMark[]
   semesterResults SemesterResult[]
   submissions     AssignmentSubmission[]
+  studentSections StudentSection[]
 }
 
 model Attendance {
@@ -357,9 +359,41 @@ model ClassAssignment {
   section        String
   assignmentStatus String @default("ACTIVE") // ACTIVE | TRANSFERRED | REMOVED
   assignedAt     DateTime   @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime   @updatedAt
 
   @@unique([departmentId, semester, section, assignedAt])
   @@index([facultyId])
   @@index([departmentId, semester, section])
+}
+
+model Section {
+  id              String    @id @default(uuid())
+  name            String
+  className       String
+  departmentId    String
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  academicYear    String
+  semester        Int
+  capacity        Int
+  assignedStudents Int      @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  studentSections StudentSection[]
+
+  @@index([departmentId, semester, academicYear])
+}
+
+model StudentSection {
+  id         String   @id @default(uuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sectionId  String
+  section    Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  assignedBy String?
+
+  @@unique([studentId, sectionId])
+  @@index([sectionId])
+  @@index([studentId])
 }

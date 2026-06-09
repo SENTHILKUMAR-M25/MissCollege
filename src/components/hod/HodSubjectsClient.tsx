@@ -13,6 +13,8 @@ type Subject = {
   semester: number
   subjectType: string
   isActive: boolean
+  academicYear?: string | null
+  regulation?: string | null
   facultyId?: string | null
   totalHoursPerWeek?: number | null
   faculty?: { user: { name: string } } | null
@@ -157,16 +159,24 @@ export default function HodSubjectsClient({
   }
 
   const handleAllocate = async () => {
-    if (!allocatingSubject || !facultyUserId) return
+    if (!allocatingSubject || !facultyUserId || selectedFacultyIds.length === 0) return
     setSaving(true)
     try {
-      const body: any = { action: "reassign", subjectId: allocatingSubject.id, facultyUserId, facultyIds: selectedFacultyIds }
-      if (Object.keys(hoursMap).length > 0) body.hoursMap = hoursMap
-      const res = await fetch("/api/hod-subjects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      const res = await fetch("/api/hod-subjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "allocate",
+          subjectId: allocatingSubject.id,
+          facultyIds: selectedFacultyIds,
+        }),
+      })
       const j = await res.json()
       if (!j.success) throw new Error(j.error)
-      showToast("success", "Faculty allocated")
+      showToast("success", "Faculty allocated successfully")
       setShowAllocate(false)
+      setSelectedFacultyIds([])
+      setHoursMap({})
       load()
     } catch (err: any) {
       showToast("error", err.message)
@@ -281,7 +291,7 @@ export default function HodSubjectsClient({
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button onClick={() => { setAllocatingSubject(sub); setSelectedFacultyIds((sub.facultySubjects || []).map((a) => a.facultyId)); setHoursMap((sub.facultySubjects || []).reduce((acc: Record<string, number>, a) => ({ ...acc, [a.facultyId]: a.assignedHours ?? 0 }), {})); setShowAllocate(true) }} className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"><Users size={14} /></button>
-                          <button onClick={() => { setEditingSubject(sub); setFormData({ name: sub.name, code: sub.code, credits: sub.credits.toString(), semester: sub.semester.toString(), subjectType: sub.subjectType, description: sub.description || "", totalHoursPerWeek: sub.totalHoursPerWeek?.toString() || "", academicYear: "", regulation: "" }); setShowEdit(true) }} className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"><Edit size={14} /></button>
+                          <button onClick={() => { setEditingSubject(sub); setFormData({ name: sub.name, code: sub.code, credits: sub.credits.toString(), semester: sub.semester.toString(), subjectType: sub.subjectType, description: sub.description || "", totalHoursPerWeek: sub.totalHoursPerWeek?.toString() || "", academicYear: sub.academicYear || "", regulation: sub.regulation || "" }); setShowEdit(true) }} className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"><Edit size={14} /></button>
                           <button onClick={() => handleDelete(sub.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash size={14} /></button>
                         </div>
                       </td>
@@ -295,8 +305,8 @@ export default function HodSubjectsClient({
 
       {/* Add/Edit Modal */}
       {(showAdd || showEdit) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowAdd(false); setShowEdit(false) }}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-white font-bold text-lg">{showAdd ? "Add Subject" : "Edit Subject"}</h3>
               <button onClick={() => { setShowAdd(false); setShowEdit(false) }} className="text-slate-400 hover:text-white"><X size={18} /></button>
@@ -354,8 +364,8 @@ export default function HodSubjectsClient({
 
       {/* Allocate Modal */}
       {showAllocate && allocatingSubject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowAllocate(false)}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-white font-bold text-lg">Allocate Faculty</h3>

@@ -122,6 +122,7 @@ export async function createSubject(facultyId: string, data: {
   departmentId: string
   semester: number
   credits: number
+  totalHoursPerWeek?: number
   subjectType?: string
   regulation?: string
   academicYear?: string
@@ -149,10 +150,11 @@ export async function createSubject(facultyId: string, data: {
         departmentId: deptId,
         semester: data.semester,
         credits: data.credits,
+        totalHoursPerWeek: data.totalHoursPerWeek || null,
         subjectType: data.subjectType || "THEORY",
-        regulation: data.regulation,
-        academicYear: data.academicYear,
-        description: data.description,
+        regulation: data.regulation || null,
+        academicYear: data.academicYear || null,
+        description: data.description || null,
       },
     })
 
@@ -177,6 +179,7 @@ export async function createSubject(facultyId: string, data: {
 export async function updateSubject(subjectId: string, facultyId: string, data: {
   name?: string
   credits?: number
+  totalHoursPerWeek?: number
   subjectType?: string
   regulation?: string
   academicYear?: string
@@ -200,6 +203,7 @@ export async function updateSubject(subjectId: string, facultyId: string, data: 
       data: {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.credits !== undefined && { credits: data.credits }),
+        ...(data.totalHoursPerWeek !== undefined && { totalHoursPerWeek: data.totalHoursPerWeek }),
         ...(data.subjectType !== undefined && { subjectType: data.subjectType }),
         ...(data.regulation !== undefined && { regulation: data.regulation }),
         ...(data.academicYear !== undefined && { academicYear: data.academicYear }),

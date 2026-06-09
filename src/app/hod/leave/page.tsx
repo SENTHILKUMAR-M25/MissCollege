@@ -59,7 +59,7 @@ export default async function HodLeavePage() {
         </div>
       </div>
 
-      <LeaveClient initialLeaves={serialized as any} />
+      <LeaveClient initialLeaves={serialized as any} facultyUserId={faculty.userId} />
     </div>
   )
 }

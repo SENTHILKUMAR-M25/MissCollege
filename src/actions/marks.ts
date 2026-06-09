@@ -81,28 +81,65 @@ export async function upsertMark(data: {
   cat2: number
   assignment: number
 }) {
-  const { studentId, subjectId, cat1, cat2, assignment } = data
+  try {
+    const { studentId, subjectId, cat1, cat2, assignment } = data
 
-  await prisma.$transaction([
-    prisma.internalMark.upsert({
-      where: { studentId_subjectId_examType: { studentId, subjectId, examType: "CAT1" } },
-      update: { mark: cat1 },
-      create: { studentId, subjectId, examType: "CAT1", mark: cat1 },
-    }),
-    prisma.internalMark.upsert({
-      where: { studentId_subjectId_examType: { studentId, subjectId, examType: "CAT2" } },
-      update: { mark: cat2 },
-      create: { studentId, subjectId, examType: "CAT2", mark: cat2 },
-    }),
-    prisma.internalMark.upsert({
-      where: { studentId_subjectId_examType: { studentId, subjectId, examType: "ASSIGNMENT" } },
-      update: { mark: assignment },
-      create: { studentId, subjectId, examType: "ASSIGNMENT", mark: assignment },
-    }),
-  ])
+    const subject = await prisma.subject.findUnique({
+      where: { id: subjectId },
+      select: { departmentId: true },
+    })
 
-  revalidatePath("/admin/marks")
-  return { success: true }
+    if (!subject) {
+      return { success: false, error: "Subject not found" }
+    }
+
+    const session = await (await import("@/lib/permissions")).getSession()
+    if (!session?.user || (session.user.role !== "HOD" && session.user.role !== "FACULTY")) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    if (session.user.role === "HOD") {
+      const hodFaculty = await prisma.faculty.findUnique({
+        where: { userId: session.user.id },
+        include: { hodAssignments: { where: { isActive: true } } },
+      })
+      if (!hodFaculty?.hodAssignments.some(a => a.departmentId === subject.departmentId)) {
+        return { success: false, error: "Unauthorized: Not your department" }
+      }
+    } else {
+      const faculty = await prisma.faculty.findUnique({
+        where: { userId: session.user.id },
+      })
+      if (!faculty || faculty.departmentId !== subject.departmentId) {
+        return { success: false, error: "Unauthorized: Not your department" }
+      }
+    }
+
+    await prisma.$transaction([
+      prisma.internalMark.upsert({
+        where: { studentId_subjectId_examType: { studentId, subjectId, examType: "CAT1" } },
+        update: { mark: cat1 },
+        create: { studentId, subjectId, examType: "CAT1", mark: cat1 },
+      }),
+      prisma.internalMark.upsert({
+        where: { studentId_subjectId_examType: { studentId, subjectId, examType: "CAT2" } },
+        update: { mark: cat2 },
+        create: { studentId, subjectId, examType: "CAT2", mark: cat2 },
+      }),
+      prisma.internalMark.upsert({
+        where: { studentId_subjectId_examType: { studentId, subjectId, examType: "ASSIGNMENT" } },
+        update: { mark: assignment },
+        create: { studentId, subjectId, examType: "ASSIGNMENT", mark: assignment },
+      }),
+    ])
+
+    revalidatePath("/admin/marks")
+    revalidatePath("/hod/examinations")
+    return { success: true }
+  } catch (error) {
+    console.error("Error upserting mark:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Failed to save mark" }
+  }
 }
 
 export async function getMarksFilters() {

@@ -115,7 +115,7 @@ export default async function StudentDashboard() {
                   </div>
                   <div className="flex items-center gap-3 ml-3">
                     <div className="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${s.pct >= 75 ? "bg-emerald-400" : s.pct >= 60 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${s.pct}%` }} />
+                      {/* <div className={`h-full rounded-full ${s.pct >= 75 ? "bg-emerald-400" : s.pct >= 60 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${s.pct}%` }} /> */}
                     </div>
                     <AttBadge pct={s.pct} />
                   </div>

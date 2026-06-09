@@ -132,6 +132,7 @@ export default function NoticesClient({ notices: initialNotices }: Props) {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
             <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
               className="w-full max-w-2xl bg-slate-800 border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
                 <h2 className="text-white font-bold">Create New Notice</h2>

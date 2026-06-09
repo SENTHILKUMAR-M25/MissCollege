@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { revalidatePath } from "next/cache"
 
 const hodLoginSchema = z.object({
   facultyId: z.string().min(1, "Faculty ID is required"),
@@ -78,6 +79,16 @@ export async function hodLogin(facultyId: string, dateOfBirth: string) {
     if (!hodAssignment) {
       return { success: false, error: "No active HOD assignment found" }
     }
+
+    await prisma.auditLog.create({
+      data: {
+        userId: faculty.user.id,
+        action: "HOD_LOGIN",
+        entityType: "HOD",
+        entityId: hodAssignment.departmentId,
+        details: `HOD login successful for department ${hodAssignment.department.name} (${hodAssignment.department.code})`,
+      },
+    })
 
     const mustChangePassword = !faculty.user.passwordChanged
 
@@ -287,8 +298,16 @@ export async function createTimetableEntry(data: {
   endTime: string
   classroom: string
   semester?: number
+  facultyUserId?: string
 }) {
   try {
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: data.facultyUserId || data.facultyId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+    if (hod.departmentId !== data.departmentId) return { success: false, error: "Forbidden" }
+
     if (data.dayOfWeek < 1 || data.dayOfWeek > 7) {
       return { success: false, error: "Invalid day of week" }
     }
@@ -349,6 +368,7 @@ export async function createTimetableEntry(data: {
       },
     })
 
+    revalidatePath("/hod/timetable")
     return { success: true, data: timetableEntry }
   } catch (error) {
     console.error("Error creating timetable entry:", error)
@@ -369,12 +389,15 @@ export async function updateTimetableEntry(
     endTime: string
     classroom: string
     semester?: number
+    facultyUserId: string
   }
 ) {
   try {
-    if (data.dayOfWeek < 1 || data.dayOfWeek > 7) {
-      return { success: false, error: "Invalid day of week" }
-    }
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: data.facultyUserId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
 
     const existing = await prisma.timetable.findUnique({
       where: { id },
@@ -382,6 +405,14 @@ export async function updateTimetableEntry(
 
     if (!existing) {
       return { success: false, error: "Timetable entry not found" }
+    }
+
+    if (existing.departmentId !== hod.departmentId) {
+      return { success: false, error: "Forbidden" }
+    }
+
+    if (data.dayOfWeek < 1 || data.dayOfWeek > 7) {
+      return { success: false, error: "Invalid day of week" }
     }
 
     const facultyConflict = await prisma.timetable.findFirst({
@@ -443,6 +474,7 @@ export async function updateTimetableEntry(
       },
     })
 
+    revalidatePath("/hod/timetable")
     return { success: true, data: updated }
   } catch (error) {
     console.error("Error updating timetable entry:", error)
@@ -450,8 +482,14 @@ export async function updateTimetableEntry(
   }
 }
 
-export async function deleteTimetableEntry(id: string, departmentId: string) {
+export async function deleteTimetableEntry(id: string, departmentId: string, facultyUserId: string) {
   try {
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: facultyUserId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+
     const entry = await prisma.timetable.findUnique({
       where: { id },
     })
@@ -460,14 +498,15 @@ export async function deleteTimetableEntry(id: string, departmentId: string) {
       return { success: false, error: "Timetable entry not found" }
     }
 
-    if (entry.departmentId !== departmentId) {
-      return { success: false, error: "Unauthorized: Entry belongs to different department" }
+    if (entry.departmentId !== hod.departmentId) {
+      return { success: false, error: "Forbidden" }
     }
 
     await prisma.timetable.delete({
       where: { id },
     })
 
+    revalidatePath("/hod/timetable")
     return { success: true, message: "Timetable entry deleted successfully" }
   } catch (error) {
     console.error("Error deleting timetable entry:", error)
@@ -475,8 +514,32 @@ export async function deleteTimetableEntry(id: string, departmentId: string) {
   }
 }
 
-export async function approveLeave(id: string, remarks?: string) {
+export async function approveLeave(id: string, remarks?: string, facultyUserId?: string) {
   try {
+    if (!facultyUserId) return { success: false, error: "Not authorized" }
+
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: facultyUserId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+
+    const leaveRequest = await prisma.leaveRequest.findUnique({
+      where: { id },
+    })
+
+    if (!leaveRequest) {
+      return { success: false, error: "Leave request not found" }
+    }
+
+    if (leaveRequest.departmentId !== hod.departmentId) {
+      return { success: false, error: "Forbidden" }
+    }
+
+    if (leaveRequest.status !== "PENDING") {
+      return { success: false, error: "Leave request already processed" }
+    }
+
     await prisma.leaveRequest.update({
       where: { id },
       data: {
@@ -485,6 +548,8 @@ export async function approveLeave(id: string, remarks?: string) {
         reviewRemarks: remarks || null,
       },
     })
+
+    revalidatePath("/hod/leave")
     return { success: true, message: "Leave request approved successfully" }
   } catch (error) {
     console.error("Error approving leave:", error)
@@ -492,16 +557,46 @@ export async function approveLeave(id: string, remarks?: string) {
   }
 }
 
-export async function rejectLeave(id: string, remarks?: string) {
+export async function rejectLeave(id: string, remarks?: string, facultyUserId?: string) {
   try {
+    if (!facultyUserId) return { success: false, error: "Not authorized" }
+
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: facultyUserId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+
+    const leaveRequest = await prisma.leaveRequest.findUnique({
+      where: { id },
+    })
+
+    if (!leaveRequest) {
+      return { success: false, error: "Leave request not found" }
+    }
+
+    if (leaveRequest.departmentId !== hod.departmentId) {
+      return { success: false, error: "Forbidden" }
+    }
+
+    if (leaveRequest.status !== "PENDING") {
+      return { success: false, error: "Leave request already processed" }
+    }
+
+    if (!remarks || remarks.trim() === "") {
+      return { success: false, error: "Remarks are required for rejection" }
+    }
+
     await prisma.leaveRequest.update({
       where: { id },
       data: {
         status: "REJECTED",
         reviewedBy: "HOD",
-        reviewRemarks: remarks || null,
+        reviewRemarks: remarks,
       },
     })
+
+    revalidatePath("/hod/leave")
     return { success: true, message: "Leave request rejected successfully" }
   } catch (error) {
     console.error("Error rejecting leave:", error)

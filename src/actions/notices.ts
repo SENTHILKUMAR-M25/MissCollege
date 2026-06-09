@@ -21,34 +21,118 @@ export async function getNotices() {
 }
 
 export async function createNotice(formData: FormData) {
-  // We use a system admin user for notices - find or create
-  let adminUser = await prisma.user.findFirst({
-    where: { role: "ADMIN" },
-    select: { id: true },
-  })
+  try {
+    const title = (formData.get("title") || "").toString().trim()
+    const description = (formData.get("description") || "").toString().trim()
+    const targetAudience = (formData.get("targetAudience") || "").toString().trim()
 
-  if (!adminUser) {
-    return { success: false, error: "No admin user found" }
+    if (!title || title.length < 3) return { success: false, error: "Title must be at least 3 characters" }
+    if (!description || description.length < 5) return { success: false, error: "Description must be at least 5 characters" }
+    if (!targetAudience) return { success: false, error: "Audience is required" }
+
+    const users = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { id: true },
+    })
+
+    if (users.length === 0) {
+      return { success: false, error: "No admin user found" }
+    }
+
+    const notice = await prisma.notice.create({
+      data: {
+        title,
+        description,
+        targetAudience,
+        createdBy: users[0].id,
+      },
+      include: {
+        creator: { select: { name: true } },
+      },
+    })
+
+    revalidatePath("/admin/announcements")
+    revalidatePath("/admin/notices")
+    return { success: true, data: notice }
+  } catch (error) {
+    console.error("Error creating notice:", error)
+    return { success: false, error: "Failed to create notice" }
   }
-
-  const data = noticeSchema.safeParse({
-    title: formData.get("title"),
-    description: formData.get("description"),
-    targetAudience: formData.get("targetAudience") ?? "All",
-    createdBy: adminUser.id,
-  })
-
-  if (!data.success) {
-    return { success: false, error: data.error.issues[0]?.message || "Invalid notice details" }
-  }
-
-  await prisma.notice.create({ data: data.data })
-  revalidatePath("/admin/announcements")
-  return { success: true }
 }
 
 export async function deleteNotice(id: string) {
-  await prisma.notice.delete({ where: { id } })
-  revalidatePath("/admin/announcements")
-  return { success: true }
+  try {
+    await prisma.notice.delete({ where: { id } })
+    revalidatePath("/admin/announcements")
+    revalidatePath("/admin/notices")
+    return { success: true }
+  } catch (error) {
+    console.error("Error deleting notice:", error)
+    return { success: false, error: "Failed to delete notice" }
+  }
+}
+
+export async function createDepartmentNotice(data: {
+  title: string
+  description: string
+  targetAudience: string
+  departmentId: string
+  createdByUserId: string
+}) {
+  try {
+    const hod = await prisma.faculty.findUnique({
+      where: { userId: data.createdByUserId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+    if (hod.departmentId !== data.departmentId) return { success: false, error: "Forbidden" }
+
+    const notice = await prisma.notice.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        targetAudience: data.targetAudience,
+        createdBy: data.createdByUserId,
+      },
+      include: {
+        creator: { select: { name: true } },
+      },
+    })
+
+    revalidatePath("/hod/notices")
+    return { success: true, data: notice }
+  } catch (error) {
+    console.error("Error creating department notice:", error)
+    return { success: false, error: "Failed to create notice" }
+  }
+}
+
+export async function getHodNotices(userId: string) {
+  try {
+    const hod = await prisma.faculty.findUnique({
+      where: { userId },
+      include: { hodAssignments: { where: { isActive: true } } },
+    })
+    if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+
+    const notices = await prisma.notice.findMany({
+      where: {
+        OR: [
+          { targetAudience: "ALL" },
+          { targetAudience: "HOD" },
+          { targetAudience: "FACULTY" },
+        ],
+      },
+      include: {
+        creator: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    })
+
+    return { success: true, data: notices }
+  } catch (error) {
+    console.error("Error fetching HoD notices:", error)
+    return { success: false, error: "Failed to fetch notices" }
+  }
 }

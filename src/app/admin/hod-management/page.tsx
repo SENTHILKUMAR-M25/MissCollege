@@ -335,7 +335,8 @@ export default function HodManagementPage() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-2xl bg-slate-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-slate-800 border border-white/10 rounded-2xl shadow-2xl p-6"
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 sticky top-0 bg-slate-800 z-10">
                 <div>

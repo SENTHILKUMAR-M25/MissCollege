@@ -23,7 +23,7 @@ type LeaveRequest = {
   department: { name: string; code: string }
 }
 
-export default function LeaveClient({ initialLeaves }: { initialLeaves: LeaveRequest[] }) {
+export default function LeaveClient({ initialLeaves, facultyUserId }: { initialLeaves: LeaveRequest[]; facultyUserId: string }) {
   const [leaves, setLeaves] = useState(initialLeaves)
   const [loading, setLoading] = useState<string | null>(null)
   const [remarks, setRemarks] = useState<Record<string, string>>({})
@@ -31,7 +31,7 @@ export default function LeaveClient({ initialLeaves }: { initialLeaves: LeaveReq
 
   async function handleApprove(id: string) {
     setLoading(id)
-    const result = await approveLeave(id, remarks[id] || undefined)
+    const result = await approveLeave(id, remarks[id] || undefined, facultyUserId)
     if (result.success) {
       toast.success("Leave request approved!")
       setLeaves((prev) => prev.map((l) => l.id === id ? { ...l, status: "APPROVED", reviewRemarks: remarks[id] || null } : l))
@@ -47,7 +47,7 @@ export default function LeaveClient({ initialLeaves }: { initialLeaves: LeaveReq
       return
     }
     setLoading(id)
-    const result = await rejectLeave(id, remarks[id])
+    const result = await rejectLeave(id, remarks[id], facultyUserId)
     if (result.success) {
       toast.success("Leave request rejected")
       setLeaves((prev) => prev.map((l) => l.id === id ? { ...l, status: "REJECTED", reviewRemarks: remarks[id] } : l))

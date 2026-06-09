@@ -26,8 +26,17 @@ const updateClassAssignmentSchema = z.object({
   facultyId: z.string().min(1, "Faculty is required").optional(),
 })
 
-export async function getClassAssignments(departmentId: string, semester?: number, section?: string) {
+export async function getClassAssignments(departmentId: string, semester?: number, section?: string, facultyUserId?: string) {
   try {
+    if (facultyUserId) {
+      const hod = await prisma.faculty.findUnique({
+        where: { userId: facultyUserId },
+        include: { hodAssignments: { where: { isActive: true } } },
+      })
+      if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+      if (hod.departmentId !== departmentId) return { success: false, error: "Forbidden" }
+    }
+
     const where: any = { departmentId }
 
     if (semester) where.semester = semester
@@ -57,20 +66,17 @@ export async function getClassAssignments(departmentId: string, semester?: numbe
     const uniqueSections = await prisma.classAssignment.findMany({
       where: { departmentId, assignmentStatus: "ACTIVE" },
       select: { section: true },
-      distinct: ["section"],
     })
 
     const uniqueSemesters = await prisma.classAssignment.findMany({
       where: { departmentId, assignmentStatus: "ACTIVE" },
       select: { semester: true },
-      distinct: ["semester"],
     })
 
     const assignedClassAdvisors = await prisma.classAssignment.findMany({
       where: { departmentId, assignmentStatus: "ACTIVE" },
       include: { faculty: { include: { user: { select: { name: true } } } } },
-      distinct: ["facultyId"],
-      orderBy: { faculty: { user: { name: "asc" } } },
+      orderBy: { assignedAt: "desc" },
     })
 
     const recentAssignments = await prisma.classAssignment.findMany({
@@ -90,9 +96,9 @@ export async function getClassAssignments(departmentId: string, semester?: numbe
         assignments,
         stats: {
           totalAssignments,
-          totalSections: uniqueSections.length,
-          totalSemesters: uniqueSemesters.length,
-          classAdvisorCount: assignedClassAdvisors.length,
+          totalSections: new Set(uniqueSections.map((s) => s.section)).size,
+          totalSemesters: new Set(uniqueSemesters.map((s) => s.semester)).size,
+          classAdvisorCount: new Set(assignedClassAdvisors.map((a) => a.facultyId)).size,
         },
         unassignedSections,
         recentAssignments,
@@ -139,8 +145,18 @@ export async function assignClassToFaculty(data: {
   academicYear: string
   semester: number
   section: string
+  facultyUserId?: string
 }) {
   try {
+    if (data.facultyUserId) {
+      const hod = await prisma.faculty.findUnique({
+        where: { userId: data.facultyUserId },
+        include: { hodAssignments: { where: { isActive: true } } },
+      })
+      if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
+      if (hod.departmentId !== data.departmentId) return { success: false, error: "Forbidden" }
+    }
+
     const parsed = createClassAssignmentSchema.safeParse(data)
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0]?.message || "Invalid input" }
@@ -366,8 +382,7 @@ export async function transferClassAssignment(data: {
       },
     })
 
-    revalidatePath("/hod/class-assignments")
-    revalidatePath("/hod/dashboard")
+    revalidatePath("/hod/faculty-allocation")
 
     return {
       success: true,
@@ -519,8 +534,7 @@ export async function updateClassAssignment(data: {
       },
     })
 
-    revalidatePath("/hod/class-assignments")
-    revalidatePath("/hod/dashboard")
+    revalidatePath("/hod/faculty-allocation")
 
     return {
       success: true,
