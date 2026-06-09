@@ -193,3 +193,79 @@ export async function getRecentActivities() {
     .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     .slice(0, 6)
 }
+
+export async function getHodList() {
+  const hods = await prisma.hodAssignment.findMany({
+    where: { isActive: true },
+    include: {
+      faculty: {
+        include: {
+          user: { select: { name: true, email: true } },
+          department: { select: { name: true, code: true } },
+        },
+      },
+      department: { select: { name: true, code: true } },
+    },
+    orderBy: { assignedAt: "desc" },
+  })
+
+  return hods.map((h) => ({
+    id: h.id,
+    facultyId: h.faculty.facultyId,
+    name: h.faculty.user.name,
+    email: h.faculty.user.email,
+    departmentName: h.department.name,
+    departmentCode: h.department.code,
+    assignedAt: h.assignedAt,
+  }))
+}
+
+export async function getTodayTimetable() {
+  const today = new Date()
+  const dayOfWeek = ((today.getDay() + 6) % 7) + 1 // Monday=1
+
+  const entries = await prisma.timetable.findMany({
+    where: { dayOfWeek },
+    include: {
+      faculty: { include: { user: { select: { name: true } }, department: { select: { name: true } } } },
+      subject: true,
+    },
+    orderBy: [{ startTime: "asc" }],
+  })
+
+  return entries.map((e) => ({
+    id: e.id,
+    className: e.className,
+    section: e.section,
+    startTime: e.startTime,
+    endTime: e.endTime,
+    classroom: e.classroom,
+    facultyName: e.faculty.user.name,
+    facultyId: e.faculty.facultyId,
+    subjectName: e.subject.name,
+    departmentName: e.faculty.department.name,
+  }))
+}
+
+export async function getFacultyWorkload() {
+  const facultyList = await prisma.faculty.findMany({
+    include: {
+      user: { select: { name: true } },
+      department: { select: { name: true, code: true } },
+      timetables: true,
+      subjects: true,
+    },
+    orderBy: { user: { createdAt: "desc" } },
+  })
+
+  return facultyList.map((f) => ({
+    id: f.id,
+    facultyId: f.facultyId,
+    name: f.user.name,
+    designation: f.designation,
+    departmentName: f.department.name,
+    subjectCount: f.subjects.length,
+    timetableCount: f.timetables.length,
+  }))
+}
+

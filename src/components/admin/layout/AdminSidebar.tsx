@@ -9,7 +9,7 @@ import {
   ClipboardList, BarChart3, Bell, Settings, LogOut, ChevronDown,
   ChevronRight, BookMarked, FileText, UserCheck, TrendingUp,
   Library, Shield, ChevronLeft, School, Award, Megaphone,
-  CalendarDays, FileBarChart,
+  CalendarDays, FileBarChart, Crown,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -40,6 +40,7 @@ const navGroups: { group: string; items: NavItem[] }[] = [
     items: [
       { label: "Faculty", href: "/admin/faculty", icon: UserCheck },
       { label: "Students", href: "/admin/students", icon: GraduationCap },
+      { label: "HoD Management", href: "/admin/hod-management", icon: Crown },
     ],
   },
   {

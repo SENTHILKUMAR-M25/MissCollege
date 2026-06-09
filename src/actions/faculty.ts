@@ -8,6 +8,9 @@ import { join } from "path"
 import bcrypt from "bcryptjs"
 import { FACULTY_DESIGNATIONS, FACULTY_PREFIXES, type FacultyDesignation } from "@/lib/faculty"
 
+// NOTE: Faculty hiring and account creation is admin-only.
+// HODs are not allowed to hire faculty via this action.
+
 const facultySchema = z.object({
   id: z.string().optional(),
   firstName: z.string().min(2, "First name is required"),

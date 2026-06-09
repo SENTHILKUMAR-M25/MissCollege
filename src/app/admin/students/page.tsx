@@ -1,25 +1,23 @@
 import prisma from "@/lib/prisma"
 import StudentsClient from "@/components/admin/students/StudentsClient"
+import { getStudentStats } from "@/actions/students"
 
 export default async function StudentsPage() {
-  const departments = await prisma.department.findMany({
-    select: { id: true, name: true },
-    orderBy: { name: "asc" },
-  })
+  const [departments, courses, students, statsResult] = await Promise.all([
+    prisma.department.findMany({ select: { id: true, name: true, code: true }, orderBy: { name: "asc" } }),
+    prisma.course.findMany({ select: { id: true, name: true, code: true, departmentId: true }, orderBy: { name: "asc" } }),
+    prisma.student.findMany({
+      include: {
+        department: { select: { id: true, name: true, code: true } },
+        course: { select: { id: true, name: true, code: true } },
+        user: { select: { name: true, email: true, isActive: true, passwordChanged: true, createdAt: true } },
+      },
+      orderBy: { registerNumber: "asc" },
+    }),
+    getStudentStats(),
+  ])
 
-  const courses = await prisma.course.findMany({
-    select: { id: true, name: true },
-    orderBy: { name: "asc" },
-  })
+  const stats = statsResult.success ? statsResult.data : null
 
-  const students = await prisma.student.findMany({
-    include: {
-      department: { select: { id: true, name: true } },
-      course: { select: { id: true, name: true } },
-      user: { select: { name: true, email: true } },
-    },
-    orderBy: { registerNumber: "asc" },
-  })
-
-  return <StudentsClient students={students} departments={departments} courses={courses} />
+  return <StudentsClient students={students} departments={departments} courses={courses} stats={stats} />
 }

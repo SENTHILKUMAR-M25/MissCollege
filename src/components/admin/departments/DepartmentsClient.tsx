@@ -2,7 +2,17 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Plus, Edit2, Trash2, Users, Library, X, Building2 } from "lucide-react"
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Users,
+  Library,
+  X,
+  Building2,
+  Crown,
+  UserCheck,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { addDepartment, updateDepartment, deleteDepartment } from "@/actions/departments"
 import toast from "react-hot-toast"
@@ -17,6 +27,19 @@ type DbDepartment = {
     faculty: number
     students: number
   }
+  hodAssignments?: Array<{
+    id: string
+    facultyId: string
+    faculty: {
+      facultyId: string
+      user: {
+        name?: string | null
+        email: string
+      }
+    }
+    assignedAt: Date | string
+    isActive: boolean
+  }>
 }
 
 const colorMap = ["blue", "purple", "green", "orange", "red", "yellow", "pink", "teal"]
@@ -158,12 +181,13 @@ export default function DepartmentsClient({ departments }: { departments: DbDepa
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {departments.map((dept, idx) => {
           const colorKey = colorMap[idx % colorMap.length]
+          const activeHod = (dept.hodAssignments || [])[0]
           return (
             <motion.div key={dept.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
               className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-white/5 p-5 group flex flex-col">
               <div className={cn("absolute top-0 left-0 right-0 h-1 bg-gradient-to-r", gradientMap[colorKey])} />
-              
+
               <div className="flex items-start justify-between mb-4">
                 <div className={cn("w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-lg shadow-lg shrink-0", gradientMap[colorKey])}>
                   {dept.code}
@@ -197,10 +221,15 @@ export default function DepartmentsClient({ departments }: { departments: DbDepa
               </div>
 
               <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                <span className="text-slate-500 text-xs">ID: {dept.code}</span>
-                <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-semibold border", bgMap[colorKey])}>
-                  Active
+                <div className="flex flex-col gap-1">
+                  <span className="text-slate-500 text-[10px] font-semibold">HOD</span>
+                  {activeHod ? (
+                    <span className="text-white text-[10px] font-medium truncate">{activeHod.faculty?.user?.name || activeHod.facultyId}</span>
+                  ) : (
+                    <span className="text-slate-500 text-[10px]">Not assigned</span>
+                  )}
                 </div>
+                <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-semibold border", bgMap[colorKey])}>Active</div>
               </div>
             </motion.div>
           )

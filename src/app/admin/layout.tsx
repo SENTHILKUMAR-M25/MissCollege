@@ -11,6 +11,7 @@ const pageTitles: Record<string, string> = {
   "/admin/students": "Student Management",
   "/admin/faculty": "Faculty Management",
   "/admin/departments": "Department Management",
+  "/admin/hod-management": "HoD Management",
   "/admin/courses": "Course Management",
   "/admin/subjects": "Subject Management",
   "/admin/attendance": "Attendance Management",

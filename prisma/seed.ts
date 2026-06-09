@@ -72,6 +72,16 @@ async function main() {
     },
   })
 
+  const adminHashedPassword = await hashPassword('Miss1980')
+  await prisma.user.create({
+    data: {
+      name: 'System Admin',
+      email: 'miss@edu.com',
+      password: adminHashedPassword,
+      role: Role.ADMIN,
+    },
+  })
+
   const facultyUser = await prisma.user.create({
     data: {
       name: 'Dr. Alan Turing',
@@ -85,6 +95,34 @@ async function main() {
           qualification: 'Ph.D in Computer Science',
           departmentId: csDept.id,
           phone: '+91 9876543210',
+        },
+      },
+    },
+    include: { faculty: true },
+  })
+
+  const apDob = new Date('1998-06-16')
+  const apFacultyUser = await prisma.user.create({
+    data: {
+      name: 'Dr. Priya Sharma',
+      email: 'priya@miss.edu',
+      password: hashedPassword,
+      role: Role.FACULTY,
+      passwordChanged: false,
+      faculty: {
+        create: {
+          facultyId: 'MISS-AP-001',
+          designation: 'Assistant Professor',
+          qualification: 'M.Tech, Ph.D',
+          departmentId: csDept.id,
+          phone: '+91 9876543212',
+          dateOfBirth: apDob,
+          gender: 'Female',
+          experience: 5,
+          joiningDate: new Date('2021-06-01'),
+          specialization: 'Data Science, Machine Learning',
+          assignedSemesters: '3,4,5',
+          assignedSections: 'A,B',
         },
       },
     },
@@ -128,6 +166,39 @@ async function main() {
       },
     },
     include: { student: true },
+  })
+
+  const itDept = departments.get('Information Technology')!
+
+  const hodFaculty = await prisma.user.create({
+    data: {
+      name: 'Dr. Sarada',
+      email: 'sarada@miss.edu',
+      password: hashedPassword,
+      role: Role.HOD,
+      faculty: {
+        create: {
+          facultyId: 'MISS-HOD-IT-001',
+          designation: 'Professor',
+          qualification: 'Ph.D in Computer Science',
+          departmentId: itDept.id,
+          phone: '+91 9876543211',
+          dateOfBirth: new Date('1980-01-01'),
+          accountStatus: true,
+          isHod: true,
+        },
+      },
+    },
+    include: { faculty: true },
+  })
+
+  await prisma.hodAssignment.create({
+    data: {
+      departmentId: itDept.id,
+      facultyId: hodFaculty.faculty!.id,
+      assignedBy: null,
+      isActive: true,
+    },
   })
 
   console.log('Database seeded successfully!')

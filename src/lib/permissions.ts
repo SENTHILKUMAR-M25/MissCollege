@@ -2,29 +2,18 @@ import { auth } from "./auth"
 import { Role } from "@prisma/client"
 import { redirect } from "next/navigation"
 
-/**
- * Returns the current authenticated user session.
- */
 export async function getSession() {
   return await auth()
 }
 
-/**
- * Gets the current user and asserts that they are logged in.
- * If not, redirects them to the login page.
- */
 export async function requireAuth() {
   const session = await getSession()
   if (!session?.user) {
-    redirect("/login")
+    redirect("/admin-login")
   }
   return session.user
 }
 
-/**
- * Ensures the logged-in user has one of the allowed roles.
- * If not, redirects them to an unauthorized error page.
- */
 export async function requireRole(allowedRoles: Role[]) {
   const user = await requireAuth()
   if (!allowedRoles.includes(user.role)) {
@@ -33,34 +22,69 @@ export async function requireRole(allowedRoles: Role[]) {
   return user
 }
 
-/**
- * Require ADMIN role.
- */
 export async function requireAdmin() {
   return requireRole([Role.ADMIN])
 }
 
-/**
- * Require FACULTY role.
- */
+export async function requireHod() {
+  return requireRole([Role.HOD])
+}
+
 export async function requireFaculty() {
-  return requireRole([Role.FACULTY])
+  const session = await getSession()
+  if (!session?.user) {
+    redirect("/Faculty-login")
+  }
+  // Allow both FACULTY and HOD roles (HOD is also a faculty member)
+  if (session.user.role !== "FACULTY" && session.user.role !== "HOD") {
+    redirect("/unauthorized")
+  }
+  return session.user
 }
 
-/**
- * Require STUDENT role.
- */
 export async function requireStudent() {
-  return requireRole([Role.STUDENT])
+  const session = await getSession()
+  if (!session?.user) {
+    redirect("/student-login")
+  }
+  if (session.user.role !== "STUDENT") {
+    redirect("/unauthorized")
+  }
+  return session.user
 }
 
-/**
- * Check if the current user has a specific role (returns boolean without redirecting).
- */
 export async function hasRole(allowedRoles: Role[]): Promise<boolean> {
   const session = await getSession()
   if (!session?.user) {
     return false
   }
   return allowedRoles.includes(session.user.role)
+}
+
+export async function isHodOfDepartment(departmentId: string): Promise<boolean> {
+  const session = await getSession()
+  if (!session?.user || session.user.role !== Role.HOD) {
+    return false
+  }
+
+  try {
+    const { prisma } = await import("./prisma")
+    const faculty = await prisma.faculty.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        hodAssignments: {
+          where: { isActive: true },
+        },
+      },
+    })
+
+    if (!faculty) return false
+
+    const isAssigned = faculty.hodAssignments.some(
+      (a) => a.departmentId === departmentId && a.isActive
+    )
+    return isAssigned
+  } catch {
+    return false
+  }
 }
