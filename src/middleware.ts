@@ -1,12 +1,14 @@
-import { auth } from "@/lib/auth"
-import { Role } from "@prisma/client"
+import NextAuth from "next-auth"
+import type { NextAuthRequest } from "next-auth"
+import { authConfig } from "./auth.config"
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 
-const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
+const ADMIN_ROLES: readonly string[] = ["ADMIN", "ACADEMIC_ADMIN", "EXAM_ADMIN"]
 
-export async function middleware(request: NextRequest) {
-  const session = await auth()
+const { auth } = NextAuth(authConfig)
+
+export const middleware = auth((request: NextAuthRequest) => {
+  const session = request.auth
   const { pathname } = request.nextUrl
 
   const isHodLogin = pathname === "/hod-login"
@@ -17,7 +19,7 @@ export async function middleware(request: NextRequest) {
   if (isHodLogin || isAdminLogin || isFacultyLogin || isStudentLogin) {
     if (session?.user) {
       if (session.user.role === "HOD") return NextResponse.redirect(new URL("/hod/dashboard", request.url))
-      if (ADMIN_ROLES.includes(session.user.role as Role)) return NextResponse.redirect(new URL("/admin", request.url))
+      if (ADMIN_ROLES.includes(session.user.role)) return NextResponse.redirect(new URL("/admin", request.url))
       if (session.user.role === "FACULTY") return NextResponse.redirect(new URL("/faculty/dashboard", request.url))
       if (session.user.role === "STUDENT") return NextResponse.redirect(new URL("/student/dashboard", request.url))
     }
@@ -33,12 +35,12 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/hod") && session.user.role !== "HOD") return NextResponse.redirect(new URL("/unauthorized", request.url))
-  if (pathname.startsWith("/admin") && !ADMIN_ROLES.includes(session.user.role as Role)) return NextResponse.redirect(new URL("/unauthorized", request.url))
+  if (pathname.startsWith("/admin") && !ADMIN_ROLES.includes(session.user.role)) return NextResponse.redirect(new URL("/unauthorized", request.url))
   if (pathname.startsWith("/faculty") && session.user.role !== "FACULTY" && session.user.role !== "HOD") return NextResponse.redirect(new URL("/unauthorized", request.url))
   if (pathname.startsWith("/student") && session.user.role !== "STUDENT") return NextResponse.redirect(new URL("/unauthorized", request.url))
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: ["/admin/:path*", "/hod/:path*", "/faculty/:path*", "/student/:path*"],
