@@ -245,9 +245,9 @@ export async function getAttendanceSummary(facultyId: string) {
 
     const bySubject = new Map<string, { code: string; present: number; absent: number; od: number; leave: number; total: number }>()
     const byPeriod = new Map<number, { present: number; absent: number; od: number; leave: number; total: number }>()
-    const byMonth = new Map<string, { present: number; absent: number; od: number; leave: number; total: number }>()
+    const byMonth = new Map<string, { month: string; present: number; absent: number; od: number; leave: number; total: number }>()
     const byStudent = new Map<string, { name: string; present: number; total: number }>()
-    const bySection = new Map<string, { present: number; total: number }>()
+    const bySection = new Map<string, { section: string; present: number; total: number }>()
 
     for (const r of records) {
       const month = new Date(r.date).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
@@ -268,6 +268,7 @@ export async function getAttendanceSummary(facultyId: string) {
         total: (byPeriod.get(r.periodNumber)?.total || 0) + 1,
       })
       byMonth.set(month, {
+        month,
         present: (byMonth.get(month)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
         absent: (byMonth.get(month)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
         od: (byMonth.get(month)?.od || 0) + (r.status === "OD" ? 1 : 0),
@@ -284,6 +285,7 @@ export async function getAttendanceSummary(facultyId: string) {
 
       const sectionKey = `${r.student.department?.code || ""}-${r.student.section || ""}`
       bySection.set(sectionKey, {
+        section: sectionKey,
         present: (bySection.get(sectionKey)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
         total: (bySection.get(sectionKey)?.total || 0) + 1,
       })

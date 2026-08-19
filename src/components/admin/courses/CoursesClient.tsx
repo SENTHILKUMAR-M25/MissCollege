@@ -17,6 +17,7 @@ type DbCourse = {
   duration: string
   departmentId: string
   department: DbDepartment
+  bgImage?: string | null
   _count?: { students: number }
 }
 

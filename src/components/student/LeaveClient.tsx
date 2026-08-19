@@ -20,6 +20,10 @@ export default function StudentLeaveClient({ leaves, facultyId, departmentId }: 
   const [showModal, setShowModal] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [leaveType, setLeaveType] = useState("CL")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+  const [reason, setReason] = useState("")
 
   const resetForm = () => {
     setLeaveType("CL")

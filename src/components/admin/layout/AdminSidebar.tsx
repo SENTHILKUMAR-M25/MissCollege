@@ -34,7 +34,7 @@ const EXAM_NAV_ITEMS: NavItem[] = [
   { label: "Reports", href: "/admin/exams/reports", icon: FileSpreadsheet },
 ]
 
-type AllowedRole = Role | [Role.ADMIN, Role.EXAM_ADMIN] | [Role.ADMIN, Role.ACADEMIC_ADMIN]
+type AllowedRole = Role | ["ADMIN", "EXAM_ADMIN"] | ["ADMIN", "ACADEMIC_ADMIN"]
 
 interface NavGroup {
   group: string
@@ -206,7 +206,7 @@ function NavItemRow({ item, collapsed, depth = 0 }: { item: NavItem; collapsed: 
 }
 
 function roleMatches(userRole: Role, allowed: AllowedRole): boolean {
-  if (Array.isArray(allowed)) return allowed.includes(userRole)
+  if (Array.isArray(allowed)) return (allowed as Role[]).includes(userRole)
   return userRole === allowed
 }
 

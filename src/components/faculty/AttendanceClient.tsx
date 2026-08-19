@@ -8,7 +8,7 @@ import Modal from "@/components/ui/Modal"
 
 type Subject = { id: string; name: string; code: string; semester: number; departmentId: string }
 type Student = { id: string; registerNumber: string; semester: number; section: string; user: { id?: string; name: string | null } }
-type Record = {
+type AttendanceRecord = {
   id: string
   date: string | Date
   periodNumber: number
@@ -58,7 +58,7 @@ export default function AttendanceClient({
   facultyId: string
   departmentId: string
   subjects: Subject[]
-  initialRecords: Record[]
+  initialRecords: AttendanceRecord[]
   timetable: TimetableEntry[]
   periods: { id: string; periodNumber: number; name: string; startTime: string; endTime: string }[]
   summary?: {
@@ -76,7 +76,7 @@ export default function AttendanceClient({
   const [semFilter, setSemFilter] = useState("All")
   const [secFilter, setSecFilter] = useState("All")
   const [loading, setLoading] = useState(false)
-  const [records, setRecords] = useState<Record[]>(initialRecords)
+  const [records, setRecords] = useState<AttendanceRecord[]>(initialRecords)
   const [attendance, setAttendance] = useState<Record<string, "PRESENT" | "ABSENT" | "OD" | "LEAVE">>({})
   const [reportTab, setReportTab] = useState<ReportTab>("recent")
   const [showAttendanceModal, setShowAttendanceModal] = useState(false)
@@ -260,7 +260,7 @@ export default function AttendanceClient({
                 <option value="">Select Period</option>
                 {availablePeriods.map((entry) => (
                   <option key={entry.id} value={entry.periodNumber}>
-                    {entry.periodNumber} ({DAYS[entry.dayOfWeek]}) {entry.startTime}-{entry.endTime}
+                    {entry.periodNumber} {entry.startTime}-{entry.endTime}
                   </option>
                 ))}
               </select>
@@ -281,7 +281,9 @@ export default function AttendanceClient({
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
             <div className="flex gap-4 text-xs">
-              <span className="text-gray-500">P:{summary?.present || 0} A:{summary?.absent || 0} OD:{summary?.od || 0} L:{summary?.leave || 0}</span>
+              <span className="text-gray-500">
+                P:{summary?.subjectWise?.reduce((t, s) => t + s.present, 0) || 0} A:{summary?.subjectWise?.reduce((t, s) => t + s.absent, 0) || 0} OD:{summary?.subjectWise?.reduce((t, s) => t + s.od, 0) || 0} L:{summary?.subjectWise?.reduce((t, s) => t + s.leave, 0) || 0}
+              </span>
             </div>
             <div className="flex gap-2">
               {STATUS_OPTIONS.map((opt) => (
@@ -346,7 +348,7 @@ function StudentTable({
   setSemFilter: (v: string) => void
   setSecFilter: (v: string) => void
   attendance: Record<string, "PRESENT" | "ABSENT" | "OD" | "LEAVE">
-  setAttendance: (v: Record<string, "PRESENT" | "ABSENT" | "OD" | "LEAVE">) => void
+  setAttendance: React.Dispatch<React.SetStateAction<Record<string, "PRESENT" | "ABSENT" | "OD" | "LEAVE">>>
 }) {
   const [students, setStudents] = useState<Student[]>([])
 
@@ -445,7 +447,7 @@ function ReportPanel({
   summary,
   reportTab,
 }: {
-  records: Record[]
+  records: AttendanceRecord[]
   summary?: {
     subjectWise: Array<{ code: string; present: number; absent: number; od: number; leave: number; total: number }>
     periodWise: Array<{ periodNumber: number; present: number; absent: number; od: number; leave: number; total: number }>
