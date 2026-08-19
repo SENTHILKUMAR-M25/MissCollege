@@ -1,100 +1,70 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HeroBanner from './components/HeroBanner'
 import { GlassCard, DepartmentCard, StatisticCard, EventCard, NewsCard } from './components/Cards'
 import { Section, SectionTitle, Container, Button } from './components/UI'
 import { BookOpen, Users, Award, Zap, TrendingUp, Microscope } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 import Link from 'next/link'
 
 export default function Home() {
-  const stats = [
-    { number: '45+', label: 'Years of Excellence', icon: Award },
-    { number: '8000+', label: 'Students', icon: Users },
-    { number: '150+', label: 'Faculty Members', icon: BookOpen },
-    { number: '12', label: 'Departments', icon: Zap },
-  ]
+  const [stats, setStats] = useState([
+    { number: '...', label: 'Departments', icon: Award },
+    { number: '...', label: 'Students', icon: Users },
+    { number: '...', label: 'Faculty Members', icon: BookOpen },
+    { number: '...', label: 'Courses', icon: Zap },
+  ])
+  const [departments, setDepartments] = useState([])
+  const [announcements, setAnnouncements] = useState([])
+  const [upcomingEvents, setUpcomingEvents] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const departments = [
-    {
-      name: 'Computer Science',
-      description: 'Modern computing and technology education',
-      image: '/department/Computer-Science.jpg',
-      href: '/departments#computer-science',
-    },
-    {
-      name: 'Commerce',
-      description: 'Business and commerce expertise',
-      image: '/department/Commerce.jpg',
-      href: '/departments#commerce',
-    },
-    {
-      name: 'English',
-      description: 'Language, literature and communication skills',
-      image: '/department/English.jpg',
-      href: '/departments#english',
-    },
-    {
-      name: 'Management Studies',
-      description: 'Business leadership and strategic thinking',
-      image: '/department/Management-Studies.jpg',
-      href: '/departments#management',
-    },
-  ]
-
-  const announcements = [
-    {
-      title: 'Admissions Open for 2026-27',
-      excerpt: 'Applications are now being accepted for all undergraduate and postgraduate programs.',
-      date: '2026-05-29',
-      category: 'Admissions',
-      href: '/admissions',
-    },
-    {
-      title: 'Campus Placement Drive',
-      excerpt: 'Multiple companies to visit campus for recruitment. Register now to participate.',
-      date: '2026-05-25',
-      category: 'Placements',
-      href: '/placements',
-    },
-    {
-      title: 'NAAC Accreditation Result',
-      excerpt: 'MISS College has been accredited with Grade A by NAAC.',
-      date: '2026-05-20',
-      category: 'News',
-      href: '/naac',
-    },
-  ]
-
-  const upcomingEvents = [
-    {
-      title: 'Orientation Program for New Students',
-      date: 'June 15, 2026',
-      time: '10:00 AM',
-      location: 'Main Campus',
-      category: 'Academic',
-      href: '/events',
-    },
-    {
-      title: 'Annual Sports Meet 2026',
-      date: 'June 20-22, 2026',
-      time: '9:00 AM',
-      location: 'Sports Complex',
-      category: 'Sports',
-      href: '/events',
-    },
-    {
-      title: 'Research Symposium',
-      date: 'June 25, 2026',
-      time: '2:00 PM',
-      location: 'Research Center',
-      category: 'Research',
-      href: '/events',
-    },
-  ]
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const [statsRes, deptRes, noticeRes, eventRes] = await Promise.all([
+          fetch('/api/public/stats'),
+          fetch('/api/public/departments'),
+          fetch('/api/public/announcements'),
+          fetch('/api/public/events?upcoming=true&limit=3'),
+        ])
+        if (!cancelled) {
+          if (statsRes.ok) {
+            const statsJson = await statsRes.json()
+            const s = statsJson.stats || {}
+            setStats([
+              { number: `${s.departmentCount ?? 0}`, label: 'Departments', icon: Award },
+              { number: `${s.studentCount ?? 0}`, label: 'Students', icon: Users },
+              { number: `${s.facultyCount ?? 0}`, label: 'Faculty Members', icon: BookOpen },
+              { number: `${s.courseCount ?? 0}`, label: 'Courses', icon: Zap },
+            ])
+          }
+          if (deptRes.ok) {
+            const deptJson = await deptRes.json()
+            setDepartments((deptJson.departments || []).slice(0, 4))
+          }
+          if (noticeRes.ok) {
+            const noticeJson = await noticeRes.json()
+            setAnnouncements(noticeJson.announcements || [])
+          }
+          if (eventRes.ok) {
+            const eventJson = await eventRes.json()
+            setUpcomingEvents(eventJson.events || [])
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load homepage data', err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
 
   const features = [
     {
@@ -279,11 +249,29 @@ export default function Home() {
             title="Our Departments"
             subtitle="Explore our diverse academic departments"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {departments.map((dept, index) => (
-              <DepartmentCard key={index} {...dept} index={index} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[0,1,2,3].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 shadow-soft animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-full" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {departments.map((dept, index) => (
+                <DepartmentCard
+                  key={dept.id || index}
+                  name={dept.name}
+                  description={dept.description}
+                  image={`/department/${dept.name.replace(/[^a-zA-Z]/g, '')}.jpg`}
+                  href={`/departments#${dept.name.replace(/[^a-zA-Z]/g, '-').toLowerCase()}`}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
           <div className="text-center">
             <Link href="/departments">
               <Button variant="primary" size="lg">
@@ -294,9 +282,76 @@ export default function Home() {
         </Container>
       </Section>
 
-      
+      {/* Announcements */}
+      <Section>
+        <Container>
+          <SectionTitle
+            title="Latest Announcements"
+            subtitle="Stay updated with the latest news and events"
+          />
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[0,1,2].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 shadow-soft animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+                  <div className="h-3 bg-gray-200 rounded w-full mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {announcements.map((announcement, index) => (
+                <NewsCard
+                  key={announcement.id || index}
+                  title={announcement.title}
+                  excerpt={announcement.content || announcement.excerpt || ''}
+                  date={new Date(announcement.createdAt || announcement.startDate || Date.now()).toLocaleDateString()}
+                  category={announcement.title}
+                  href="#"
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </Container>
+      </Section>
 
-      
+      {/* Events */}
+      <Section className="bg-neutral-light">
+        <Container>
+          <SectionTitle
+            title="Upcoming Events"
+            subtitle="Mark your calendar for these exciting events"
+          />
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[0,1,2].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 shadow-soft animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+                  <div className="h-3 bg-gray-200 rounded w-full mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {upcomingEvents.map((event, index) => (
+                <EventCard
+                  key={event.id || index}
+                  title={event.name || event.title}
+                  date={new Date(event.date || event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  time={event.startTime || ''}
+                  location={event.location || event.classroom || ''}
+                  category={event.examType?.name || event.type || 'Event'}
+                  href="/events"
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </Container>
+      </Section>
 
       {/* Testimonials Section */}
       <Section>
@@ -334,8 +389,6 @@ export default function Home() {
           </div>
         </Container>
       </Section>
-
-     
 
       {/* Call to Action */}
       <Section className="bg-gradient-to-r from-primary-navy via-primary-blue to-secondary-emerald text-white">

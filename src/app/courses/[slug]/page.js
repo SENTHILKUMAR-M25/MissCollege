@@ -1,13 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import ApplyModal from '../../components/ApplyModal'
-import { getCourse, courses } from '../data'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "motion/react"
 import {
   Clock, Users, BookOpen, Award, ChevronDown, ChevronRight,
   CheckCircle, ArrowRight, Download, Phone, Mail,
@@ -15,11 +14,73 @@ import {
 } from 'lucide-react'
 
 export default function CourseDetail({ params }) {
-  const course = getCourse(params.slug)
-  if (!course) notFound()
-
+  const resolvedParams = use(params)
+  const slug = resolvedParams.slug
+  const [course, setCourse] = useState(null)
+  const [related, setRelated] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [openSem, setOpenSem] = useState(0)
   const [applyOpen, setApplyOpen] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch('/api/public/courses')
+        if (!cancelled && res.ok) {
+          const json = await res.json()
+          const all = json.courses || []
+          const found = all.find(c => c.slug === slug)
+          if (found) {
+            setCourse(found)
+            setRelated(all.filter(c => c.slug !== found.slug && c.type === found.type).slice(0, 3))
+          } else {
+            setCourse(null)
+          }
+          setError(false)
+        } else if (!cancelled) {
+          setError(true)
+        }
+      } catch (err) {
+        if (!cancelled) setError(true)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [slug])
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="animate-pulse space-y-6">
+            <div className="h-48 bg-gray-200 rounded-2xl" />
+            <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div className="h-6 bg-gray-200 rounded w-2/3" />
+            <div className="h-4 bg-gray-200 rounded w-full" />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <p className="text-slate-500 text-lg mb-4">Failed to load course details.</p>
+          <button onClick={() => window.location.reload()} className="px-6 py-2.5 rounded-xl bg-primary-blue text-white font-semibold text-sm">Retry</button>
+        </div>
+      </>
+    )
+  }
+
+  if (!course) notFound()
 
   const stats = [
     { icon: Clock, label: 'Duration', value: course.duration },
@@ -34,8 +95,10 @@ export default function CourseDetail({ params }) {
       <ApplyModal isOpen={applyOpen} onClose={() => setApplyOpen(false)} preselectedCourse={course} />
 
       {/* ── Hero ── */}
-      <div className={`relative bg-gradient-to-br ${course.color} overflow-hidden`}>
-        <div className="absolute inset-0 bg-primary-navy/60" />
+      <div className={`relative overflow-hidden ${course.bgImage ? 'bg-cover bg-center min-h-[320px]' : `bg-gradient-to-br ${course.color} min-h-[320px]`}`} style={course.bgImage ? { backgroundImage: `url(${course.bgImage})` } : undefined}>
+        {course.bgImage && <div className="absolute inset-0 bg-primary-navy/70" />}
+        {!course.bgImage && <div className="absolute inset-0 bg-primary-navy/60" />}
+      
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5" />
         <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/5" />
 
@@ -118,63 +181,71 @@ export default function CourseDetail({ params }) {
             {/* Curriculum */}
             <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
               <SectionHeading icon={BookOpen} title="Curriculum" />
-              <div className="mt-6 space-y-3">
-                {course.curriculum.map((sem, i) => (
-                  <div key={i} className="border border-neutral-gray rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => setOpenSem(openSem === i ? -1 : i)}
-                      className="w-full flex items-center justify-between px-5 py-4 bg-neutral-light hover:bg-blue-50 transition-colors text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full bg-primary-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
-                        <span className="font-semibold text-primary-navy">{sem.semester}</span>
-                        <span className="text-xs text-slate-500 hidden sm:inline">— {sem.subjects.length} subjects</span>
-                      </div>
-                      <ChevronDown size={18} className={`text-slate-400 transition-transform duration-200 ${openSem === i ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {openSem === i && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-                          <ul className="px-5 py-4 bg-white grid sm:grid-cols-2 gap-2">
-                            {sem.subjects.map((sub, j) => (
-                              <li key={j} className="flex items-center gap-2 text-sm text-slate-600">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary-blue flex-shrink-0" />{sub}
-                              </li>
-                            ))}
-                          </ul>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </div>
+              {Array.isArray(course.curriculum) && course.curriculum.length > 0 ? (
+                <div className="mt-6 space-y-3">
+                  {course.curriculum.map((sem, i) => (
+                    <div key={i} className="border border-neutral-gray rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => setOpenSem(openSem === i ? -1 : i)}
+                        className="w-full flex items-center justify-between px-5 py-4 bg-neutral-light hover:bg-blue-50 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-7 h-7 rounded-full bg-primary-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                          <span className="font-semibold text-primary-navy">{sem.semester}</span>
+                          <span className="text-xs text-slate-500 hidden sm:inline">— {(sem.subjects || []).length} subjects</span>
+                        </div>
+                        <ChevronDown size={18} className={`text-slate-400 transition-transform duration-200 ${openSem === i ? 'rotate-180' : ''}`} />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {openSem === i && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+                            <ul className="px-5 py-4 bg-white grid sm:grid-cols-2 gap-2">
+                              {(sem.subjects || []).map((sub, j) => (
+                                <li key={j} className="flex items-center gap-2 text-sm text-slate-600">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary-blue flex-shrink-0" />{sub}
+                                </li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm mt-4">Curriculum details coming soon.</p>
+              )}
             </motion.section>
 
             {/* Faculty */}
             <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
               <SectionHeading icon={GraduationCap} title="Faculty" />
-              <div className="mt-6 grid sm:grid-cols-2 gap-5">
-                {course.faculty.map((f, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-4 bg-white border border-neutral-gray rounded-xl p-5 hover:shadow-medium transition-shadow">
-                    <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${course.color} flex items-center justify-center text-white text-xl font-bold flex-shrink-0`}>
-                      {f.name.charAt(f.name.indexOf(' ') + 1)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-primary-navy text-sm">{f.name}</p>
-                      <p className="text-primary-blue text-xs font-semibold">{f.designation}</p>
-                      <p className="text-slate-500 text-xs mt-0.5">{f.qualification}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              {Array.isArray(course.faculty) && course.faculty.length > 0 ? (
+                <div className="mt-6 grid sm:grid-cols-2 gap-5">
+                  {course.faculty.map((f, i) => (
+                    <motion.div key={i} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-4 bg-white border border-neutral-gray rounded-xl p-5 hover:shadow-medium transition-shadow">
+                      <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${course.color} flex items-center justify-center text-white text-xl font-bold flex-shrink-0`}>
+                        {f.name?.charAt(f.name?.indexOf(' ') + 1) || '?'}
+                      </div>
+                      <div>
+                        <p className="font-bold text-primary-navy text-sm">{f.name}</p>
+                        <p className="text-primary-blue text-xs font-semibold">{f.designation}</p>
+                        <p className="text-slate-500 text-xs mt-0.5">{f.qualification}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm mt-4">Faculty details will be updated soon.</p>
+              )}
             </motion.section>
 
             {/* Career Prospects */}
             <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
               <SectionHeading icon={Briefcase} title="Career Prospects" />
               <div className="mt-6 flex flex-wrap gap-3">
-                {course.careerProspects.map((c, i) => (
+                {(course.careerProspects || []).map((c, i) => (
                   <motion.span key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
                     className="flex items-center gap-2 bg-white border border-neutral-gray rounded-full px-4 py-2 text-sm text-slate-700 hover:border-primary-blue hover:text-primary-blue hover:bg-blue-50 transition-colors">
                     <ArrowRight size={13} className="text-primary-blue" />{c}
@@ -187,7 +258,7 @@ export default function CourseDetail({ params }) {
             <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
               <SectionHeading icon={Building2} title="Top Recruiters" />
               <div className="mt-6 grid grid-cols-4 sm:grid-cols-8 gap-3">
-                {course.topRecruiters.map((r, i) => (
+                {(course.topRecruiters || []).map((r, i) => (
                   <motion.div key={i} initial={{ opacity: 0, scale: 0.85 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.06 }}
                     className="aspect-square bg-white border border-neutral-gray rounded-xl flex items-center justify-center text-center p-2 hover:shadow-medium hover:border-primary-blue transition-all">
                     <span className="text-xs font-bold text-primary-navy leading-tight">{r}</span>
@@ -231,7 +302,7 @@ export default function CourseDetail({ params }) {
           <div className="hidden lg:block">
             <div className="sticky top-28 space-y-6">
               <ApplyCard course={course} onApply={() => setApplyOpen(true)} />
-              <RelatedCourses current={course} />
+              <RelatedCourses related={related} currentSlug={course.slug} />
             </div>
           </div>
         </div>
@@ -239,7 +310,9 @@ export default function CourseDetail({ params }) {
         {/* Mobile apply card */}
         <div className="lg:hidden mt-10">
           <ApplyCard course={course} onApply={() => setApplyOpen(true)} />
-          <div className="mt-6"><RelatedCourses current={course} /></div>
+          {related.length > 0 && (
+            <div className="mt-6"><RelatedCourses related={related} currentSlug={course.slug} /></div>
+          )}
         </div>
       </div>
 
@@ -311,9 +384,8 @@ function ApplyCard({ course, onApply }) {
   )
 }
 
-function RelatedCourses({ current }) {
-  const related = courses.filter(c => c.slug !== current.slug && c.type === current.type).slice(0, 3)
-  if (!related.length) return null
+function RelatedCourses({ related, currentSlug }) {
+  if (!related || !related.length) return null
   return (
     <div className="bg-white rounded-2xl border border-neutral-gray p-5">
       <p className="font-bold text-primary-navy mb-4">Related Courses</p>

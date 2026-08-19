@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Shield, Eye, EyeOff } from "lucide-react"
 
 export default function ChangePasswordPage() {
@@ -67,10 +67,10 @@ export default function ChangePasswordPage() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
           <p className="text-red-400">Invalid session. Please login again.</p>
-          <a href="/hod-login" className="text-violet-400 hover:text-violet-300 mt-4 inline-block">
+          <a href="/hod-login" className="text-[#2F2FE4] hover:text-[#4F6FE4] mt-4 inline-block">
             Go to Login
           </a>
         </div>
@@ -79,23 +79,23 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
+          <div className="w-16 h-16 rounded-2xl bg-[#2F2FE4] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#2F2FE4]/20">
             <Shield size={28} className="text-white" />
           </div>
-          <h1 className="text-white text-2xl font-bold">Change Your Password</h1>
-          <p className="text-slate-400 text-sm mt-2">
+          <h1 className="text-black text-2xl font-bold">Change Your Password</h1>
+          <p className="text-gray-500 text-sm mt-2">
             You are logging in for the first time. Please set a new password to continue.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900 border border-white/10 rounded-2xl p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
           {error && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               {error}
@@ -108,7 +108,7 @@ export default function ChangePasswordPage() {
           )}
 
           <div>
-            <label className="text-slate-400 text-xs mb-1.5 block font-medium">New Password *</label>
+            <label className="text-gray-500 text-xs mb-1.5 block font-medium">New Password *</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -117,12 +117,12 @@ export default function ChangePasswordPage() {
                 placeholder="Enter new password"
                 required
                 minLength={6}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-amber-500/50 pr-10"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -130,7 +130,7 @@ export default function ChangePasswordPage() {
           </div>
 
           <div>
-            <label className="text-slate-400 text-xs mb-1.5 block font-medium">Confirm Password *</label>
+            <label className="text-gray-500 text-xs mb-1.5 block font-medium">Confirm Password *</label>
             <input
               type={showPassword ? "text" : "password"}
               value={confirmPassword}
@@ -138,14 +138,14 @@ export default function ChangePasswordPage() {
               placeholder="Confirm new password"
               required
               minLength={6}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading || !newPassword || !confirmPassword}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition shadow-lg shadow-amber-500/25"
+            className="w-full py-3 rounded-xl bg-[#2F2FE4] text-white text-sm font-semibold hover:bg-[#2525c5] disabled:opacity-50 transition shadow-lg shadow-[#2F2FE4]/20"
           >
             {loading ? "Updating Password..." : "Change Password"}
           </button>

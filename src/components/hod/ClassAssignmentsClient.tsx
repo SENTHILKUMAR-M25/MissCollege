@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import {
   BookOpen, Plus, Pencil, Trash2, X, Search,
   Check, UserPlus, UserMinus
@@ -40,19 +40,19 @@ function AssignmentFilter({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="relative">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
         <input
           type="text"
           placeholder="Search by faculty name..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-8 pr-4 py-2 rounded-xl bg-slate-800/50 border border-white/5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-violet-500/40 w-48"
+          className="pl-8 pr-4 py-2 rounded-xl bg-white border border-gray-200 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/40 w-48"
         />
       </div>
       <select
         value={semesterFilter ?? ""}
         onChange={(e) => setSemesterFilter(e.target.value ? Number(e.target.value) : null)}
-        className="px-3 py-2 rounded-xl bg-slate-800/50 border border-white/5 text-slate-300 text-sm focus:outline-none focus:border-violet-500/40 appearance-none cursor-pointer"
+        className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-[#2F2FE4]/40 appearance-none cursor-pointer"
       >
         <option value="">All Semesters</option>
         {SEMESTERS.map((s) => (
@@ -62,7 +62,7 @@ function AssignmentFilter({
       <select
         value={sectionFilter}
         onChange={(e) => setSectionFilter(e.target.value)}
-        className="px-3 py-2 rounded-xl bg-slate-800/50 border border-white/5 text-slate-300 text-sm focus:outline-none focus:border-violet-500/40 appearance-none cursor-pointer"
+        className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm focus:outline-none focus:border-[#2F2FE4]/40 appearance-none cursor-pointer"
       >
         <option value="">All Sections</option>
         {SECTIONS.map((s) => (
@@ -119,37 +119,37 @@ function AssignmentFormModal({
 
   if (!isOpen) return null
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-bold text-lg">
-            {mode === "create" ? "Assign Class Advisor" : "Edit Assignment"}
-          </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-            <X size={18} />
-          </button>
-        </div>
+   return (
+     <motion.div
+       initial={{ opacity: 0 }}
+       animate={{ opacity: 1 }}
+       exit={{ opacity: 0 }}
+       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+       onClick={(e) => e.target === e.currentTarget && onClose()}
+     >
+       <motion.div
+         initial={{ scale: 0.95, opacity: 0 }}
+         animate={{ scale: 1, opacity: 1 }}
+         exit={{ scale: 0.95, opacity: 0 }}
+         onClick={(e) => e.stopPropagation()}
+         className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+       >
+         <div className="flex items-center justify-between mb-4">
+           <h3 className="text-black font-bold text-lg">
+             {mode === "create" ? "Assign Class Advisor" : "Edit Assignment"}
+           </h3>
+           <button onClick={onClose} className="bg-white hover:bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:text-black transition-all w-8 h-8">
+             <X size={19} />
+           </button>
+         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">Academic Year</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">Academic Year</label>
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/40"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/40"
             >
               {ACADEMIC_YEARS.map((y) => (
                 <option key={y} value={y}>{y}</option>
@@ -158,11 +158,11 @@ function AssignmentFormModal({
           </div>
 
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">Semester</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">Semester</label>
             <select
               value={selectedSemester}
               onChange={(e) => setSelectedSemester(Number(e.target.value))}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/40"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/40"
             >
               {SEMESTERS.map((s) => (
                 <option key={s} value={s}>Semester {s}</option>
@@ -171,11 +171,11 @@ function AssignmentFormModal({
           </div>
 
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">Section</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">Section</label>
             <select
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/40"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/40"
             >
               {SECTIONS.map((s) => (
                 <option key={s} value={s}>Section {s}</option>
@@ -184,11 +184,11 @@ function AssignmentFormModal({
           </div>
 
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">Faculty Member</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">Faculty Member</label>
             <select
               value={selectedFaculty}
               onChange={(e) => setSelectedFaculty(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/40"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/40"
             >
               <option value="">Select a faculty member</option>
               {faculty.map((f) => (
@@ -203,13 +203,13 @@ function AssignmentFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-medium hover:bg-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium hover:from-violet-500 hover:to-indigo-500 transition-all shadow-lg shadow-violet-500/20"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#2F2FE4] text-white text-sm font-medium hover:bg-[#2525c5] transition-all shadow-lg shadow-[#2F2FE4]/20"
             >
               {mode === "create" ? "Assign" : "Update"}
             </button>
@@ -258,36 +258,36 @@ function TransferFormModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+        className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md shadow-2xl"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-bold text-lg">Transfer Class Advisor</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-            <X size={18} />
+          <h3 className="text-black font-bold text-lg">Transfer Class Advisor</h3>
+          <button onClick={onClose} className="bg-white hover:bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:text-black transition-all w-8 h-8">
+            <X size={19} />
           </button>
         </div>
 
         <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
           <p className="text-amber-400 text-xs font-medium">Current Assignment</p>
-          <p className="text-white text-sm mt-1">
+          <p className="text-black text-sm mt-1">
             {currentAssignment.faculty?.user?.name || "Unknown"} — Semester {currentAssignment.semester}, Section {currentAssignment.section}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">New Advisor</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">New Advisor</label>
             <select
               value={newFacultyId}
               onChange={(e) => setNewFacultyId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/40"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/40"
             >
               <option value="">Select new advisor</option>
               {availableFaculty.map((f) => (
@@ -299,13 +299,13 @@ function TransferFormModal({
           </div>
 
           <div>
-            <label className="block text-slate-400 text-xs font-medium uppercase tracking-wide mb-1.5">Transfer Reason (Optional)</label>
+            <label className="block text-gray-500 text-xs font-medium uppercase tracking-wide mb-1.5">Transfer Reason (Optional)</label>
             <textarea
               value={transferReason}
               onChange={(e) => setTransferReason(e.target.value)}
               rows={2}
               placeholder="Reason for transfer..."
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-violet-500/40 resize-none"
+              className="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/40 resize-none"
             />
           </div>
 
@@ -313,14 +313,14 @@ function TransferFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-medium hover:bg-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!newFacultyId}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 text-white text-sm font-medium hover:from-amber-500 hover:to-orange-500 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#2F2FE4] text-white text-sm font-medium hover:bg-[#2525c5] transition-all shadow-lg shadow-[#2F2FE4]/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Transfer
             </button>
@@ -488,14 +488,14 @@ export default function ClassAssignmentsClient({
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-white font-bold text-base">Class Assignments</h3>
-          <span className="text-slate-500 text-xs">({filteredAssignments.length})</span>
+          <h3 className="text-black font-bold text-base">Class Assignments</h3>
+          <span className="text-gray-400 text-xs">({filteredAssignments.length})</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refresh}
             disabled={loading}
-            className="p-2 rounded-xl bg-slate-800/50 border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50"
+            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-black hover:bg-white transition-all disabled:opacity-50"
           >
             <svg className={cn("w-4 h-4", loading && "animate-spin")} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
@@ -506,7 +506,7 @@ export default function ClassAssignmentsClient({
               setEditingAssignment(null)
               setShowCreateModal(true)
             }}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium hover:from-violet-500 hover:to-indigo-500 transition-all shadow-lg shadow-violet-500/20"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2F2FE4] text-white text-sm font-medium hover:bg-[#2525c5] transition-all shadow-lg shadow-[#2F2FE4]/20"
           >
             <Plus size={14} />
             New Assignment
@@ -515,35 +515,35 @@ export default function ClassAssignmentsClient({
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
+        <div className="xl:col-span-2 rounded-2xl bg-white border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/5 bg-slate-900/20">
+                <tr className="border-b border-gray-100 bg-gray-50">
                   {["Semester", "Section", "Academic Year", "Class Advisor", "Faculty ID", "Assigned Date", "Actions"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredAssignments.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500 text-xs">
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-xs">
                       No class assignments found. Create a new assignment to get started.
                     </td>
                   </tr>
                 ) : (
                   filteredAssignments.map((a) => (
-                    <tr key={a.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 text-white text-sm font-medium">Semester {a.semester}</td>
-                      <td className="px-4 py-3 text-slate-300 text-sm">{a.section}</td>
-                      <td className="px-4 py-3 text-slate-300 text-sm">{a.academicYear}</td>
+                    <tr key={a.id} className="border-b border-gray-100 hover:bg-gray-100 transition-colors">
+                      <td className="px-4 py-3 text-black text-sm font-medium">Semester {a.semester}</td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{a.section}</td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{a.academicYear}</td>
                       <td className="px-4 py-3">
-                        <p className="text-white text-sm font-medium">{a.faculty?.user?.name}</p>
-                        <p className="text-slate-500 text-xs">{a.department?.code}</p>
+                        <p className="text-black text-sm font-medium">{a.faculty?.user?.name}</p>
+                        <p className="text-gray-400 text-xs">{a.department?.code}</p>
                       </td>
-                      <td className="px-4 py-3 text-slate-400 text-xs font-mono">{a.faculty?.facultyId}</td>
-                      <td className="px-4 py-3 text-slate-300 text-xs">{new Date(a.assignedAt).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs font-mono">{a.faculty?.facultyId}</td>
+                      <td className="px-4 py-3 text-gray-700 text-xs">{new Date(a.assignedAt).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <button
@@ -551,7 +551,7 @@ export default function ClassAssignmentsClient({
                               setEditingAssignment(a)
                               setShowEditModal(true)
                             }}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 transition-all"
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-[#2F2FE4] hover:bg-[#2F2FE4]/10 transition-all"
                             title="Edit"
                           >
                             <Pencil size={12} />
@@ -561,14 +561,14 @@ export default function ClassAssignmentsClient({
                               setTransferringAssignment(a)
                               setShowTransferModal(true)
                             }}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all"
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all"
                             title="Transfer"
                           >
                             <UserPlus size={12} />
                           </button>
                           <button
                             onClick={() => handleRemove(a.id)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
                             title="Remove"
                           >
                             <Trash2 size={12} />
@@ -584,16 +584,16 @@ export default function ClassAssignmentsClient({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-4">
+          <div className="rounded-2xl bg-white border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-white font-bold text-sm">Unassigned Classes</h3>
+              <h3 className="text-black font-bold text-sm">Unassigned Classes</h3>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400">
                 {unassignedFiltered.length}
               </span>
             </div>
             <div className="max-h-80 overflow-y-auto space-y-1.5">
               {unassignedFiltered.length === 0 ? (
-                <p className="text-slate-500 text-xs py-2">All classes have advisors assigned.</p>
+                <p className="text-gray-400 text-xs py-2">All classes have advisors assigned.</p>
               ) : (
                 unassignedFiltered.map((u, i) => (
                   <button
@@ -606,11 +606,11 @@ export default function ClassAssignmentsClient({
                       })
                       setShowCreateModal(true)
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/20 border border-white/5 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all group"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all group"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">⚠</span>
-                      <span className="text-slate-300 text-xs">Semester {u.semester}, Section {u.section}</span>
+                      <span className="text-gray-700 text-xs">Semester {u.semester}, Section {u.section}</span>
                     </div>
                     <Plus size={10} className="text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>

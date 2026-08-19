@@ -22,12 +22,12 @@ export default async function StudentExaminationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <Award size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Examinations</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Internal marks and academic performance</p>
+          <h1 className="text-black text-2xl font-bold">Examinations</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Internal marks and academic performance</p>
         </div>
       </div>
 
@@ -37,33 +37,33 @@ export default async function StudentExaminationsPage() {
           { label: "Subjects with Marks", value: Object.keys(grouped).length },
           { label: "Average Mark", value: `${avgMark}/100` },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 text-center">
-            <p className="text-slate-400 text-xs uppercase">{label}</p>
-            <p className="text-white text-2xl font-bold mt-1">{value}</p>
+          <div key={label} className="rounded-2xl bg-white border border-gray-200 p-4 text-center">
+            <p className="text-gray-500 text-xs uppercase">{label}</p>
+            <p className="text-black text-2xl font-bold mt-1">{value}</p>
           </div>
         ))}
       </div>
 
       {Object.keys(grouped).length === 0 ? (
-        <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-16 text-center">
-          <Award size={32} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">No internal marks recorded yet.</p>
+        <div className="rounded-2xl bg-white border border-gray-200 p-16 text-center">
+          <Award size={32} className="text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">No internal marks recorded yet.</p>
         </div>
       ) : (
         Object.entries(grouped).map(([subjectId, subMarks]) => {
           const sub = subjectMap[subjectId] || subMarks[0]?.subject
           return (
-            <div key={subjectId} className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
-              <div className="px-5 py-3 border-b border-white/5 bg-slate-900/30">
-                <p className="text-white font-bold">{subMarks[0]?.subjectName || sub?.name}</p>
-                <p className="text-teal-400 text-xs font-mono">{subMarks[0]?.subjectCode || sub?.code} · Sem {subMarks[0]?.semester || sub?.semester}</p>
+            <div key={subjectId} className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                <p className="text-black font-bold">{subMarks[0]?.subjectName || sub?.name}</p>
+                <p className="text-[#2F2FE4] text-xs font-mono">{subMarks[0]?.subjectCode || sub?.code} · Sem {subMarks[0]?.semester || sub?.semester}</p>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-gray-100">
                 {subMarks.map((m: any) => (
                   <div key={m.id} className="flex items-center justify-between px-5 py-3">
-                    <p className="text-slate-300 text-sm">{m.examType}</p>
+                    <p className="text-gray-700 text-sm">{m.examType}</p>
                     <div className="flex items-center gap-4">
-                      <div className="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div className={`h-full rounded-full ${m.mark >= 75 ? "bg-emerald-400" : m.mark >= 50 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${m.mark}%` }} />
                       </div>
                       <span className={`text-base font-bold ${m.mark >= 75 ? "text-emerald-400" : m.mark >= 50 ? "text-amber-400" : "text-red-400"}`}>{m.mark}</span>

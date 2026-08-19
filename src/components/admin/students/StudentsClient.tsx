@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import {
   Search, Plus, Edit2, Trash2, Eye, X, GraduationCap, Calendar,
   Phone, Mail, Users, BookOpen, Building2, Shield, AlertCircle,
@@ -39,15 +39,15 @@ const SEMESTERS = [1, 2, 3, 4, 5, 6]
 const SECTIONS = ["A", "B", "C", "D"]
 const GENDERS = ["Male", "Female", "Other"]
 
-const inp = "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500/50 placeholder:text-slate-500"
-const sel = "w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500/50"
+const inp = "w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-black text-sm focus:outline-none focus:border-[#2F2FE4] placeholder:text-gray-400"
+const sel = "w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-black text-sm focus:outline-none focus:border-[#2F2FE4]"
 
 function StatCard({ label, value, icon: Icon, color }: { label: string; value: number; icon: any; color: string }) {
   return (
-    <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 flex items-center justify-between">
+    <div className="rounded-2xl bg-white border border-gray-200 border border-gray-100 p-4 flex items-center justify-between">
       <div>
-        <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">{label}</p>
-        <p className="text-white text-2xl font-bold mt-1">{value}</p>
+        <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">{label}</p>
+        <p className="text-black text-2xl font-bold mt-1">{value}</p>
       </div>
       <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${color}`}><Icon size={20} /></div>
     </div>
@@ -57,7 +57,7 @@ function StatCard({ label, value, icon: Icon, color }: { label: string; value: n
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-slate-400 text-xs mb-1.5 block font-medium">{label}</label>
+      <label className="text-gray-500 text-xs mb-1.5 block font-medium">{label}</label>
       {children}
     </div>
   )
@@ -224,7 +224,7 @@ export default function StudentsClient({ students, departments, courses, stats }
         <div className="flex flex-wrap gap-2">
           {stats.deptStats.map(d => (
             <button key={d.id} onClick={() => setDeptFilter(deptFilter === d.id ? "All" : d.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${deptFilter === d.id ? "bg-amber-500/20 border-amber-500/40 text-amber-300" : "bg-slate-800/50 border-white/5 text-slate-400 hover:text-white"}`}>
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${deptFilter === d.id ? "bg-[#2F2FE4]/10 border-[#2F2FE4]/40 text-[#2F2FE4]" : "bg-white border border-gray-200 border-gray-100 text-gray-500 hover:text-black"}`}>
               {d.code}: {d.count}
             </button>
           ))}
@@ -234,34 +234,34 @@ export default function StudentsClient({ students, departments, courses, stats }
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-white font-bold text-xl">Students Directory</h2>
-          <p className="text-slate-400 text-sm mt-0.5">{filtered.length} of {students.length} students</p>
+          <h2 className="text-black font-bold text-xl">Students Directory</h2>
+          <p className="text-gray-500 text-sm mt-0.5">{filtered.length} of {students.length} students</p>
         </div>
-        <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold hover:opacity-90 shadow-lg shadow-amber-500/25">
+        <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2F2FE4] to-[#4F6FE4] text-black text-sm font-semibold hover:opacity-90 shadow-lg shadow-[#2F2FE4]/20">
           <Plus size={15} /> Enroll Student
         </button>
       </div>
 
       {/* Filters - single line */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 bg-slate-800/60 border border-white/5 rounded-xl px-3 py-1.5 flex-1 min-w-0">
-          <Search size={14} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-1.5 flex-1 min-w-0">
+          <Search size={14} className="text-gray-500 shrink-0" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, reg no, email…"
-            className="bg-transparent text-white text-xs placeholder:text-slate-500 outline-none flex-1 min-w-0" />
+            className="bg-transparent text-black text-xs placeholder:text-gray-400 outline-none flex-1 min-w-0" />
         </div>
-        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 whitespace-nowrap">
+        <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-black text-xs min-w-0 whitespace-nowrap">
           <option value="All">All Depts</option>
           {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
-        <select value={semFilter} onChange={e => setSemFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-24">
+        <select value={semFilter} onChange={e => setSemFilter(e.target.value)} className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-black text-xs min-w-0 w-24">
           <option value="All">All Sems</option>
           {SEMESTERS.map(s => <option key={s} value={s.toString()}>Sem {s}</option>)}
         </select>
-        <select value={secFilter} onChange={e => setSecFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-24">
+        <select value={secFilter} onChange={e => setSecFilter(e.target.value)} className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-black text-xs min-w-0 w-24">
           <option value="All">All Secs</option>
           {SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-slate-800/60 border border-white/5 rounded-xl px-2 py-1.5 text-white text-xs min-w-0 w-28">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-black text-xs min-w-0 w-28">
           <option value="All">All Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
@@ -269,40 +269,40 @@ export default function StudentsClient({ students, departments, courses, stats }
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
+      <div className="rounded-2xl bg-white border border-gray-200 border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5 bg-slate-900/20">
+              <tr className="border-b border-gray-100 bg-gray-50">
                 {["Student ID", "Name", "Department", "Course", "Sem / Sec", "Admission", "Status", "Actions"].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-500 text-sm">No students found.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400 text-sm">No students found.</td></tr>
               ) : filtered.map((s, i) => (
                 <motion.tr key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 text-amber-400 text-xs font-mono font-semibold whitespace-nowrap">{s.registerNumber}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2F2FE4] to-[#4F6FE4] flex items-center justify-center text-black font-bold text-xs shrink-0">
                         {s.user.name?.charAt(0) || "?"}
                       </div>
                       <div>
-                        <p className="text-white text-sm font-medium">{s.user.name}</p>
-                        <p className="text-slate-400 text-xs">{s.user.email}</p>
+                        <p className="text-black text-sm font-medium">{s.user.name}</p>
+                        <p className="text-gray-500 text-xs">{s.user.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-300 text-sm whitespace-nowrap">{s.department.code}</td>
-                  <td className="px-4 py-3 text-slate-300 text-xs max-w-[120px] truncate">{s.course.name}</td>
+                  <td className="px-4 py-3 text-gray-700 text-sm whitespace-nowrap">{s.department.code}</td>
+                  <td className="px-4 py-3 text-gray-700 text-xs max-w-[120px] truncate">{s.course.name}</td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-1 rounded bg-slate-900 text-slate-300 text-xs font-semibold border border-white/5">S{s.semester} / {s.section}</span>
+                    <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-100">S{s.semester} / {s.section}</span>
                   </td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">{s.admissionYear}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">{s.admissionYear}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase w-fit ${s.user.isActive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
@@ -315,10 +315,10 @@ export default function StudentsClient({ students, departments, courses, stats }
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setModal({ mode: "view", data: s })} title="View" className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"><Eye size={13} /></button>
-                      <button onClick={() => openEdit(s)} title="Edit" className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all"><Edit2 size={13} /></button>
-                      <button onClick={() => { setResetDob(""); setModal({ mode: "reset", data: s }) }} title="Reset Password" className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all"><Key size={13} /></button>
-                      <button onClick={() => handleDelete(s.id)} title="Delete" className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"><Trash2 size={13} /></button>
+                      <button onClick={() => setModal({ mode: "view", data: s })} title="View" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-100 transition-all"><Eye size={13} /></button>
+                      <button onClick={() => openEdit(s)} title="Edit" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all"><Edit2 size={13} /></button>
+                      <button onClick={() => { setResetDob(""); setModal({ mode: "reset", data: s }) }} title="Reset Password" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-all"><Key size={13} /></button>
+                      <button onClick={() => handleDelete(s.id)} title="Delete" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"><Trash2 size={13} /></button>
                     </div>
                   </td>
                 </motion.tr>
@@ -332,20 +332,20 @@ export default function StudentsClient({ students, departments, courses, stats }
       <AnimatePresence>
         {modal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             onClick={e => e.target === e.currentTarget && setModal(null)}>
           <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-3xl bg-slate-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+            className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
 
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400"><GraduationCap size={16} /></div>
-                  <h2 className="text-white font-bold">
+                  <div className="w-8 h-8 rounded-xl bg-[#2F2FE4]/10 flex items-center justify-center text-amber-400"><GraduationCap size={16} /></div>
+                  <h2 className="text-black font-bold">
                     {modal.mode === "add" ? "Enroll New Student" : modal.mode === "edit" ? "Edit Student" : modal.mode === "reset" ? "Reset Password" : "Student Profile"}
                   </h2>
                 </div>
-                <button onClick={() => setModal(null)} className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all"><X size={15} /></button>
+                <button onClick={() => setModal(null)} className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-black transition-all"><X size={15} /></button>
               </div>
 
               <div className="overflow-y-auto p-6 flex-1">
@@ -354,11 +354,11 @@ export default function StudentsClient({ students, departments, courses, stats }
                 {modal.mode === "view" && modal.data && (
                   <div className="space-y-5">
                     <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/5 border border-amber-500/20">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2F2FE4] to-[#4F6FE4] flex items-center justify-center text-black text-2xl font-bold">
                         {modal.data.user.name?.charAt(0) || "?"}
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">{modal.data.user.name}</h3>
+                        <h3 className="text-black font-bold text-lg">{modal.data.user.name}</h3>
                         <p className="text-amber-400 font-mono text-sm font-semibold">{modal.data.registerNumber}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${modal.data.user.isActive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
@@ -383,9 +383,9 @@ export default function StudentsClient({ students, departments, courses, stats }
                         { label: "Admission Year", value: modal.data.admissionYear.toString(), icon: Calendar },
                         { label: "Portal Access", value: "Enabled", icon: Shield },
                       ].map(({ label, value, icon: Icon }) => (
-                        <div key={label} className="bg-slate-900/50 p-3.5 rounded-xl border border-white/5">
-                          <p className="text-slate-500 text-[10px] uppercase font-semibold mb-1">{label}</p>
-                          <p className="text-white text-sm font-medium flex items-center gap-2"><Icon size={13} className="text-amber-400 shrink-0" /> {value}</p>
+                        <div key={label} className="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                          <p className="text-gray-400 text-[10px] uppercase font-semibold mb-1">{label}</p>
+                          <p className="text-black text-sm font-medium flex items-center gap-2"><Icon size={13} className="text-amber-400 shrink-0" /> {value}</p>
                         </div>
                       ))}
                     </div>
@@ -412,12 +412,12 @@ export default function StudentsClient({ students, departments, courses, stats }
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                         <Shield size={14} className="text-amber-400 shrink-0" />
                         <div>
-                          <p className="text-amber-300 text-xs font-semibold">Register Number (Auto-Generated)</p>
-                          <p className="text-white font-mono font-bold text-lg">
+                          <p className="text-[#2F2FE4] text-xs font-semibold">Register Number (Auto-Generated)</p>
+                          <p className="text-black font-mono font-bold text-lg">
                             {autoId || (form.departmentId && form.admissionYear ? "Generating…" : "Select dept & year")}
                           </p>
                         </div>
-                        <p className="text-slate-400 text-xs ml-auto">Format: YY + Dept + Seq</p>
+                        <p className="text-gray-500 text-xs ml-auto">Format: YY + Dept + Seq</p>
                       </div>
                     )}
 
@@ -503,11 +503,11 @@ export default function StudentsClient({ students, departments, courses, stats }
                     </div>
 
                     {modal.mode === "add" && (
-                      <div className="p-3 rounded-xl bg-slate-900/50 border border-white/5 text-xs text-slate-400 space-y-1">
+                      <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-xs text-gray-500 space-y-1">
                         <p className="flex items-center gap-2 text-amber-400 font-semibold"><Key size={12} /> Default Password Info</p>
-                        <p>• Password = DOB in <strong className="text-white">DDMMYYYY</strong> format (e.g. 16061998)</p>
-                        <p>• If no DOB entered, default password is <strong className="text-white">12345678</strong></p>
-                        <p>• Register number format: <strong className="text-white">YY + Dept Code + Seq</strong> (e.g. 22CS001)</p>
+                        <p>• Password = DOB in <strong className="text-black">DDMMYYYY</strong> format (e.g. 16061998)</p>
+                        <p>• If no DOB entered, default password is <strong className="text-black">12345678</strong></p>
+                        <p>• Register number format: <strong className="text-black">YY + Dept Code + Seq</strong> (e.g. 22CS001)</p>
                         <p>• Student must change password on first login</p>
                       </div>
                     )}
@@ -516,10 +516,10 @@ export default function StudentsClient({ students, departments, courses, stats }
               </div>
 
               {modal.mode !== "view" && (
-                <div className="flex gap-3 px-6 py-4 border-t border-white/5 bg-slate-900/30 shrink-0">
-                  <button type="button" onClick={() => setModal(null)} className="px-5 py-2.5 rounded-xl border border-white/10 text-slate-400 text-sm hover:text-white transition-colors">Cancel</button>
+                <div className="flex gap-3 px-6 py-4 border-t border-gray-100 bg-gray-100/30 shrink-0">
+                  <button type="button" onClick={() => setModal(null)} className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-500 text-sm hover:text-black transition-colors">Cancel</button>
                   <button type="submit" form="main-form" disabled={loading}
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#2F2FE4] to-[#4F6FE4] text-black text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
                     {loading ? "Saving..." : modal.mode === "add" ? "Enroll Student" : modal.mode === "reset" ? "Reset Password" : "Save Changes"}
                   </button>
                 </div>

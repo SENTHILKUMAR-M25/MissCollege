@@ -57,21 +57,21 @@ export default async function HodAttendancePage() {
           <Activity size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Attendance Overview</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Department of {me.department.name}</p>
+          <h1 className="text-black text-2xl font-bold">Attendance Overview</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Department of {me.department.name}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Faculty Attendance Today */}
-        <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/5 bg-slate-900/30">
-            <h3 className="text-white font-bold">Faculty Present Today</h3>
-            <p className="text-slate-500 text-xs mt-0.5">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short", year: "numeric" })}</p>
+        <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 className="text-black font-bold">Faculty Present Today</h3>
+            <p className="text-gray-400 text-xs mt-0.5">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short", year: "numeric" })}</p>
           </div>
           <div className="p-4">
             {facultyList.length === 0 ? (
-              <p className="text-slate-500 text-sm py-4 text-center">No faculty in department.</p>
+              <p className="text-gray-400 text-sm py-4 text-center">No faculty in department.</p>
             ) : (
               <div className="space-y-2">
                 {facultyList.map((f) => {
@@ -79,19 +79,19 @@ export default async function HodAttendancePage() {
                   const isPresent = status === "PRESENT"
                   const isAbsent = status === "ABSENT"
                   return (
-                    <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-100">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-black font-bold text-xs">
                           {f.user.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-white text-sm font-medium">{f.user.name}</p>
-                          <p className="text-slate-500 text-xs">{f.facultyId}</p>
+                          <p className="text-black text-sm font-medium">{f.user.name}</p>
+                          <p className="text-gray-400 text-xs">{f.facultyId}</p>
                         </div>
                       </div>
                       {isPresent && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400">Present</span>}
                       {isAbsent && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/10 text-red-400">Absent</span>}
-                      {!status && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-500/10 text-slate-400">Not Marked</span>}
+                      {!status && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-500">Not Marked</span>}
                     </div>
                   )
                 })}
@@ -101,35 +101,35 @@ export default async function HodAttendancePage() {
         </div>
 
         {/* Student Attendance Summary */}
-        <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/5 bg-slate-900/30">
-            <h3 className="text-white font-bold">Student Attendance (Last 30 Days)</h3>
-            <p className="text-slate-500 text-xs mt-0.5">{students.length} students tracked</p>
+        <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 className="text-black font-bold">Student Attendance (Last 30 Days)</h3>
+            <p className="text-gray-400 text-xs mt-0.5">{students.length} students tracked</p>
           </div>
           <div className="p-4">
             {students.length === 0 ? (
-              <p className="text-slate-500 text-sm py-4 text-center">No students in department.</p>
+              <p className="text-gray-400 text-sm py-4 text-center">No students in department.</p>
             ) : (
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {students.map((s) => {
                   const pct = getAttendancePercent(s.attendance)
                   const low = pct !== null && pct < 60
                   return (
-                    <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-100">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-bold text-xs">
                           {s.user.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-white text-sm font-medium">{s.user.name}</p>
-                          <p className="text-slate-500 text-xs">{s.registerNumber} • Sem {s.semester} • {s.section || "N/A"}</p>
+                          <p className="text-black text-sm font-medium">{s.user.name}</p>
+                          <p className="text-gray-400 text-xs">{s.registerNumber} • Sem {s.semester} • {s.section || "N/A"}</p>
                         </div>
                       </div>
                       {pct === null ? (
-                        <span className="text-slate-500 text-xs">No data</span>
+                        <span className="text-gray-400 text-xs">No data</span>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <div className="w-20 h-1.5 rounded-full bg-slate-700">
+                          <div className="w-20 h-1.5 rounded-full bg-gray-200">
                             <div className={`h-1.5 rounded-full ${pct >= 75 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-red-500"}`} style={{ width: `${pct}%` }} />
                           </div>
                           <span className={`text-xs font-semibold ${low ? "text-red-400" : "text-emerald-400"}`}>{pct}%</span>

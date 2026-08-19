@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Shield, ArrowRight } from "lucide-react"
+import { motion } from "motion/react"
+import { Shield, ArrowRight, Eye, EyeOff } from "lucide-react"
 import { signIn } from "next-auth/react"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -27,7 +28,8 @@ export default function AdminLoginPage() {
     if (res?.ok) {
       const { getSession } = await import("next-auth/react")
       const session = await getSession()
-      if (session?.user?.role === "ADMIN") {
+      const ADMIN_ROLES = ["ADMIN", "ACADEMIC_ADMIN", "EXAM_ADMIN"]
+      if (session?.user?.role && ADMIN_ROLES.includes(session.user.role)) {
         router.push("/admin")
       } else {
         setError("Access denied. Admin credentials required.")
@@ -77,15 +79,20 @@ export default function AdminLoginPage() {
 
           <div>
             <label className="text-slate-400 text-xs mb-1.5 block font-medium">Password *</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500/50 pr-10"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition">
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <button

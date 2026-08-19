@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Users, Edit, Trash, BookOpen, Plus, X, Clock } from "lucide-react"
 
 type Subject = {
@@ -24,8 +24,8 @@ type Subject = {
 type FacultyOpt = { id: string; facultyId: string; user: { name: string; email: string }; designation: string }
 
 const TYPE_STYLE: Record<string, string> = {
-  THEORY: "bg-blue-500/10 text-blue-400",
-  LAB: "bg-violet-500/10 text-violet-400",
+  THEORY: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
+  LAB: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
   ELECTIVE: "bg-amber-500/10 text-amber-400",
   PROJECT: "bg-emerald-500/10 text-emerald-400",
 }
@@ -36,13 +36,13 @@ export default function HodSubjectsClient({
   departmentName,
   facultyUserId,
 }: {
-  initialSubjects: Subject[]
-  initialFaculty: FacultyOpt[]
+  initialSubjects?: Subject[]
+  initialFaculty?: FacultyOpt[]
   departmentName: string
   facultyUserId: string
 }) {
-  const [subjects, setSubjects] = useState<Subject[]>(initialSubjects)
-  const [faculty, setFaculty] = useState<FacultyOpt[]>(initialFaculty)
+  const [subjects, setSubjects] = useState<Subject[]>(initialSubjects || [])
+  const [faculty, setFaculty] = useState<FacultyOpt[]>(initialFaculty || [])
   const [search, setSearch] = useState("")
   const [semFilter, setSemFilter] = useState("ALL")
   const [typeFilter, setTypeFilter] = useState("ALL")
@@ -65,7 +65,7 @@ export default function HodSubjectsClient({
   const load = async () => {
     const r = await fetch("/api/hod-subjects")
     const j = await r.json()
-    if (j.success) setSubjects(j.data.subjects)
+    if (j.success) setSubjects(Array.isArray(j.data) ? j.data : [])
   }
   const loadFaculty = async () => {
     const r = await fetch("/api/hod-departments/hod")
@@ -75,14 +75,14 @@ export default function HodSubjectsClient({
 
   useEffect(() => { load(); loadFaculty() }, [facultyUserId])
 
-  const filtered = subjects
+  const filtered = (subjects || [])
     .filter((s) => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase()))
     .filter((s) => semFilter === "ALL" || s.semester.toString() === semFilter)
     .filter((s) => typeFilter === "ALL" || s.subjectType === typeFilter)
     .filter((s) => statusFilter === "ALL" || (statusFilter === "ACTIVE" ? s.isActive : !s.isActive))
 
-  const unassigned = subjects.filter((s) => !s.facultyId && (!s.facultySubjects || s.facultySubjects.length === 0)).length
-  const active = subjects.filter((s) => s.isActive).length
+  const unassigned = (subjects || []).filter((s) => !s.facultyId && (!s.facultySubjects || s.facultySubjects.length === 0)).length
+  const active = (subjects || []).filter((s) => s.isActive).length
 
   const handleCreate = async () => {
     if (!facultyUserId) return
@@ -189,15 +189,15 @@ export default function HodSubjectsClient({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+          <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
             <BookOpen size={20} />
           </div>
           <div>
-            <h1 className="text-white text-2xl font-bold">Subject Management</h1>
-            <p className="text-slate-400 text-sm mt-0.5">Department of {departmentName}</p>
+            <h1 className="text-black text-2xl font-bold">Subject Management</h1>
+            <p className="text-gray-500 text-sm mt-0.5">Department of {departmentName}</p>
           </div>
         </div>
-        <button onClick={() => { setFormData({ name: "", code: "", credits: "", semester: "", subjectType: "THEORY", description: "", totalHoursPerWeek: "", academicYear: "", regulation: "" }); setShowAdd(true) }} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold">
+        <button onClick={() => { setFormData({ name: "", code: "", credits: "", semester: "", subjectType: "THEORY", description: "", totalHoursPerWeek: "", academicYear: "", regulation: "" }); setShowAdd(true) }} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold">
           <Plus size={16} /> Add Subject
         </button>
       </div>
@@ -211,32 +211,32 @@ export default function HodSubjectsClient({
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Subjects", value: subjects.length, color: "text-white" },
+          { label: "Total Subjects", value: subjects.length, color: "text-black" },
           { label: "Active", value: active, color: "text-emerald-400" },
           { label: "Unassigned", value: unassigned, color: "text-red-400" },
-          { label: "Faculty", value: faculty.length, color: "text-blue-400" },
+          { label: "Faculty", value: faculty.length, color: "text-[#2F2FE4]" },
         ].map((s) => (
-          <div key={s.label} className="rounded-2xl bg-white/[0.03] border border-white/5 p-4">
-            <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">{s.label}</p>
+          <div key={s.label} className="rounded-2xl bg-gray-50 border border-gray-100 p-4">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">{s.label}</p>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-3 items-center rounded-2xl bg-white/[0.03] border border-white/5 p-4">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search code or name..." className="flex-1 min-w-[220px] bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-violet-500/50" />
-        <select value={semFilter} onChange={(e) => setSemFilter(e.target.value)} className="bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm">
+      <div className="flex flex-wrap gap-3 items-center rounded-2xl bg-gray-50 border border-gray-100 p-4">
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search code or name..." className="flex-1 min-w-[220px] bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none focus:ring-1 focus:ring-[#2F2FE4]/30" />
+        <select value={semFilter} onChange={(e) => setSemFilter(e.target.value)} className="bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm">
           <option value="ALL">All Semesters</option>
           {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => <option key={n} value={n.toString()}>Semester {n}</option>)}
         </select>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm">
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm">
           <option value="ALL">All Types</option>
           <option value="THEORY">Theory</option>
           <option value="LAB">Lab</option>
           <option value="ELECTIVE">Elective</option>
           <option value="PROJECT">Project</option>
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm">
           <option value="ALL">All Status</option>
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Inactive</option>
@@ -244,54 +244,54 @@ export default function HodSubjectsClient({
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-16 text-center">
-          <BookOpen size={32} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400">No subjects to display.</p>
+        <div className="rounded-2xl bg-gray-50 border border-gray-100 p-16 text-center">
+          <BookOpen size={32} className="text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">No subjects to display.</p>
         </div>
       )}
 
       {Object.entries(filtered.reduce<Record<number, Subject[]>>((acc, s) => { acc[s.semester] = acc[s.semester] || []; acc[s.semester].push(s); return acc }, {}))
         .sort(([a], [b]) => Number(a) - Number(b))
         .map(([sem, rows]) => (
-          <div key={sem} className="rounded-2xl bg-white/[0.03] border border-white/5 overflow-hidden">
-            <div className="px-6 py-3 border-b border-white/5 bg-slate-900/40 flex items-center justify-between">
+          <div key={sem} className="rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden">
+            <div className="px-6 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div>
-                <h3 className="text-white font-bold text-sm">Semester {sem}</h3>
-                <p className="text-slate-500 text-xs">{rows.length} subjects</p>
+                <h3 className="text-black font-bold text-sm">Semester {sem}</h3>
+                <p className="text-gray-400 text-xs">{rows.length} subjects</p>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/5 bg-slate-900/20">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Code</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Credits</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Hours</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Faculty</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">Actions</th>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Code</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Credits</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Hours</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Faculty</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((sub) => (
-                    <tr key={sub.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 text-violet-400 text-sm font-mono font-semibold">{sub.code}</td>
-                      <td className="px-4 py-3 text-white text-sm font-medium">{sub.name}</td>
-                      <td className="px-4 py-3 text-slate-300 text-sm">{sub.credits}</td>
-                      <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${TYPE_STYLE[sub.subjectType] || "bg-slate-500/10 text-slate-400"}`}>{sub.subjectType}</span></td>
-                      <td className="px-4 py-3 text-slate-300 text-sm">{sub.totalHoursPerWeek ?? "-"}</td>
-                      <td className="px-4 py-3 text-slate-300 text-sm">
-                        {sub.faculty ? sub.faculty.user.name : <span className="text-slate-500 italic">Unassigned</span>}
+                    <tr key={sub.id} className="border-b border-gray-100 hover:bg-gray-100 transition-colors">
+                      <td className="px-4 py-3 text-[#2F2FE4] text-sm font-mono font-semibold">{sub.code}</td>
+                      <td className="px-4 py-3 text-black text-sm font-medium">{sub.name}</td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{sub.credits}</td>
+                      <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${TYPE_STYLE[sub.subjectType] || "bg-gray-100 text-gray-500"}`}>{sub.subjectType}</span></td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">{sub.totalHoursPerWeek ?? "-"}</td>
+                      <td className="px-4 py-3 text-gray-700 text-sm">
+                        {sub.faculty ? sub.faculty.user.name : <span className="text-gray-400 italic">Unassigned</span>}
                       </td>
                       <td className="px-4 py-3">
-                        {sub.isActive ? <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400">Active</span> : <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase bg-slate-500/10 text-slate-400">Inactive</span>}
+                        {sub.isActive ? <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400">Active</span> : <span className="px-2 py-1 rounded-md text-[10px] font-bold uppercase bg-gray-100 text-gray-500">Inactive</span>}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => { setAllocatingSubject(sub); setSelectedFacultyIds((sub.facultySubjects || []).map((a) => a.facultyId)); setHoursMap((sub.facultySubjects || []).reduce((acc: Record<string, number>, a) => ({ ...acc, [a.facultyId]: a.assignedHours ?? 0 }), {})); setShowAllocate(true) }} className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"><Users size={14} /></button>
-                          <button onClick={() => { setEditingSubject(sub); setFormData({ name: sub.name, code: sub.code, credits: sub.credits.toString(), semester: sub.semester.toString(), subjectType: sub.subjectType, description: sub.description || "", totalHoursPerWeek: sub.totalHoursPerWeek?.toString() || "", academicYear: sub.academicYear || "", regulation: sub.regulation || "" }); setShowEdit(true) }} className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"><Edit size={14} /></button>
+                          <button onClick={() => { setAllocatingSubject(sub); setSelectedFacultyIds((sub.facultySubjects || []).map((a) => a.facultyId)); setHoursMap((sub.facultySubjects || []).reduce((acc: Record<string, number>, a) => ({ ...acc, [a.facultyId]: a.assignedHours ?? 0 }), {})); setShowAllocate(true) }} className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15"><Users size={14} /></button>
+                          <button onClick={() => { setEditingSubject(sub); setFormData({ name: sub.name, code: sub.code, credits: sub.credits.toString(), semester: sub.semester.toString(), subjectType: sub.subjectType, description: sub.description || "", totalHoursPerWeek: sub.totalHoursPerWeek?.toString() || "", academicYear: sub.academicYear || "", regulation: sub.regulation || "" }); setShowEdit(true) }} className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15"><Edit size={14} /></button>
                           <button onClick={() => handleDelete(sub.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash size={14} /></button>
                         </div>
                       </td>
@@ -306,31 +306,31 @@ export default function HodSubjectsClient({
       {/* Add/Edit Modal */}
       {(showAdd || showEdit) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowAdd(false); setShowEdit(false) }}>
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl p-6">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-white font-bold text-lg">{showAdd ? "Add Subject" : "Edit Subject"}</h3>
-              <button onClick={() => { setShowAdd(false); setShowEdit(false) }} className="text-slate-400 hover:text-white"><X size={18} /></button>
+              <h3 className="text-black font-bold text-lg">{showAdd ? "Add Subject" : "Edit Subject"}</h3>
+              <button onClick={() => { setShowAdd(false); setShowEdit(false) }} className="text-gray-500 hover:text-black"><X size={18} /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Subject Name</label>
-                <input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Subject Name</label>
+                <input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Code</label>
-                <input required value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Code</label>
+                <input required value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Credits</label>
-                <input required type="number" min="1" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Credits</label>
+                <input required type="number" min="1" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Semester</label>
-                <input required type="number" min="1" max="8" value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Semester</label>
+                <input required type="number" min="1" max="8" value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Type</label>
-                <select value={formData.subjectType} onChange={(e) => setFormData({ ...formData, subjectType: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                <label className="text-xs text-gray-500 font-medium">Type</label>
+                <select value={formData.subjectType} onChange={(e) => setFormData({ ...formData, subjectType: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none">
                   <option value="THEORY">Theory</option>
                   <option value="LAB">Lab / Practical</option>
                   <option value="ELECTIVE">Elective</option>
@@ -338,25 +338,25 @@ export default function HodSubjectsClient({
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Total Hours / Week</label>
-                <input type="number" min="0" value={formData.totalHoursPerWeek} onChange={(e) => setFormData({ ...formData, totalHoursPerWeek: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Total Hours / Week</label>
+                <input type="number" min="0" value={formData.totalHoursPerWeek} onChange={(e) => setFormData({ ...formData, totalHoursPerWeek: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Academic Year</label>
-                <input placeholder="e.g. 2025-2026" value={formData.academicYear} onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Academic Year</label>
+                <input placeholder="e.g. 2025-2026" value={formData.academicYear} onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Regulation</label>
-                <input placeholder="e.g. R2021" value={formData.regulation} onChange={(e) => setFormData({ ...formData, regulation: e.target.value })} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Regulation</label>
+                <input placeholder="e.g. R2021" value={formData.regulation} onChange={(e) => setFormData({ ...formData, regulation: e.target.value })} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
               <div className="col-span-2 space-y-1">
-                <label className="text-xs text-slate-400 font-medium">Description</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" />
+                <label className="text-xs text-gray-500 font-medium">Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none" />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-5">
-              <button onClick={() => { setShowAdd(false); setShowEdit(false) }} className="px-4 py-2 rounded-xl bg-slate-800 border border-white/5 text-slate-300 text-sm">Cancel</button>
-              <button onClick={showAdd ? handleCreate : handleUpdate} disabled={saving} className="px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Subject"}</button>
+              <button onClick={() => { setShowAdd(false); setShowEdit(false) }} className="px-4 py-2 rounded-xl bg-white border border-gray-100 text-gray-700 text-sm">Cancel</button>
+              <button onClick={showAdd ? handleCreate : handleUpdate} disabled={saving} className="px-4 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Subject"}</button>
             </div>
           </motion.div>
         </div>
@@ -365,35 +365,35 @@ export default function HodSubjectsClient({
       {/* Allocate Modal */}
       {showAllocate && allocatingSubject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowAllocate(false)}>
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl p-6">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl bg-white border border-gray-200 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="text-white font-bold text-lg">Allocate Faculty</h3>
-                <p className="text-slate-400 text-xs mt-0.5">{allocatingSubject.code} - {allocatingSubject.name}</p>
+                <h3 className="text-black font-bold text-lg">Allocate Faculty</h3>
+                <p className="text-gray-500 text-xs mt-0.5">{allocatingSubject.code} - {allocatingSubject.name}</p>
               </div>
-              <button onClick={() => setShowAllocate(false)} className="text-slate-400 hover:text-white"><X size={18} /></button>
+              <button onClick={() => setShowAllocate(false)} className="text-gray-500 hover:text-black"><X size={18} /></button>
             </div>
             <div className="mb-4">
-              <p className="text-slate-400 text-xs mb-3">Select faculty members and assign teaching hours.</p>
+              <p className="text-gray-500 text-xs mb-3">Select faculty members and assign teaching hours.</p>
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {faculty.map((f) => {
                   const checked = selectedFacultyIds.includes(f.id)
                   const hours = hoursMap[f.id] ?? 0
                   return (
-                    <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-white/5">
+                    <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-gray-200">
                       <div className="flex items-center gap-3">
-                        <button type="button" onClick={() => setSelectedFacultyIds((prev) => checked ? prev.filter((x) => x !== f.id) : [...prev, f.id])} className={`w-8 h-8 rounded-full flex items-center justify-center border transition-colors ${checked ? "bg-violet-500 text-white border-violet-500" : "bg-slate-800 text-slate-400 border-white/10"}`}>
+                        <button type="button" onClick={() => setSelectedFacultyIds((prev) => checked ? prev.filter((x) => x !== f.id) : [...prev, f.id])} className={`w-8 h-8 rounded-full flex items-center justify-center border transition-colors ${checked ? "bg-[#2F2FE4] text-white border-[#2F2FE4]" : "bg-white text-gray-500 border-gray-200"}`}>
                           {checked ? <CheckIcon /> : <Plus size={14} />}
                         </button>
                         <div>
-                          <p className="text-white text-sm font-medium">{f.user.name}</p>
-                          <p className="text-slate-500 text-xs">{f.facultyId} • {f.designation}</p>
+                          <p className="text-black text-sm font-medium">{f.user.name}</p>
+                          <p className="text-gray-400 text-xs">{f.facultyId} • {f.designation}</p>
                         </div>
                       </div>
                       {checked && (
                         <div className="flex items-center gap-2">
-                          <input type="number" min="0" value={hours} onChange={(e) => setHoursMap({ ...hoursMap, [f.id]: e.target.value ? parseInt(e.target.value) : 0 })} className="w-20 bg-slate-900 border border-white/5 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none" />
-                          <span className="text-slate-400 text-xs">hrs</span>
+                          <input type="number" min="0" value={hours} onChange={(e) => setHoursMap({ ...hoursMap, [f.id]: e.target.value ? parseInt(e.target.value) : 0 })} className="w-20 bg-gray-100 border border-gray-100 rounded-lg px-2 py-1.5 text-black text-xs focus:outline-none" />
+                          <span className="text-gray-500 text-xs">hrs</span>
                         </div>
                       )}
                     </div>
@@ -402,10 +402,10 @@ export default function HodSubjectsClient({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <p className="text-slate-400 text-xs">{selectedFacultyIds.length} faculty selected</p>
+              <p className="text-gray-500 text-xs">{selectedFacultyIds.length} faculty selected</p>
               <div className="flex items-center gap-3">
-                <button onClick={() => setShowAllocate(false)} className="px-4 py-2 rounded-xl bg-slate-800 border border-white/5 text-slate-300 text-sm">Cancel</button>
-                <button onClick={handleAllocate} disabled={saving || selectedFacultyIds.length === 0} className="px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Allocation"}</button>
+                <button onClick={() => setShowAllocate(false)} className="px-4 py-2 rounded-xl bg-white border border-gray-100 text-gray-700 text-sm">Cancel</button>
+                <button onClick={handleAllocate} disabled={saving || selectedFacultyIds.length === 0} className="px-4 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Allocation"}</button>
               </div>
             </div>
           </motion.div>

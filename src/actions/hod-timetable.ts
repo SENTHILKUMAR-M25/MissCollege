@@ -49,6 +49,14 @@ export async function savePeriods(periods: { periodNumber: number; name: string;
   }
 }
 
+const DAYS = [1, 2, 3, 4, 5, 6]
+const MAX_THEORY_CONSECUTIVE = 2
+const MAX_LAB_CONSECUTIVE = 3
+const MAX_SAME_SUBJECT_PER_DAY = 2  // theory; lab uses its own block logic
+
+// ─── Slot key helper ──────────────────────────────────────────────────────
+function slotKey(day: number, periodNum: number) { return `${day}|${periodNum}` }
+
 export async function generateTimetable(data: {
   departmentId: string
   className: string
@@ -58,8 +66,8 @@ export async function generateTimetable(data: {
   academicYear: string
   workingDays?: number[]
   excludeBreaks?: boolean
-  maxConsecutiveSameSubject?: number
   facultyUserId: string
+  maxConsecutiveSameSubject?: number
 }) {
   try {
     const session = await getSession()
@@ -72,11 +80,9 @@ export async function generateTimetable(data: {
     if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
     if (hod.departmentId !== data.departmentId) return { success: false, error: "Forbidden" }
 
-    const workingDays = data.workingDays || [1, 2, 3, 4, 5]
-    const excludeBreaks = data.excludeBreaks !== false
-    const maxConsecutive = data.maxConsecutiveSameSubject || 2
+    const workingDays = data.workingDays && data.workingDays.length > 0 ? data.workingDays : DAYS
 
-    const [subjects, existingEntries, commonPeriods, classStudents] = await Promise.all([
+    const [subjects, existingEntries, periods] = await Promise.all([
       prisma.subject.findMany({
         where: { departmentId: data.departmentId, semester: data.semester, isActive: true },
         include: { faculty: { include: { user: { select: { name: true } } } } },
@@ -85,161 +91,143 @@ export async function generateTimetable(data: {
         where: { departmentId: data.departmentId, className: data.className, section: data.section, semester: data.semester },
       }),
       prisma.period.findMany({ orderBy: { displayOrder: "asc" } }),
-      prisma.student.count({ where: { departmentId: data.departmentId, semester: data.semester, section: data.section } }),
     ])
 
     if (subjects.length === 0) return { success: false, error: "No subjects found for this semester" }
-    if (commonPeriods.length === 0) return { success: false, error: "No period timings configured. Please configure periods first." }
+    if (periods.length === 0) return { success: false, error: "No periods configured. Initialize periods first." }
 
+    const nonBreakPeriods = periods.filter(p => !p.isBreak).sort((a, b) => a.displayOrder - b.displayOrder)
+    const periodOrder = new Map(periods.map(p => [p.periodNumber, p.displayOrder]))
+    const totalSlotsPerWeek = workingDays.length * nonBreakPeriods.length
+
+    // ── Slot occupancy maps ──────────────────────────────────────────────
+    // key: "day|periodNum"
+    const occupiedFaculty  = new Map<string, string>()   // slot → facultyId
+    const occupiedSection  = new Map<string, string>()   // slot → "className|section"
+    const slotSubject      = new Map<string, string>()   // slot → subjectId (for this section)
+
+    for (const t of existingEntries) {
+      const k = slotKey(t.dayOfWeek, t.periodNumber ?? 0)
+      occupiedFaculty.set(k, t.facultyId)
+      occupiedSection.set(k, `${t.className}|${t.section}`)
+      slotSubject.set(k, t.subjectId ?? "")
+    }
+
+    const classroom = (code: string) => `CR-${code.slice(-4).toUpperCase()}`
+
+    // ── Build target hours per subject ──────────────────────────────────
     const targetHours: Record<string, number> = {}
     for (const s of subjects) {
-      const hours = s.totalHoursPerWeek || Math.max(1, Math.ceil(s.credits))
-      targetHours[s.id] = hours
+      const raw = s.totalHoursPerWeek ?? Math.max(1, Math.ceil(s.credits))
+      // Never request more slots than exist
+      targetHours[s.id] = Math.min(raw, totalSlotsPerWeek)
     }
 
-    const occupiedFaculty = new Map<string, string[]>()
-    const occupiedClassroom = new Map<string, string[]>()
-    const occupiedSection = new Map<string, string[]>()
+    // ── Sort queue: labs first, then by required hours desc ─────────────
+    const queue = subjects
+      .filter(s => targetHours[s.id] > 0)
+      .map(s => ({ subject: s, remaining: targetHours[s.id], isLab: (s.subjectType ?? "") === "LAB" }))
+      .sort((a, b) => {
+        if (a.isLab !== b.isLab) return a.isLab ? -1 : 1
+        return b.remaining - a.remaining
+      })
 
-    const slotKey = (day: number, periodNum: number) => `${day}|${periodNum}`
+    const toInsert: any[] = []
+    const unscheduled: string[] = []
 
-    const allEntries = [...existingEntries]
-
-    for (const t of allEntries) {
-      const fKey = slotKey(t.dayOfWeek, t.periodNumber || 0)
-      const cKey = slotKey(t.dayOfWeek, t.periodNumber || 0)
-      const sKey = slotKey(t.dayOfWeek, t.periodNumber || 0)
-      occupiedFaculty.set(fKey, [...(occupiedFaculty.get(fKey) || []), t.facultyId])
-      occupiedClassroom.set(cKey, [...(occupiedClassroom.get(cKey) || []), t.classroom])
-      occupiedSection.set(sKey, [...(occupiedSection.get(sKey) || []), `${t.className}|${t.section}`])
-    }
-
-    const pending = subjects
-      .map(s => ({ subject: s, remaining: targetHours[s.id] }))
-      .sort((a, b) => b.remaining - a.remaining)
-
-    const generated: any[] = []
-    const unscheduled: any[] = []
-
-    const facultyLastPeriod = new Map<string, { day: number; period: number; subjectId: string }>()
-    const subjectLastPeriod = new Map<string, { day: number; period: number }>()
-
-    function isPeriodAvailable(day: number, periodNum: number, facultyId: string, classroom: string, subjectId: string): boolean {
-      const key = slotKey(day, periodNum)
-      const period = commonPeriods.find(p => p.periodNumber === periodNum)
-      if (excludeBreaks && period?.isBreak) return false
-
-      const facultyAtSlot = occupiedFaculty.get(key) || []
-      if (facultyAtSlot.includes(facultyId)) return false
-
-      const classroomAtSlot = occupiedClassroom.get(key) || []
-      if (classroomAtSlot.includes(classroom)) return false
-
-      const sectionAtSlot = occupiedSection.get(key) || []
-      if (sectionAtSlot.includes(`${data.className}|${data.section}`)) return false
-
-      const last = facultyLastPeriod.get(facultyId)
-      if (last && last.day === day && last.subjectId === subjectId) {
-        const consecutiveCount = getConsecutiveCount(facultyId, day, periodNum, subjectId, allEntries)
-        if (consecutiveCount >= maxConsecutive) return false
-      }
-
-      return true
-    }
-
-    function getConsecutiveCount(facultyId: string, day: number, startPeriod: number, subjectId: string, entries: any[]): number {
-      let count = 1
-      for (let p = startPeriod - 1; p >= 1; p--) {
-        const key = slotKey(day, p)
-        const entriesAtSlot = allEntries.filter((e) => {
-          const k = slotKey(e.dayOfWeek, e.periodNumber || 0)
-          return k === key && e.facultyId === facultyId && e.subjectId === subjectId
-        })
-        if (entriesAtSlot.length > 0) count++
-        else break
-      }
-      return count
-    }
-
-    function getAvailablePeriodIndices(day: number): { periodNum: number; startTime: string; endTime: string }[] {
-      return commonPeriods
-        .filter(p => !excludeBreaks || !p.isBreak)
-        .map(p => ({ periodNum: p.periodNumber, startTime: p.startTime, endTime: p.endTime }))
-    }
-
-    for (const item of pending) {
-      if (item.remaining <= 0) continue
+    for (const item of queue) {
       const subject = item.subject
       const facultyId = subject.facultyId
-      if (!facultyId) { unscheduled.push(subject); continue }
+      if (!facultyId) { unscheduled.push(subject.name); continue }
 
-      const classroom = `CR-${subject.code.slice(-4)}`
+      const classRoom = classroom(subject.code)
+      const isLab = item.isLab
+      let remaining = item.remaining
 
-      let placed = 0
-      dayLoop: for (const day of workingDays) {
-        const periodsForDay = getAvailablePeriodIndices(day)
-        for (const periodInfo of periodsForDay) {
-          if (placed >= item.remaining) break dayLoop
-          if (!isPeriodAvailable(day, periodInfo.periodNum, facultyId, classroom, subject.id)) continue
+      if (isLab) {
+        // ── LAB: place as block(s) of up to 3 consecutive periods ────────
+        // Try block sizes from MAX down to 1
+        for (const { day } of getOrderedDays(workingDays, subject.id, toInsert)) {
+          if (remaining <= 0) break
+          const blockSize = Math.min(remaining, MAX_LAB_CONSECUTIVE)
 
-          await prisma.timetable.create({
-            data: {
-              facultyId,
-              departmentId: data.departmentId,
-              courseId: data.courseId,
-              subjectId: subject.id,
-              className: data.className,
-              section: data.section,
-              dayOfWeek: day,
-              periodNumber: periodInfo.periodNum,
-              startTime: periodInfo.startTime,
-              endTime: periodInfo.endTime,
-              classroom,
-              semester: data.semester,
-            },
-          })
+          // Try to find a consecutive block of `blockSize` on this day
+          let placed = tryPlaceBlock(day, blockSize, nonBreakPeriods, periodOrder,
+            facultyId, classRoom, data.className, data.section, subject.id,
+            occupiedFaculty, occupiedSection, slotSubject, toInsert, data, subject)
 
-          const fKey = slotKey(day, periodInfo.periodNum)
-          occupiedFaculty.set(fKey, [...(occupiedFaculty.get(fKey) || []), facultyId])
-          occupiedClassroom.set(fKey, [...(occupiedClassroom.get(fKey) || []), classroom])
-          occupiedSection.set(fKey, [...(occupiedSection.get(fKey) || []), `${data.className}|${data.section}`])
+          // If full block not possible, try smaller blocks
+          if (placed === 0 && blockSize > 1) {
+            placed = tryPlaceBlock(day, blockSize - 1, nonBreakPeriods, periodOrder,
+              facultyId, classRoom, data.className, data.section, subject.id,
+              occupiedFaculty, occupiedSection, slotSubject, toInsert, data, subject)
+          }
+          if (placed === 0 && blockSize > 2) {
+            placed = tryPlaceBlock(day, 1, nonBreakPeriods, periodOrder,
+              facultyId, classRoom, data.className, data.section, subject.id,
+              occupiedFaculty, occupiedSection, slotSubject, toInsert, data, subject)
+          }
+          remaining -= placed
+        }
+      } else {
+        // ── THEORY: spread across days, max 2 consecutive per day ────────
+        // Calculate ideal spread: how many periods per day
+        const periodsPerDay = Math.ceil(remaining / workingDays.length)
+        const maxPerDay = Math.min(periodsPerDay, MAX_THEORY_CONSECUTIVE)
 
-          facultyLastPeriod.set(facultyId, { day, period: periodInfo.periodNum, subjectId: subject.id })
+        for (const { day } of getOrderedDays(workingDays, subject.id, toInsert)) {
+          if (remaining <= 0) break
 
-          generated.push({
-            subject: subject.name,
-            subjectCode: subject.code,
-            day,
-            period: periodInfo.periodNum,
-            startTime: periodInfo.startTime,
-            endTime: periodInfo.endTime,
-            classroom,
-            faculty: subject.faculty?.user?.name,
-          })
-          placed++
+          // Count how many already placed today for this subject
+          const todayCount = toInsert.filter(e => e.subjectId === subject.id && e.dayOfWeek === day).length
+          if (todayCount >= maxPerDay) continue
+
+          const canPlace = Math.min(remaining, maxPerDay - todayCount)
+          const placed = placeTheory(day, canPlace, nonBreakPeriods, periodOrder,
+            facultyId, classRoom, data.className, data.section, subject.id,
+            occupiedFaculty, occupiedSection, slotSubject, toInsert, data, subject)
+          remaining -= placed
+        }
+
+        // Second pass: if still remaining, try any available slot without day limit
+        if (remaining > 0) {
+          for (const { day } of getOrderedDays(workingDays, subject.id, toInsert)) {
+            if (remaining <= 0) break
+            const todayCount = toInsert.filter(e => e.subjectId === subject.id && e.dayOfWeek === day).length
+            if (todayCount >= MAX_THEORY_CONSECUTIVE) continue  // hard limit still applies
+            const canPlace = Math.min(remaining, MAX_THEORY_CONSECUTIVE - todayCount)
+            const placed = placeTheory(day, canPlace, nonBreakPeriods, periodOrder,
+              facultyId, classRoom, data.className, data.section, subject.id,
+              occupiedFaculty, occupiedSection, slotSubject, toInsert, data, subject)
+            remaining -= placed
+          }
         }
       }
 
-      if (placed < item.remaining) {
-        unscheduled.push({ ...subject, unscheduledHours: item.remaining - placed })
+      if (remaining > 0) {
+        unscheduled.push(`${subject.name} (${remaining} hrs unscheduled)`)
       }
     }
 
-    if (generated.length === 0) return { success: false, error: "Could not schedule any period. Check conflicts or available hours." }
+    if (toInsert.length === 0) {
+      return { success: false, error: "Could not schedule any period. Ensure subjects have faculty assigned and periods are configured." }
+    }
+
+    // ── Batch insert ─────────────────────────────────────────────────────
+    await prisma.timetable.createMany({ data: toInsert, skipDuplicates: true })
 
     revalidatePath("/hod/timetable")
     revalidatePath("/faculty/timetable")
     revalidatePath("/student/timetable")
 
+    const msg = unscheduled.length > 0
+      ? `Generated ${toInsert.length} periods. Could not fully schedule: ${unscheduled.join(", ")}`
+      : `Generated ${toInsert.length} periods. All subjects scheduled ✓`
+
     return {
       success: true,
-      data: {
-        generated: generated.length,
-        unscheduled: unscheduled.length,
-        unscheduledSubjects: unscheduled.map((u) => ({ code: u.code, name: u.name, unscheduledHours: (u as any).unscheduledHours })),
-        entries: generated,
-      },
-      message: `Generated ${generated.length} periods${unscheduled.length > 0 ? ` (${unscheduled.length} subjects unscheduled)` : ""}`,
+      data: { generated: toInsert.length, unscheduled: unscheduled.length, unscheduledSubjects: unscheduled },
+      message: msg,
     }
   } catch (error) {
     console.error("Error generating timetable:", error)
@@ -247,7 +235,131 @@ export async function generateTimetable(data: {
   }
 }
 
-export async function getHodTimetable(departmentId: string, filters?: { className?: string; section?: string; semester?: number; academicYear?: string }) {
+// ─── Get days ordered by least usage for this subject (for spreading) ─────
+function getOrderedDays(
+  workingDays: number[],
+  subjectId: string,
+  pending: any[]
+): { day: number }[] {
+  return workingDays
+    .map(day => ({ day, count: pending.filter(e => e.subjectId === subjectId && e.dayOfWeek === day).length }))
+    .sort((a, b) => a.count - b.count)
+}
+
+// ─── Try to place a consecutive block for lab subjects ────────────────────
+function tryPlaceBlock(
+  day: number, size: number,
+  nonBreakPeriods: any[], periodOrder: Map<number, number>,
+  facultyId: string, classRoom: string, className: string, section: string, subjectId: string,
+  occupiedFaculty: Map<string, string>, occupiedSection: Map<string, string>,
+  slotSubject: Map<string, string>, pending: any[],
+  data: any, subject: any
+): number {
+  const sorted = [...nonBreakPeriods].sort((a, b) => a.displayOrder - b.displayOrder)
+
+  for (let start = 0; start <= sorted.length - size; start++) {
+    const block: number[] = []
+    for (let j = start; j < start + size; j++) {
+      const p = sorted[j]
+      // Must be consecutive in display order (no break in between)
+      if (j > start) {
+        const prevOrder = periodOrder.get(sorted[j - 1].periodNumber) ?? 0
+        const curOrder = periodOrder.get(p.periodNumber) ?? 0
+        if (curOrder - prevOrder !== 1) break
+      }
+      if (!isSlotFree(day, p.periodNumber, facultyId, classRoom, className, section, occupiedFaculty, occupiedSection, pending)) break
+      block.push(p.periodNumber)
+    }
+    if (block.length === size) {
+      // Place the block
+      for (const pNum of block) {
+        markSlot(day, pNum, facultyId, classRoom, className, section, subjectId, occupiedFaculty, occupiedSection, slotSubject)
+        pending.push(buildEntry(data, subject, day, pNum, nonBreakPeriods, classRoom, facultyId))
+      }
+      return size
+    }
+  }
+  return 0
+}
+
+// ─── Place theory periods (respecting max 2 consecutive) ─────────────────
+function placeTheory(
+  day: number, count: number,
+  nonBreakPeriods: any[], periodOrder: Map<number, number>,
+  facultyId: string, classRoom: string, className: string, section: string, subjectId: string,
+  occupiedFaculty: Map<string, string>, occupiedSection: Map<string, string>,
+  slotSubject: Map<string, string>, pending: any[],
+  data: any, subject: any
+): number {
+  const sorted = [...nonBreakPeriods].sort((a, b) => a.displayOrder - b.displayOrder)
+  let placed = 0
+  let lastOrder = -999
+  let consecutive = 0
+
+  for (const period of sorted) {
+    if (placed >= count) break
+    const pNum = period.periodNumber
+    const pOrder = periodOrder.get(pNum) ?? 0
+
+    if (!isSlotFree(day, pNum, facultyId, classRoom, className, section, occupiedFaculty, occupiedSection, pending)) continue
+
+    // Track consecutive for this subject on this day
+    const isAdjacent = pOrder - lastOrder === 1
+    // Check what's in the previous slot — only count as consecutive if same subject
+    const prevKey = slotKey(day, sorted.find(p => (periodOrder.get(p.periodNumber) ?? 0) === pOrder - 1)?.periodNumber ?? -1)
+    const prevIsSame = pending.some(e => e.dayOfWeek === day && e.periodNumber === sorted.find(p => (periodOrder.get(p.periodNumber) ?? 0) === pOrder - 1)?.periodNumber && e.subjectId === subjectId)
+
+    if (isAdjacent && prevIsSame) {
+      consecutive++
+    } else {
+      consecutive = 1
+    }
+
+    // Hard limit: max 2 consecutive for theory
+    if (consecutive > MAX_THEORY_CONSECUTIVE) continue
+
+    markSlot(day, pNum, facultyId, classRoom, className, section, subjectId, occupiedFaculty, occupiedSection, slotSubject)
+    pending.push(buildEntry(data, subject, day, pNum, nonBreakPeriods, classRoom, facultyId))
+    lastOrder = pOrder
+    placed++
+  }
+  return placed
+}
+
+// ─── Check if a slot is free ──────────────────────────────────────────────
+function isSlotFree(
+  day: number, pNum: number,
+  facultyId: string, classRoom: string, className: string, section: string,
+  occupiedFaculty: Map<string, string>,
+  occupiedSection: Map<string, string>,
+  pending: any[]
+): boolean {
+  const k = slotKey(day, pNum)
+  // Check DB-existing occupancy
+  if (occupiedFaculty.has(k)) return false           // faculty busy
+  if (occupiedSection.get(k) === `${className}|${section}`) return false  // section busy
+  // Check pending inserts
+  return !pending.some(e =>
+    e.dayOfWeek === day && e.periodNumber === pNum &&
+    (e.facultyId === facultyId || (e.className === className && e.section === section))
+  )
+}
+
+// ─── Mark a slot as occupied ──────────────────────────────────────────────
+function markSlot(
+  day: number, pNum: number,
+  facultyId: string, classRoom: string, className: string, section: string, subjectId: string,
+  occupiedFaculty: Map<string, string>,
+  occupiedSection: Map<string, string>,
+  slotSubject: Map<string, string>
+) {
+  const k = slotKey(day, pNum)
+  occupiedFaculty.set(k, facultyId)
+  occupiedSection.set(k, `${className}|${section}`)
+  slotSubject.set(k, subjectId)
+}
+
+export async function getHodTimetable(departmentId: string, filters?: { className?: string; section?: string; semester?: number }) {
   try {
     const where: any = { departmentId }
     if (filters?.className) where.className = filters.className
@@ -366,3 +478,5 @@ export async function initDefaultPeriods(facultyUserId: string) {
     return { success: false, error: "Failed to initialize periods" }
   }
 }
+
+

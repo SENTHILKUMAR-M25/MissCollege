@@ -16,12 +16,12 @@ export default async function HodTimetablePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <CalendarDays size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Timetable Management</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Generate and manage class timetables</p>
+          <h1 className="text-black text-2xl font-bold">Timetable Management</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Generate and manage class timetables</p>
         </div>
       </div>
 

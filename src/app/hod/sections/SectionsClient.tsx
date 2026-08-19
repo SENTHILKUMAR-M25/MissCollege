@@ -3,7 +3,7 @@
 import type { Section, Student } from "@prisma/client"
 import { useState, useEffect, useCallback } from "react"
 import { Users, UserPlus, Trash2, ChevronRight, ChevronDown, Filter, Search, PlusCircle, GraduationCap } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
 import { deleteSection, getUnassignedStudents, getSections } from "@/actions/sections"
 import SectionModal from "./SectionModal"
@@ -128,27 +128,27 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-white text-2xl font-bold">Section Management</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Create sections, assign and move students across sections</p>
+          <h1 className="text-black text-2xl font-bold">Section Management</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Create sections, assign and move students across sections</p>
         </div>
         <button
           onClick={() => setShowSectionModal(true)}
-          className="inline-flex items-center gap-2 rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-600 transition-colors"
+          className="inline-flex items-center gap-2 rounded-2xl bg-[#2F2FE4] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2525c5] transition-colors"
         >
           <PlusCircle size={16} />
           Create Section
         </button>
       </div>
 
-      <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
+      <div className="rounded-2xl bg-white border border-gray-200 p-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 text-gray-500 text-sm">
           <Filter size={16} />
           <span className="font-semibold uppercase tracking-wider text-xs">Filters</span>
         </div>
         <select
           value={activeFilters.academicYear}
           onChange={(e) => setActiveFilters({ ...activeFilters, academicYear: e.target.value })}
-          className="rounded-xl bg-slate-900/50 border border-white/10 px-3 py-2 text-sm text-white outline-none"
+          className="rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-black outline-none"
         >
           <option value="">All Years</option>
           {availableYears.map((year) => (
@@ -158,7 +158,7 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
         <select
           value={activeFilters.semester}
           onChange={(e) => setActiveFilters({ ...activeFilters, semester: e.target.value })}
-          className="rounded-xl bg-slate-900/50 border border-white/10 px-3 py-2 text-sm text-white outline-none"
+          className="rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-black outline-none"
         >
           <option value="">All Semesters</option>
           {availableSemesters.map((sem) => (
@@ -169,25 +169,25 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
           value={activeFilters.className}
           onChange={(e) => setActiveFilters({ ...activeFilters, className: e.target.value })}
           placeholder="Filter by class..."
-          className="rounded-xl bg-slate-900/50 border border-white/10 px-3 py-2 text-sm text-white outline-none w-48"
+          className="rounded-xl bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-black outline-none w-48"
         />
         <div className="relative ml-auto">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search section..."
-            className="rounded-xl bg-slate-900/50 border border-white/10 pl-9 pr-4 py-2 text-sm text-white outline-none w-52"
+            className="rounded-xl bg-gray-50 border border-gray-200 pl-9 pr-4 py-2 text-sm text-black outline-none w-52"
           />
         </div>
       </div>
 
       {loading ? (
-        <p className="text-slate-400 text-sm">Loading sections...</p>
+        <p className="text-gray-500 text-sm">Loading sections...</p>
       ) : sections.length === 0 ? (
-        <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-12 text-center">
-          <GraduationCap size={32} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">No sections found. Create one to start managing students.</p>
+        <div className="rounded-2xl bg-white border border-gray-200 p-12 text-center">
+          <GraduationCap size={32} className="text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">No sections found. Create one to start managing students.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -197,13 +197,13 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
                 key={section.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden"
+                className="rounded-2xl bg-white border border-gray-200 overflow-hidden"
               >
-                <div className="px-6 py-4 border-b border-white/5 bg-slate-900/30 flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                      <p className="text-white font-bold">{section.className} • {section.name}</p>
-                      <p className="text-slate-500 text-xs">
+                      <p className="text-black font-bold">{section.className} • {section.name}</p>
+                      <p className="text-gray-400 text-xs">
                         {section.department?.name} • {section.academicYear} • Semester {section.semester} • Capacity {section.capacity}
                       </p>
                     </div>
@@ -222,14 +222,14 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
                         setSelectedSectionId(section.id)
                         setShowAssignModal(true)
                       }}
-                      className="inline-flex items-center gap-1 rounded-xl bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-600"
+                      className="inline-flex items-center gap-1 rounded-xl bg-[#2F2FE4] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#2525c5]"
                     >
                       <UserPlus size={14} />
                       Add
                     </button>
                     <button
                       onClick={() => handleDeleteSection(section.id)}
-                      className="rounded-xl bg-slate-900/50 border border-white/10 p-1.5 text-red-400 hover:text-red-300"
+                      className="rounded-xl bg-gray-50 border border-gray-200 p-1.5 text-red-400 hover:text-red-300"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -238,29 +238,29 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/5 bg-slate-900/20">
+                      <tr className="border-b border-gray-100 bg-gray-50">
                         {["Student", "Reg No", "Email", "Course"].map((h) => (
-                          <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">{h}</th>
+                          <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
                         ))}
-                        <th className="px-4 py-2.5 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">Actions</th>
+                        <th className="px-4 py-2.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {section.studentSections.slice(0, 5).map((ss: any) => (
-                        <tr key={ss.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-2.5 text-white text-sm flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/30 flex items-center justify-center text-emerald-300 font-bold text-xs">
+                        <tr key={ss.id} className="border-b border-gray-100 hover:bg-gray-100 transition-colors">
+                          <td className="px-4 py-2.5 text-black text-sm flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-emerald-600 font-bold text-xs">
                               {ss.student.user.name?.charAt(0) || "S"}
                             </div>
                             {ss.student.user.name}
                           </td>
-                          <td className="px-4 py-2.5 text-violet-400 text-sm font-mono font-semibold">{ss.student.registerNumber}</td>
-                          <td className="px-4 py-2.5 text-slate-400 text-xs">{ss.student.user.email}</td>
-                          <td className="px-4 py-2.5 text-slate-300 text-sm">{ss.student.course.code}</td>
+                          <td className="px-4 py-2.5 text-[#2F2FE4] text-sm font-mono font-semibold">{ss.student.registerNumber}</td>
+                          <td className="px-4 py-2.5 text-gray-500 text-xs">{ss.student.user.email}</td>
+                          <td className="px-4 py-2.5 text-gray-700 text-sm">{ss.student.course.code}</td>
                           <td className="px-4 py-2.5 text-right">
                             <button
                               onClick={() => openMoveModal(ss.studentId, section.id)}
-                              className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white border border-white/10"
+                              className="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-black border border-gray-200"
                             >
                               Move
                             </button>
@@ -269,14 +269,14 @@ export default function SectionsClient({ loggedUserEmail }: { loggedUserEmail: s
                       ))}
                       {section.studentSections.length > 5 && (
                         <tr>
-                          <td colSpan={4} className="px-4 py-3 text-xs text-slate-500">
+                          <td colSpan={4} className="px-4 py-3 text-xs text-gray-400">
                             Showing 5 of {section.studentSections.length} students
                           </td>
                         </tr>
                       )}
                       {section.studentSections.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="px-4 py-6 text-center text-slate-500 text-sm">
+                          <td colSpan={4} className="px-4 py-6 text-center text-gray-400 text-sm">
                             No students assigned yet
                           </td>
                         </tr>

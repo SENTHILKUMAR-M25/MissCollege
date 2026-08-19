@@ -1,13 +1,45 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { Section, SectionTitle, Container, Button } from '../components/UI'
 import HeroBanner from '../components/HeroBanner'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
+import { submitContactForm } from '@/actions/admissions'
 
 export default function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: 'General Inquiry', message: '' })
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setLoading(true); setError('')
+    const res = await submitContactForm({ ...form, message: form.message })
+    res.success ? setSuccess(true) : setError(res.error || 'Failed to send')
+    setLoading(false)
+  }
+
+  if (success) return (
+    <>
+      <Navbar />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Message Sent!</h2>
+          <p className="text-gray-600 mb-6">Thank you for reaching out. Our team will respond shortly.</p>
+          <button onClick={() => { setSuccess(false); setForm({ name:'',email:'',phone:'',subject:'General Inquiry',message:'' }) }} className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition">Send Another Message</button>
+        </div>
+      </div>
+      <Footer />
+    </>
+  )
+
   return (
     <>
       <Navbar />
@@ -85,13 +117,17 @@ export default function Contact() {
         <Container>
           <SectionTitle title="Send Us a Message" subtitle="We'll get back to you soon" />
           <div className="max-w-2xl mx-auto">
-            <form className="bg-white rounded-xl p-8 shadow-soft space-y-6">
+            <form onSubmit={handleSubmit} className="bg-white rounded-xl p-8 shadow-soft space-y-6">
+              {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>}
               <div>
                 <label className="block text-sm font-semibold text-primary-navy mb-2">
                   Full Name
                 </label>
                 <input
+                  value={form.name}
+                  onChange={e => set('name', e.target.value)}
                   type="text"
+                  required
                   placeholder="Your name"
                   className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
                 />
@@ -103,7 +139,10 @@ export default function Contact() {
                     Email
                   </label>
                   <input
+                    value={form.email}
+                    onChange={e => set('email', e.target.value)}
                     type="email"
+                    required
                     placeholder="Your email"
                     className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
                   />
@@ -113,7 +152,10 @@ export default function Contact() {
                     Phone
                   </label>
                   <input
+                    value={form.phone}
+                    onChange={e => set('phone', e.target.value)}
                     type="tel"
+                    required
                     placeholder="Your phone"
                     className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
                   />
@@ -124,7 +166,7 @@ export default function Contact() {
                 <label className="block text-sm font-semibold text-primary-navy mb-2">
                   Subject
                 </label>
-                <select className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue">
+                <select value={form.subject} onChange={e => set('subject', e.target.value)} className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue">
                   <option>Select Subject</option>
                   <option>Admissions Inquiry</option>
                   <option>Academic Information</option>
@@ -138,14 +180,17 @@ export default function Contact() {
                   Message
                 </label>
                 <textarea
+                  value={form.message}
+                  onChange={e => set('message', e.target.value)}
+                  required
                   placeholder="Your message"
                   rows="5"
                   className="w-full px-4 py-3 border border-neutral-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
                 ></textarea>
               </div>
 
-              <Button variant="primary" size="lg" className="w-full">
-                Send Message
+              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
           </div>

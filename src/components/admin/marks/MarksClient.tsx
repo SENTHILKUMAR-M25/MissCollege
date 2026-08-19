@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Search, Save, FileSpreadsheet, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { upsertMark } from "@/actions/marks"
@@ -55,78 +55,78 @@ export default function MarksClient({ records, departments, subjects }: Props) {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-white font-bold text-xl">Internal Marks Entry</h2>
-          <p className="text-slate-400 text-sm mt-0.5">Manage continuous internal assessments</p>
+          <h2 className="text-black font-bold text-xl">Internal Marks Entry</h2>
+          <p className="text-gray-500 text-sm mt-0.5">Manage continuous internal assessments</p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-semibold hover:bg-white/10 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 border border-gray-200 text-black text-sm font-semibold hover:bg-gray-100 transition-colors">
             <FileSpreadsheet size={15} /> Export CSV
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 p-4 bg-slate-800/50 border border-white/5 rounded-2xl">
+      <div className="flex flex-wrap gap-3 p-4 bg-white border border-gray-200 border border-gray-100 rounded-2xl">
         <div className="flex flex-col gap-1.5 flex-1 min-w-[200px]">
-          <label className="text-xs text-slate-400 font-medium">Department</label>
+          <label className="text-xs text-gray-500 font-medium">Department</label>
           <select value={dept} onChange={(e) => { setDept(e.target.value); setSubj("All") }}
-            className="bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-slate-300 text-sm focus:outline-none">
-            {depts.map((d) => <option key={d} className="bg-slate-800">{d}</option>)}
+            className="bg-gray-100 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-700 text-sm focus:outline-none">
+            {depts.map((d) => <option key={d} className="bg-white">{d}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1.5 w-32">
-          <label className="text-xs text-slate-400 font-medium">Semester</label>
+          <label className="text-xs text-gray-500 font-medium">Semester</label>
           <select value={sem} onChange={(e) => { setSem(e.target.value); setSubj("All") }}
-            className="bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-slate-300 text-sm focus:outline-none">
+            className="bg-gray-100 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-700 text-sm focus:outline-none">
             <option value="All">All</option>
-            {sems.map((s) => <option key={s} value={s} className="bg-slate-800">Sem {s}</option>)}
+            {sems.map((s) => <option key={s} value={s} className="bg-white">Sem {s}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1.5 flex-1 min-w-[200px]">
-          <label className="text-xs text-slate-400 font-medium">Subject</label>
+          <label className="text-xs text-gray-500 font-medium">Subject</label>
           <select value={subj} onChange={(e) => setSubj(e.target.value)}
-            className="bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-slate-300 text-sm focus:outline-none">
+            className="bg-gray-100 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-700 text-sm focus:outline-none">
             <option value="All">All Subjects</option>
-            {filteredSubjects.map((s) => <option key={s.code} value={s.code} className="bg-slate-800">{s.code} - {s.name}</option>)}
+            {filteredSubjects.map((s) => <option key={s.code} value={s.code} className="bg-white">{s.code} - {s.name}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1.5 flex-1 min-w-[250px]">
-          <label className="text-xs text-slate-400 font-medium">Search Student</label>
-          <div className="flex items-center gap-2 bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 w-full">
-            <Search size={15} className="text-slate-400 shrink-0" />
+          <label className="text-xs text-gray-500 font-medium">Search Student</label>
+          <div className="flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2.5 w-full">
+            <Search size={15} className="text-gray-500 shrink-0" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Reg No or Name..."
-              className="bg-transparent text-white text-sm placeholder:text-slate-500 outline-none flex-1" />
-            {search && <button onClick={() => setSearch("")}><X size={13} className="text-slate-500" /></button>}
+              className="bg-transparent text-black text-sm placeholder:text-gray-400 outline-none flex-1" />
+            {search && <button onClick={() => setSearch("")}><X size={13} className="text-gray-400" /></button>}
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
+      <div className="rounded-2xl bg-white border border-gray-200 border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5 bg-slate-900/50">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Student</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Subject</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wide w-24">CAT 1 (30)</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wide w-24">CAT 2 (30)</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wide w-28">Assign (10)</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wide w-24">Total (70)</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide w-20">Action</th>
+              <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Student</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Subject</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide w-24">CAT 1 (30)</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide w-24">CAT 2 (30)</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide w-28">Assign (10)</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide w-24">Total (70)</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide w-20">Action</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="p-12 text-center text-slate-500 text-sm">No mark records found for the selected filters.</td></tr>
+                <tr><td colSpan={7} className="p-12 text-center text-gray-400 text-sm">No mark records found for the selected filters.</td></tr>
               ) : filtered.map((m, idx) => (
                 <motion.tr key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.04 }}
-                  className={cn("border-b border-white/5 transition-colors", editing === m.id ? "bg-amber-500/5" : "hover:bg-white/5")}>
+                  className={cn("border-b border-gray-100 transition-colors", editing === m.id ? "bg-amber-500/5" : "hover:bg-gray-100")}>
                   <td className="px-4 py-3">
-                    <p className="text-white text-sm font-medium">{m.studentName}</p>
+                    <p className="text-black text-sm font-medium">{m.studentName}</p>
                     <p className="text-amber-400 text-xs font-mono">{m.registerNumber}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-slate-300 text-sm">{m.subjectCode}</p>
-                    <p className="text-slate-500 text-xs">{m.subjectName}</p>
+                    <p className="text-gray-700 text-sm">{m.subjectCode}</p>
+                    <p className="text-gray-400 text-xs">{m.subjectName}</p>
                   </td>
                   <td className="px-4 py-3">
                     <input type="number"
@@ -135,7 +135,7 @@ export default function MarksClient({ records, departments, subjects }: Props) {
                         if (!editRefs.current[m.id]) editRefs.current[m.id] = { cat1: m.cat1, cat2: m.cat2, assignment: m.assignment }
                         editRefs.current[m.id].cat1 = Number(e.target.value)
                       }}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-2 py-1.5 text-center text-white text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
+                      className="w-full bg-gray-100 border border-gray-200 rounded-lg px-2 py-1.5 text-center text-black text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
                   </td>
                   <td className="px-4 py-3">
                     <input type="number"
@@ -144,7 +144,7 @@ export default function MarksClient({ records, departments, subjects }: Props) {
                         if (!editRefs.current[m.id]) editRefs.current[m.id] = { cat1: m.cat1, cat2: m.cat2, assignment: m.assignment }
                         editRefs.current[m.id].cat2 = Number(e.target.value)
                       }}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-2 py-1.5 text-center text-white text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
+                      className="w-full bg-gray-100 border border-gray-200 rounded-lg px-2 py-1.5 text-center text-black text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
                   </td>
                   <td className="px-4 py-3">
                     <input type="number"
@@ -153,7 +153,7 @@ export default function MarksClient({ records, departments, subjects }: Props) {
                         if (!editRefs.current[m.id]) editRefs.current[m.id] = { cat1: m.cat1, cat2: m.cat2, assignment: m.assignment }
                         editRefs.current[m.id].assignment = Number(e.target.value)
                       }}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-2 py-1.5 text-center text-white text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
+                      className="w-full bg-gray-100 border border-gray-200 rounded-lg px-2 py-1.5 text-center text-black text-sm font-semibold disabled:bg-transparent disabled:border-transparent focus:border-amber-500 focus:outline-none" />
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className={cn("px-2.5 py-1 rounded-lg text-sm font-bold",
@@ -169,7 +169,7 @@ export default function MarksClient({ records, departments, subjects }: Props) {
                       </button>
                     ) : (
                       <button onClick={() => setEditing(m.id)}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 text-xs font-semibold hover:bg-white/10 transition-colors">
+                        className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-100 transition-colors">
                         Edit
                       </button>
                     )}

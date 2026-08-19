@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       include: { user: true },
     })
 
-    if (!faculty?.user || !faculty.user.isActive || !faculty.accountStatus) {
+    if (!faculty?.user || !faculty.user.isActive || faculty.accountStatus !== "ACTIVE") {
       return NextResponse.json({ success: false, error: "Invalid credentials" }, { status: 401 })
     }
 

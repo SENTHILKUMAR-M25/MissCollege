@@ -1,5 +1,6 @@
 "use server"
 
+import { requireAcademicAdmin } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { revalidatePath } from "next/cache"
@@ -34,6 +35,7 @@ export async function addStudent(data: {
   address?: string
 }) {
   try {
+    await requireAcademicAdmin()
     const { name, email, departmentId, courseId, semester, section, admissionYear, phone, dob, gender, parentName, parentPhone, address } = data
 
     if (!name || !email || !departmentId || !courseId || !semester || !section || !admissionYear) {
@@ -104,6 +106,7 @@ export async function updateStudent(data: {
   address?: string
 }) {
   try {
+    await requireAcademicAdmin()
     const { id, name, email, registerNumber, departmentId, courseId, semester, section, admissionYear, phone, dob, gender, parentName, parentPhone, address } = data
 
     if (!id) return { success: false, error: "ID is required" }
@@ -142,6 +145,7 @@ export async function updateStudent(data: {
 
 export async function deleteStudent(id: string) {
   try {
+    await requireAcademicAdmin()
     const student = await prisma.student.findUnique({ where: { id } })
     if (!student) return { success: false, error: "Student not found" }
     await prisma.user.delete({ where: { id: student.userId } })
@@ -154,6 +158,7 @@ export async function deleteStudent(id: string) {
 
 export async function resetStudentPassword(id: string, dob: string) {
   try {
+    await requireAcademicAdmin()
     const student = await prisma.student.findUnique({ where: { id } })
     if (!student) return { success: false, error: "Student not found" }
     const [y, m, d] = dob.split("-")
@@ -243,6 +248,11 @@ export async function getStudentPortalData(userId: string) {
 
     const leaveRequests: any[] = []
 
+    const attendanceRecords = await prisma.attendance.findMany({
+      where: { studentId: student.id },
+      include: { subject: { select: { name: true, code: true, semester: true } } },
+    })
+
     const timetable = await prisma.timetable.findMany({
       where: { departmentId: student.departmentId, semester: student.semester, section: student.section },
       include: { subject: { select: { name: true, code: true } }, faculty: { include: { user: { select: { name: true } } } } },
@@ -267,6 +277,7 @@ export async function getStudentPortalData(userId: string) {
         leaveRequests,
         timetable,
         notices,
+        attendance: attendanceRecords,
       },
     }
   } catch (error) {

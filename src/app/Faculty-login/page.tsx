@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Shield, ArrowRight } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 export default function FacultyLoginPage() {
   const [facultyId, setFacultyId] = useState("")

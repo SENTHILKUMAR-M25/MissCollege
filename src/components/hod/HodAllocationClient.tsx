@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Search, Users, Plus, Trash2, Calendar, Clock, X, Check, BookOpen, GraduationCap, ChevronDown, ChevronUp, RefreshCw } from "lucide-react"
 
 type Subject = { id: string; code: string; name: string; semester: number; academicYear?: string | null; subjectType: string; totalHoursPerWeek?: number | null; credits: number }
@@ -9,8 +9,8 @@ type Faculty = { id: string; facultyId: string; user: { name: string; email: str
 type Allocation = { id: string; subject: { id: string; code: string; name: string; semester: number; academicYear?: string | null; totalHoursPerWeek?: number | null }; faculty: { facultyId: string; user: { name: string; email: string } }; assignedHours?: number | null; assignedAt: string }
 
 const TYPE_COLORS: Record<string, string> = {
-  THEORY: "bg-blue-500/10 text-blue-400",
-  LAB: "bg-violet-500/10 text-violet-400",
+  THEORY: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
+  LAB: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
   ELECTIVE: "bg-amber-500/10 text-amber-400",
   PROJECT: "bg-emerald-500/10 text-emerald-400",
 }
@@ -168,8 +168,8 @@ export default function HodAllocationClient({
           <Users size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Faculty Allocation</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Department of {departmentName}</p>
+          <h1 className="text-black text-2xl font-bold">Faculty Allocation</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Department of {departmentName}</p>
         </div>
       </div>
 
@@ -187,71 +187,71 @@ export default function HodAllocationClient({
           { label: "Unassigned", value: stats.unassigned, color: "text-red-400" },
           { label: "Faculty Allocated", value: stats.facultyAllocated },
         ].map((s) => (
-          <div key={s.label} className="rounded-2xl bg-slate-800/50 border border-white/5 p-4">
-            <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">{s.label}</p>
-            <p className={`text-2xl font-bold ${s.color ?? "text-white"}`}>{s.value}</p>
+          <div key={s.label} className="rounded-2xl bg-white border border-gray-200 p-4">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">{s.label}</p>
+            <p className={`text-2xl font-bold ${s.color ?? "text-black"}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-4">
+      <div className="rounded-2xl bg-white border border-gray-200 p-4">
         <div className="flex flex-wrap gap-3 items-center">
-          <select value={academicYear} onChange={(e) => { setAcademicYear(e.target.value); loadAllocations() }} className="bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+          <select value={academicYear} onChange={(e) => { setAcademicYear(e.target.value); loadAllocations() }} className="bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none">
             {academicYears.map((y) => <option key={y} value={y}>AY: {y}</option>)}
           </select>
-          <select value={semester} onChange={(e) => { setSemester(e.target.value); loadAllocations() }} className="bg-slate-900 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+          <select value={semester} onChange={(e) => { setSemester(e.target.value); loadAllocations() }} className="bg-gray-100 border border-gray-100 rounded-xl px-3 py-2 text-black text-sm focus:outline-none">
             {semesters.map((s) => <option key={s} value={s.toString()}>Semester {s}</option>)}
           </select>
           <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input value={searchSubject} onChange={(e) => setSearchSubject(e.target.value)} placeholder="Search subjects..." className="w-full bg-slate-900 border border-white/5 rounded-xl pl-9 pr-3 py-2 text-white text-sm focus:outline-none" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input value={searchSubject} onChange={(e) => setSearchSubject(e.target.value)} placeholder="Search subjects..." className="w-full bg-gray-100 border border-gray-100 rounded-xl pl-9 pr-3 py-2 text-black text-sm focus:outline-none" />
           </div>
           <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input value={searchFaculty} onChange={(e) => setSearchFaculty(e.target.value)} placeholder="Filter faculty..." className="w-full bg-slate-900 border border-white/5 rounded-xl pl-9 pr-3 py-2 text-white text-sm focus:outline-none" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input value={searchFaculty} onChange={(e) => setSearchFaculty(e.target.value)} placeholder="Filter faculty..." className="w-full bg-gray-100 border border-gray-100 rounded-xl pl-9 pr-3 py-2 text-black text-sm focus:outline-none" />
           </div>
         </div>
       </div>
 
       {selectedSubject ? (
-        <div className="rounded-2xl bg-slate-800/50 border border-violet-500/20 p-5">
+        <div className="rounded-2xl bg-white border border-gray-200 border border-[#2F2FE4]/20 p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-white font-bold">Allocating: {selectedSubject.code} - {selectedSubject.name}</h3>
-              <p className="text-slate-400 text-xs mt-0.5">Semester {selectedSubject.semester} • {selectedSubject.academicYear || "No AY"} • {selectedSubject.subjectType}</p>
-              {selectedSubject.totalHoursPerWeek && <p className="text-slate-400 text-xs mt-0.5">Total Hours/Week: {selectedSubject.totalHoursPerWeek}</p>}
+              <h3 className="text-black font-bold">Allocating: {selectedSubject.code} - {selectedSubject.name}</h3>
+              <p className="text-gray-500 text-xs mt-0.5">Semester {selectedSubject.semester} • {selectedSubject.academicYear || "No AY"} • {selectedSubject.subjectType}</p>
+              {selectedSubject.totalHoursPerWeek && <p className="text-gray-500 text-xs mt-0.5">Total Hours/Week: {selectedSubject.totalHoursPerWeek}</p>}
             </div>
-            <button onClick={() => openAllocate(null)} className="text-slate-400 hover:text-white"><X size={18} /></button>
+            <button onClick={() => openAllocate(null)} className="text-gray-500 hover:text-black"><X size={18} /></button>
           </div>
 
           <div className="space-y-2 max-h-[400px] overflow-y-auto">
             {filteredFaculty.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center py-6">No faculty in this department.</p>
+              <p className="text-gray-400 text-sm text-center py-6">No faculty in this department.</p>
             ) : (
               filteredFaculty.map((f) => {
                 const checked = selectedFaculty.includes(f.id)
                 const existingHours = hoursMap[f.id]
                 return (
-                  <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-white/5">
+                  <div key={f.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-xs">
+                      <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-black font-bold text-xs">
                         {f.user.name?.charAt(0) || "?"}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white text-sm font-medium">{f.user.name}</p>
-                        <p className="text-slate-500 text-xs">{f.facultyId} • {f.designation}</p>
-                        {f.user.email && <p className="text-slate-600 text-[10px]">{f.user.email}</p>}
+                        <p className="text-black text-sm font-medium">{f.user.name}</p>
+                        <p className="text-gray-400 text-xs">{f.facultyId} • {f.designation}</p>
+                        {f.user.email && <p className="text-gray-400 text-[10px]">{f.user.email}</p>}
                       </div>
                       <button
                         type="button"
                         onClick={() => setSelectedFaculty((prev) => checked ? prev.filter((x) => x !== f.id) : [...prev, f.id])}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${checked ? "bg-violet-500 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${checked ? "bg-[#2F2FE4] text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-200"}`}
                       >
                         {checked ? <><Check size={12} className="inline mr-1" />Selected</> : <><Plus size={12} className="inline mr-1" />Select</>}
                       </button>
                     </div>
                     {checked && (
-                      <div className="flex items-center gap-2 ml-3 pl-3 border-l border-white/5">
+                      <div className="flex items-center gap-2 ml-3 pl-3 border-l border-gray-100">
                         <input
                           type="number"
                           min="0"
@@ -261,9 +261,9 @@ export default function HodAllocationClient({
                             const val = e.target.value === "" ? 0 : parseInt(e.target.value)
                             setHoursMap((prev) => ({ ...prev, [f.id]: isNaN(val) ? 0 : val }))
                           }}
-                          className="w-20 bg-slate-800 border border-white/5 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none"
+                          className="w-20 bg-white border border-gray-100 rounded-lg px-2 py-1.5 text-black text-xs focus:outline-none"
                         />
-                        <span className="text-slate-400 text-xs w-6">hrs</span>
+                        <span className="text-gray-500 text-xs w-6">hrs</span>
                       </div>
                     )}
                   </div>
@@ -273,75 +273,75 @@ export default function HodAllocationClient({
           </div>
 
           <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="text-slate-400 text-xs">{selectedFaculty.length} faculty selected • Total: {Object.values(hoursMap).reduce((a, b) => a + b, 0)} hrs</p>
+            <p className="text-gray-500 text-xs">{selectedFaculty.length} faculty selected • Total: {Object.values(hoursMap).reduce((a, b) => a + b, 0)} hrs</p>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => openAllocate(null)} className="px-4 py-2 rounded-xl bg-slate-800 border border-white/5 text-slate-300 text-sm">Cancel</button>
-              <button type="button" onClick={saveAllocation} disabled={saving || selectedFaculty.length === 0} className="px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Allocation"}</button>
+              <button type="button" onClick={() => openAllocate(null)} className="px-4 py-2 rounded-xl bg-white border border-gray-100 text-gray-700 text-sm">Cancel</button>
+              <button type="button" onClick={saveAllocation} disabled={saving || selectedFaculty.length === 0} className="px-4 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50">{saving ? "Saving..." : "Save Allocation"}</button>
             </div>
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5">
+          <div className="rounded-2xl bg-white border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-bold text-sm">Available Subjects</h3>
-              <span className="text-[10px] text-slate-400 font-medium bg-slate-700/50 px-2 py-0.5 rounded">{filteredSubjects.length} subjects</span>
+              <h3 className="text-black font-bold text-sm">Available Subjects</h3>
+              <span className="text-[10px] text-gray-500 font-medium bg-gray-200/50 px-2 py-0.5 rounded">{filteredSubjects.length} subjects</span>
             </div>
             {filteredSubjects.length === 0 ? (
-              <p className="text-slate-500 text-sm py-6 text-center">No subjects match filters.</p>
+              <p className="text-gray-400 text-sm py-6 text-center">No subjects match filters.</p>
             ) : (
               <div className="space-y-2 max-h-[500px] overflow-y-auto">
                 {filteredSubjects.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => { setSelectedSubject(s); setSelectedFaculty([]); setHoursMap({}) }}
-                    className="w-full text-left p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all"
+                    className="w-full text-left p-3 rounded-xl bg-white border border-gray-100 hover:border-[#2F2FE4]/30 hover:bg-[#2F2FE4]/5 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-white text-sm font-medium">{s.code}</p>
-                        <p className="text-slate-400 text-xs mt-0.5">{s.name}</p>
+                        <p className="text-black text-sm font-medium">{s.code}</p>
+                        <p className="text-gray-500 text-xs mt-0.5">{s.name}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${TYPE_COLORS[s.subjectType] || "bg-slate-500/10 text-slate-400"}`}>{s.subjectType}</span>
-                        {s.totalHoursPerWeek ? <span className="text-slate-400 text-[10px] flex items-center gap-1"><Clock size={10} />{s.totalHoursPerWeek}h</span> : null}
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${TYPE_COLORS[s.subjectType] || "bg-gray-100 text-gray-500"}`}>{s.subjectType}</span>
+                        {s.totalHoursPerWeek ? <span className="text-gray-500 text-[10px] flex items-center gap-1"><Clock size={10} />{s.totalHoursPerWeek}h</span> : null}
                       </div>
                     </div>
-                    <p className="text-slate-500 text-[10px] mt-1">Sem {s.semester} • {s.academicYear || "No AY"} • Credits: {s.credits}</p>
+                    <p className="text-gray-400 text-[10px] mt-1">Sem {s.semester} • {s.academicYear || "No AY"} • Credits: {s.credits}</p>
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5">
+          <div className="rounded-2xl bg-white border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-bold text-sm">Current Allocations</h3>
-              <span className="text-[10px] text-slate-400 font-medium bg-slate-700/50 px-2 py-0.5 rounded">{filteredAllocations.length} records</span>
+              <h3 className="text-black font-bold text-sm">Current Allocations</h3>
+              <span className="text-[10px] text-gray-500 font-medium bg-gray-200/50 px-2 py-0.5 rounded">{filteredAllocations.length} records</span>
             </div>
             {filteredAllocations.length === 0 ? (
               <div className="py-10 text-center">
-                <Users size={28} className="text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400 text-sm">No allocations yet for this filter.</p>
+                <Users size={28} className="text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">No allocations yet for this filter.</p>
               </div>
             ) : (
               <div className="space-y-3 max-h-[500px] overflow-y-auto">
                 {filteredAllocations.map((a) => (
-                  <div key={a.id} className="p-3 rounded-xl bg-slate-900/50 border border-white/5">
+                  <div key={a.id} className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className="text-xs text-slate-400">{a.subject.academicYear || "No AY"} • Sem {a.subject.semester}</p>
-                        <p className="text-white text-sm font-medium mt-0.5">{a.subject.code} - {a.subject.name}</p>
+                        <p className="text-xs text-gray-500">{a.subject.academicYear || "No AY"} • Sem {a.subject.semester}</p>
+                        <p className="text-black text-sm font-medium mt-0.5">{a.subject.code} - {a.subject.name}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-[10px]">
+                          <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-black font-bold text-[10px]">
                             {a.faculty.user.name?.charAt(0) || "?"}
                           </div>
                           <div>
-                            <p className="text-slate-200 text-xs font-medium">{a.faculty.user.name}</p>
-                            <p className="text-slate-500 text-[10px]">{a.faculty.facultyId}</p>
+                            <p className="text-black text-xs font-medium">{a.faculty.user.name}</p>
+                            <p className="text-gray-400 text-[10px]">{a.faculty.facultyId}</p>
                           </div>
                         </div>
-                        <p className="text-slate-400 text-[10px] mt-1.5 flex items-center gap-1"><Clock size={10} /> {a.assignedHours || 0} teaching hours • Assigned {new Date(a.assignedAt).toLocaleDateString("en-IN")}</p>
+                        <p className="text-gray-500 text-[10px] mt-1.5 flex items-center gap-1"><Clock size={10} /> {a.assignedHours || 0} teaching hours • Assigned {new Date(a.assignedAt).toLocaleDateString("en-IN")}</p>
                       </div>
                       <div className="flex flex-col gap-1">
                         {showReassign === a.id ? (
@@ -349,17 +349,17 @@ export default function HodAllocationClient({
                             <select
                               value={reassignId}
                               onChange={(e) => setReassignId(e.target.value)}
-                              className="bg-slate-900 border border-white/10 rounded-lg px-1 py-1 text-white text-[10px] focus:outline-none max-w-[120px]"
+                              className="bg-white border border-gray-200 rounded-lg px-1 py-1 text-black text-[10px] focus:outline-none max-w-[120px]"
                             >
                               <option value="">New faculty...</option>
                               {faculty.map((f) => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                             </select>
                             <button onClick={() => reassignId && reassignAllocation(a.id, reassignId)} className="text-emerald-400 hover:text-emerald-300 p-1"><RefreshCw size={12} /></button>
-                            <button onClick={() => setShowReassign(null)} className="text-slate-400 hover:text-white p-1"><X size={12} /></button>
+                            <button onClick={() => setShowReassign(null)} className="text-gray-500 hover:text-black p-1"><X size={12} /></button>
                           </div>
                         ) : (
                           <>
-                            <button onClick={() => { setShowReassign(a.id); setReassignId("") }} className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Reassign"><RefreshCw size={13} /></button>
+                            <button onClick={() => { setShowReassign(a.id); setReassignId("") }} className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15" title="Reassign"><RefreshCw size={13} /></button>
                             <button onClick={() => removeAllocation(a.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Remove"><Trash2 size={13} /></button>
                           </>
                         )}

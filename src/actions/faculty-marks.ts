@@ -179,7 +179,7 @@ export async function getStudentMarks(studentUserId: string) {
   try {
     const student = await prisma.student.findUnique({
       where: { userId: studentUserId },
-      include: { department: true, course: true },
+      include: { department: true, course: true, user: { select: { name: true } } },
     })
 
     if (!student) return { success: false, error: "Student not found" }
@@ -248,7 +248,6 @@ export async function getMarksAuditLog(facultyUserId: string, limit = 50) {
         entityType: "InternalMark",
         entityId: { in: subjects.map(s => s.id) },
       },
-      include: { user: { select: { name: true, role: true } } },
       orderBy: { createdAt: "desc" },
       take: limit,
     })

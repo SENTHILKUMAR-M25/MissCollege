@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
 import { Section, SectionTitle, Container, Timeline, Accordion, Button } from '../components/UI'
 import HeroBanner from '../components/HeroBanner'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "motion/react"
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import logo from '../assets/logo.png'

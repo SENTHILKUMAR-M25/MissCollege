@@ -181,7 +181,7 @@ export async function assignClassToFaculty(data: {
       return { success: false, error: "Faculty member account is deactivated" }
     }
 
-    if (!faculty.accountStatus) {
+    if (faculty.accountStatus !== "ACTIVE") {
       return { success: false, error: "Faculty member account is suspended" }
     }
 
@@ -555,7 +555,7 @@ export async function getDepartmentFacultyForClassAssignment(departmentId: strin
     const faculty = await prisma.faculty.findMany({
       where: {
         departmentId,
-        accountStatus: true,
+        accountStatus: "ACTIVE",
         user: { isActive: true, role: "FACULTY" },
       },
       include: {

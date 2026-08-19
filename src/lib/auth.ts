@@ -30,10 +30,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .safeParse(credentials)
 
           if (!parsed.success) {
+            console.error("[auth] Zod parse failed:", parsed.error.flatten())
             return null
           }
 
           const { email, password, facultyId, dateOfBirth } = parsed.data
+          console.log("[auth] Authorize attempt:", { email, facultyId, dateOfBirth: dateOfBirth ? "***" : undefined })
 
           if (facultyId && dateOfBirth) {
             const faculty = await prisma.faculty.findUnique({
@@ -41,29 +43,52 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               include: { user: true },
             })
 
-            if (!faculty || !faculty.user) return null
-            if (!faculty.user.isActive) return null
-            if (!faculty.accountStatus) return null
+            if (!faculty || !faculty.user) {
+              console.error("[auth] Faculty not found for facultyId:", facultyId)
+              return null
+            }
+            if (!faculty.user.isActive) {
+              console.error("[auth] Faculty user is inactive:", faculty.user.id)
+              return null
+            }
+            if (faculty.accountStatus !== "ACTIVE") {
+              console.error("[auth] Faculty accountStatus is not ACTIVE:", faculty.accountStatus)
+              return null
+            }
 
-            // Must be FACULTY or HOD role
-            if (!(["HOD", "FACULTY"] as string[]).includes(faculty.user.role)) return null
+            if (!(["HOD", "FACULTY"] as string[]).includes(faculty.user.role)) {
+              console.error("[auth] Faculty role is not HOD/FACULTY:", faculty.user.role)
+              return null
+            }
 
-            // If faculty has a DOB set, verify it matches
             if (faculty.dateOfBirth) {
               const dobDate = new Date(dateOfBirth.replace(/(\d{2})(\d{2})(\d{4})/, "$3-$2-$1"))
-              if (isNaN(dobDate.getTime())) return null
+              if (isNaN(dobDate.getTime())) {
+                console.error("[auth] Invalid DOB date from input:", dateOfBirth)
+                return null
+              }
               const facultyDob = new Date(faculty.dateOfBirth)
               const isDobMatch =
                 facultyDob.getFullYear() === dobDate.getFullYear() &&
                 facultyDob.getMonth() === dobDate.getMonth() &&
                 facultyDob.getDate() === dobDate.getDate()
-              if (!isDobMatch) return null
+              if (!isDobMatch) {
+                console.error("[auth] DOB mismatch:", {
+                  input: { y: dobDate.getFullYear(), m: dobDate.getMonth(), d: dobDate.getDate() },
+                  stored: { y: facultyDob.getFullYear(), m: facultyDob.getMonth(), d: facultyDob.getDate() },
+                  storedRaw: faculty.dateOfBirth,
+                })
+                return null
+              }
             } else {
-              // No DOB set — fall back to bcrypt password compare
               const passwordsMatch = bcrypt.compareSync(dateOfBirth, faculty.user.password)
-              if (!passwordsMatch) return null
+              if (!passwordsMatch) {
+                console.error("[auth] DOB fallback bcrypt compare failed for facultyId:", facultyId)
+                return null
+              }
             }
 
+            console.log("[auth] Faculty auth success:", faculty.user.id, faculty.user.role)
             return {
               id: faculty.user.id,
               name: faculty.user.name,
@@ -75,11 +100,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           if (email && password) {
             const user = await prisma.user.findUnique({ where: { email } })
-            if (!user) return null
+            if (!user) {
+              console.error("[auth] User not found for email:", email)
+              return null
+            }
 
             const passwordsMatch = await bcrypt.compare(password, user.password)
-            if (!passwordsMatch) return null
-            if (!user.isActive) return null
+            if (!passwordsMatch) {
+              console.error("[auth] Password mismatch for email:", email)
+              return null
+            }
+            if (!user.isActive) {
+              console.error("[auth] User is inactive:", user.id)
+              return null
+            }
 
             return {
               id: user.id,
@@ -90,9 +124,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           }
 
+          console.error("[auth] No credentials matched - no facultyId+dateOfBirth or email+password provided")
           return null
         } catch (error) {
-          console.error("Authorize error:", error)
+          console.error("[auth] Authorize error:", error)
           return null
         }
       },

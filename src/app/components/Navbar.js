@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Menu, X, ChevronDown, Phone, Mail, MapPin } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "motion/react"
 import logo from '../assets/logo.png'
 const menuItems = [
   { label: 'Home', href: '/' },
@@ -150,7 +150,7 @@ export default function Navbar() {
             {/* CTA Buttons */}
             <div className="hidden xl:flex items-center gap-2">
               <Link
-                href="/student-corner"
+                href="/student-login"
                 className="px-4 py-2 rounded-lg border-2 border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white transition-all duration-200 font-semibold text-sm"
               >
                 Student Portal
@@ -296,7 +296,7 @@ export default function Navbar() {
                 {/* Mobile CTAs */}
                 <div className="pt-3 pb-1 grid grid-cols-2 gap-2 border-t border-neutral-gray mt-2">
                   <Link
-                    href="/student-corner"
+                    href="/student-login"
                     onClick={() => setIsOpen(false)}
                     className="text-center px-3 py-2.5 rounded-lg border-2 border-primary-blue text-primary-blue font-semibold text-sm hover:bg-primary-blue hover:text-white transition-all"
                   >

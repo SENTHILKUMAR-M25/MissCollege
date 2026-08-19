@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { signOut } from "next-auth/react"
 import {
   LayoutDashboard, Users, BookOpen, CalendarDays,
@@ -59,7 +59,7 @@ function NavItemRow({ item, collapsed }: { item: NavItem; collapsed: boolean }) 
       <div>
         <button className={cn(
           "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group",
-          isActive ? "bg-violet-500/20 text-violet-400" : "text-slate-400 hover:bg-white/5 hover:text-white"
+          isActive ? "bg-[#2F2FE4]/10 text-[#2F2FE4]" : "text-gray-500 hover:bg-gray-100 hover:text-black"
         )}>
           <Icon size={18} className="shrink-0" />
           {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
@@ -74,12 +74,12 @@ function NavItemRow({ item, collapsed }: { item: NavItem; collapsed: boolean }) 
       className={cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative",
         isActive
-          ? "bg-gradient-to-r from-violet-500/20 to-purple-500/10 text-violet-400 shadow-lg shadow-violet-500/10"
-          : "text-slate-400 hover:bg-white/5 hover:text-white"
+          ? "bg-[#2F2FE4]/10 text-[#2F2FE4]"
+          : "text-gray-500 hover:bg-gray-100 hover:text-black"
       )}
     >
       {isActive && (
-        <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-violet-400 rounded-full" />
+        <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#2F2FE4] rounded-full" />
       )}
       <Icon size={18} className="shrink-0" />
       {!collapsed && <span className="truncate">{item.label}</span>}
@@ -107,23 +107,23 @@ export default function HodLayoutClient({
     .slice(0, 2)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-white">
       <motion.aside
         animate={{ width: collapsed ? 72 : 260 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="h-screen flex flex-col bg-slate-900 border-r border-white/5 overflow-hidden shrink-0 z-40"
+        className="h-screen flex flex-col bg-white border-r border-gray-200 overflow-hidden shrink-0 z-40"
       >
-        <div className="flex items-center justify-between px-4 py-5 border-b border-white/5">
+        <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100">
           <motion.div animate={{ opacity: collapsed ? 0 : 1 }} className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <div className="w-9 h-9 rounded-xl bg-[#2F2FE4] flex items-center justify-center shadow-lg shadow-[#2F2FE4]/20">
               <School size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-sm leading-tight">HOD PORTAL</p>
-              {departmentName && <p className="text-violet-400 text-[10px] font-semibold truncate max-w-[160px]">{departmentName}</p>}
+              <p className="text-black font-bold text-sm leading-tight">HOD PORTAL</p>
+              {departmentName && <p className="text-[#2F2FE4] text-[10px] font-semibold truncate max-w-[160px]">{departmentName}</p>}
             </div>
           </motion.div>
-          <button onClick={() => setCollapsed((v) => !v)} className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 items-center justify-center text-slate-400 hover:text-white transition-all shrink-0">
+          <button onClick={() => setCollapsed((v) => !v)} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-100 items-center justify-center text-gray-500 hover:text-black transition-all shrink-0">
             <motion.div animate={{ rotate: collapsed ? 180 : 0 }} transition={{ duration: 0.3 }}>
               <ChevronLeft size={14} />
             </motion.div>
@@ -134,7 +134,7 @@ export default function HodLayoutClient({
           {navGroups.map((group) => (
             <div key={group.group}>
               {!collapsed && (
-                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1.5">{group.group}</p>
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 mb-1.5">{group.group}</p>
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => (
@@ -145,21 +145,21 @@ export default function HodLayoutClient({
           ))}
         </nav>
 
-        <div className="p-3 border-t border-white/5">
-          <div className={cn("flex items-center gap-3 px-2 py-2 rounded-xl", !collapsed && "bg-white/5")}>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <div className="p-3 border-t border-gray-100">
+          <div className={cn("flex items-center gap-3 px-2 py-2 rounded-xl", !collapsed && "bg-gray-50")}>
+            <div className="w-8 h-8 rounded-full bg-[#2F2FE4] flex items-center justify-center text-white text-xs font-bold shrink-0">
               {initials}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-white text-xs font-semibold truncate">{userName}</p>
-                <p className="text-slate-500 text-[10px] truncate">{userEmail}</p>
+                <p className="text-black text-xs font-semibold truncate">{userName}</p>
+                <p className="text-gray-400 text-[10px] truncate">{userEmail}</p>
               </div>
             )}
             {!collapsed && (
               <button
                 onClick={() => signOut({ callbackUrl: "/hod-login" })}
-                className="text-slate-500 hover:text-red-400 transition-colors"
+                className="text-gray-400 hover:text-red-400 transition-colors"
               >
                 <LogOut size={15} />
               </button>
@@ -169,7 +169,7 @@ export default function HodLayoutClient({
       </motion.aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-6 bg-slate-950 text-white">
+        <main className="flex-1 overflow-y-auto p-6 bg-white text-black">
           {children}
         </main>
       </div>

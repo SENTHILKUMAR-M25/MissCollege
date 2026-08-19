@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
 import { Section, SectionTitle, Container, Button, Accordion } from '../components/UI'
 import HeroBanner from '../components/HeroBanner'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 
 export default function Admissions() {
   const admissionFaq = [
@@ -43,7 +43,7 @@ export default function Admissions() {
         title="Admissions to MISS College"
         subtitle="Your Gateway to Quality Education and Bright Future"
         cta1Text="Apply Now"
-        cta1Link="/admissions/apply"
+        cta1Link="/apply"
         cta2Text="Download Prospectus"
         cta2Link="/downloads"
       />
@@ -300,11 +300,11 @@ export default function Admissions() {
               Begin your journey toward a transformative education experience.
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <Link href="/admissions/apply">
-                <Button variant="secondary" size="lg">
-                  Apply Now
-                </Button>
-              </Link>
+               <Link href="/apply">
+                 <Button variant="secondary" size="lg">
+                   Apply Now
+                 </Button>
+               </Link>
               <Link href="/downloads">
                 <Button
                   variant="outline"

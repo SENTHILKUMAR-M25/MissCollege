@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { requireAcademicAdmin } from "@/lib/permissions"
 
 const subjectSchema = z.object({
   id: z.string().optional(),
@@ -16,6 +17,7 @@ const subjectSchema = z.object({
 
 export async function addSubject(formData: FormData) {
   try {
+    await requireAcademicAdmin()
     const data = subjectSchema.parse({
       name: formData.get("name"),
       code: formData.get("code"),
@@ -38,6 +40,7 @@ export async function addSubject(formData: FormData) {
 
 export async function updateSubject(formData: FormData) {
   try {
+    await requireAcademicAdmin()
     const data = subjectSchema.parse({
       id: formData.get("id"),
       name: formData.get("name"),
@@ -71,6 +74,7 @@ export async function updateSubject(formData: FormData) {
 
 export async function deleteSubject(id: string) {
   try {
+    await requireAcademicAdmin()
     await prisma.subject.delete({
       where: { id },
     })

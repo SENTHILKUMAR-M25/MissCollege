@@ -51,6 +51,43 @@ export async function createNotice(formData: FormData) {
       },
     })
 
+    const roleMap: Record<string, any> = {
+      STUDENT: { role: "STUDENT" },
+      FACULTY: { role: "FACULTY" },
+      HOD: { role: "HOD" },
+      ADMIN: { role: { in: ["ADMIN", "ACADEMIC_ADMIN", "EXAM_ADMIN"] } },
+    }
+
+    const userWhere: any = { isActive: true }
+    if (targetAudience === "DEPARTMENT" && notice.departmentId) {
+      Object.assign(userWhere, {
+        OR: [
+          { student: { some: { departmentId: notice.departmentId } } },
+          { faculty: { some: { departmentId: notice.departmentId } } },
+        ],
+      })
+    } else if (roleMap[targetAudience]) {
+      Object.assign(userWhere, roleMap[targetAudience])
+    }
+
+    const targetUsers = await prisma.user.findMany({
+      where: userWhere,
+      select: { id: true },
+    })
+
+    if (targetUsers.length > 0) {
+      await prisma.notification.createMany({
+        data: targetUsers.map((user) => ({
+          userId: user.id,
+          noticeId: notice.id,
+          type: "NOTICE",
+          message: `New notice: ${title}`,
+          link: "/student/notices",
+        })),
+        skipDuplicates: true,
+      })
+    }
+
     revalidatePath("/admin/announcements")
     revalidatePath("/admin/notices")
     return { success: true, data: notice }

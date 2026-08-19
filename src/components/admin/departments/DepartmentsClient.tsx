@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "motion/react"
 import {
   Plus,
   Edit2,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { addDepartment, updateDepartment, deleteDepartment } from "@/actions/departments"
+import Modal from "@/components/ui/Modal"
 import toast from "react-hot-toast"
 
 type DbDepartment = {
@@ -65,98 +67,46 @@ const bgMap: Record<string, string> = {
   teal: "bg-teal-500/10 border-teal-500/20",
 }
 
-function Modal({ dept, mode, onClose }: { dept?: DbDepartment; mode: "add" | "edit"; onClose: () => void }) {
-  const [loading, setLoading] = useState(false)
+const deptImageMap: Record<string, string> = {
+  "Computer Science": "/department/Computer-Science.jpg",
+  "Commerce": "/department/Commerce.jpg",
+  "Management Studies": "/department/Management-Studies.jpg",
+  "English": "/department/English.jpg",
+  "Psychology": "/department/Psychology.jpg",
+  "Diploma": "/department/Diploma.png",
+}
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    const formData = new FormData(e.currentTarget)
-    if (mode === "edit" && dept?.id) {
-      formData.append("id", dept.id)
-      const res = await updateDepartment(formData)
-      if (res.success) {
-        toast.success("Department updated!")
-        onClose()
-      } else {
-        toast.error(res.error || "Failed to update")
-      }
-    } else {
-      const res = await addDepartment(formData)
-      if (res.success) {
-        toast.success("Department created!")
-        onClose()
-      } else {
-        toast.error(res.error || "Failed to create")
-      }
-    }
-    setLoading(false)
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md bg-slate-800 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="text-white font-bold">{mode === "add" ? "Add Department" : "Edit Department"}</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all"><X size={15} /></button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-4">
-            <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Department Name</label>
-              <input name="name" defaultValue={dept?.name} required placeholder="e.g. Computer Science"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50" />
-            </div>
-            <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Department Code</label>
-              <input name="code" defaultValue={dept?.code} required placeholder="e.g. CS"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50" />
-            </div>
-            <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Description</label>
-              <textarea name="description" defaultValue={dept?.description || ""} placeholder="Description..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50" />
-            </div>
-          </div>
-          <div className="flex gap-3 px-6 py-4 border-t border-white/5">
-            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 text-sm font-medium">Cancel</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50">
-              {loading ? "Saving..." : mode === "add" ? "Add Department" : "Save Changes"}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </motion.div>
-  )
+function getDeptImage(name: string) {
+  return deptImageMap[name] || "/department/Computer-Science.jpg"
 }
 
 export default function DepartmentsClient({ departments }: { departments: DbDepartment[] }) {
+  const router = useRouter()
   const [modal, setModal] = useState<{ mode: "add" | "edit"; dept?: DbDepartment } | null>(null)
 
   const totalStudents = departments.reduce((a, d) => a + (d._count?.students || 0), 0)
   const totalFaculty = departments.reduce((a, d) => a + (d._count?.faculty || 0), 0)
 
   async function handleDelete(id: string) {
-    if (confirm("Are you sure you want to delete this department?")) {
-      const res = await deleteDepartment(id)
-      if (res.success) toast.success("Deleted successfully")
-      else toast.error("Failed to delete")
-    }
+    if (!confirm("Are you sure you want to delete this department?")) return
+    const res = await deleteDepartment(id)
+    if (res.success) toast.success("Deleted successfully")
+    else toast.error("Failed to delete")
   }
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-white font-bold text-xl">Departments</h2>
-          <p className="text-slate-400 text-sm mt-0.5">{departments.length} departments · {totalStudents.toLocaleString()} students · {totalFaculty} faculty</p>
+          <h2 className="text-black font-bold text-xl">Departments</h2>
+          <p className="text-gray-500 text-sm mt-0.5">
+            {departments.length} departments · {totalStudents.toLocaleString()} students · {totalFaculty} faculty
+          </p>
         </div>
-        <button onClick={() => setModal({ mode: "add" })}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold hover:opacity-90 shadow-lg shadow-amber-500/25">
+        <button
+          onClick={() => setModal({ mode: "add" })}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2F2FE4] to-[#4F6FE4] text-black text-sm font-semibold hover:opacity-90 shadow-lg shadow-[#2F2FE4]/20"
+        >
           <Plus size={15} /> Add Department
         </button>
       </div>
@@ -167,13 +117,13 @@ export default function DepartmentsClient({ departments }: { departments: DbDepa
           { label: "Total Students", value: totalStudents.toLocaleString(), icon: Users, color: "text-violet-400 bg-violet-500/10" },
           { label: "Total Faculty", value: totalFaculty, icon: Users, color: "text-blue-400 bg-blue-500/10" },
         ].map((s) => (
-          <div key={s.label} className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 flex items-center gap-3">
+          <div key={s.label} className="rounded-2xl bg-white border border-gray-200 border border-gray-100 p-4 flex items-center gap-3">
             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", s.color)}>
               <s.icon size={18} />
             </div>
             <div>
-              <p className="text-white font-bold text-xl">{s.value}</p>
-              <p className="text-slate-400 text-xs">{s.label}</p>
+              <p className="text-black font-bold text-xl">{s.value}</p>
+              <p className="text-gray-500 text-xs">{s.label}</p>
             </div>
           </div>
         ))}
@@ -184,60 +134,160 @@ export default function DepartmentsClient({ departments }: { departments: DbDepa
           const colorKey = colorMap[idx % colorMap.length]
           const activeHod = (dept.hodAssignments || [])[0]
           return (
-            <motion.div key={dept.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }}
+            <motion.div
+              key={dept.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.06 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-white/5 p-5 group flex flex-col">
-              <div className={cn("absolute top-0 left-0 right-0 h-1 bg-gradient-to-r", gradientMap[colorKey])} />
+              className="relative overflow-hidden rounded-2xl border border-gray-100 flex flex-col"
+            >
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${getDeptImage(dept.name)})` }} />
+              <div className="absolute inset-0 bg-gray-100/70" />
 
-              <div className="flex items-start justify-between mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-lg shadow-lg shrink-0", gradientMap[colorKey])}>
-                  {dept.code}
-                </div>
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => setModal({ mode: "edit", dept })}
-                    className="w-7 h-7 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 flex items-center justify-center text-slate-400 transition-all">
-                    <Edit2 size={12} />
-                  </button>
-                  <button onClick={() => handleDelete(dept.id)}
-                    className="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center text-slate-400 transition-all">
-                    <Trash2 size={12} />
-                  </button>
-                </div>
-              </div>
-
-              <h3 className="text-white font-bold text-sm mb-0.5 line-clamp-1">{dept.name}</h3>
-              <p className="text-slate-500 text-xs mb-4 flex-1 line-clamp-2">{dept.description || "No description provided."}</p>
-
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { label: "Students", value: (dept._count?.students || 0).toLocaleString(), icon: Users },
-                  { label: "Faculty", value: dept._count?.faculty || 0, icon: Users },
-                  { label: "Courses", value: dept._count?.courses || 0, icon: Library },
-                ].map((s) => (
-                  <div key={s.label} className="text-center">
-                    <p className="text-white font-black text-lg">{s.value}</p>
-                    <p className="text-slate-500 text-[10px]">{s.label}</p>
+              <div className="relative p-5 flex flex-col flex-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-black font-black text-lg shadow-lg shrink-0">
+                    {dept.code}
                   </div>
-                ))}
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <span className="text-slate-500 text-[10px] font-semibold">HOD</span>
-                  {activeHod ? (
-                    <span className="text-white text-[10px] font-medium truncate">{activeHod.faculty?.user?.name || activeHod.facultyId}</span>
-                  ) : (
-                    <span className="text-slate-500 text-[10px]">Not assigned</span>
-                  )}
+                  <div className="flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => setModal({ mode: "edit", dept })}
+                      className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-amber-500/20 hover:text-amber-400 flex items-center justify-center text-gray-500 transition-all"
+                    >
+                      <Edit2 size={12} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(dept.id)}
+                      className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center text-gray-500 transition-all"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
                 </div>
-                <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-semibold border", bgMap[colorKey])}>Active</div>
+
+                <div className="relative">
+                  <h3 className="text-black font-bold text-sm mb-0.5 line-clamp-1">{dept.name}</h3>
+                  <p className="text-gray-400 text-xs mb-4 flex-1 line-clamp-2">
+                    {dept.description || "No description provided."}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: "Students", value: (dept._count?.students || 0).toLocaleString(), icon: Users },
+                      { label: "Faculty", value: dept._count?.faculty || 0, icon: Users },
+                      { label: "Courses", value: dept._count?.courses || 0, icon: Library },
+                    ].map((s) => (
+                      <div key={s.label} className="text-center">
+                        <p className="text-black font-black text-lg">{s.value}</p>
+                        <p className="text-gray-400 text-[10px]">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-gray-400 text-[10px] font-semibold">HOD</span>
+                      {activeHod ? (
+                        <span className="text-black text-[10px] font-medium truncate">
+                          {activeHod.faculty?.user?.name || activeHod.facultyId}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-[10px]">Not assigned</span>
+                      )}
+                    </div>
+                    <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-semibold border", bgMap[colorKey])}>Active</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )
         })}
       </div>
 
-      <AnimatePresence>{modal && <Modal dept={modal.dept} mode={modal.mode} onClose={() => setModal(null)} />}</AnimatePresence>
+      <AnimatePresence>
+        {modal && (
+          <Modal
+            isOpen={!!modal}
+            title={modal.mode === "add" ? "Add Department" : "Edit Department"}
+            size="md"
+            onClose={() => setModal(null)}
+          >
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                const formData = new FormData(e.currentTarget)
+                if (modal.mode === "edit" && modal.dept?.id) {
+                  formData.append("id", modal.dept.id)
+                  const res = await updateDepartment(formData)
+                  if (res.success) {
+                    toast.success("Department updated")
+                    setModal(null)
+                    router.refresh()
+                  } else {
+                    toast.error(res.error || "Failed to update")
+                  }
+                } else {
+                  const res = await addDepartment(formData)
+                  if (res.success) {
+                    toast.success("Department created")
+                    setModal(null)
+                    router.refresh()
+                  } else {
+                    toast.error(res.error || "Failed to create")
+                  }
+                }
+              }}
+              className="p-6 space-y-4"
+            >
+              <div>
+                <label className="text-gray-500 text-xs mb-1.5 block font-medium">Department Name</label>
+                <input
+                  name="name"
+                  defaultValue={modal.dept?.name}
+                  placeholder="e.g. Computer Science"
+                  required
+                  className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50"
+                />
+              </div>
+              <div>
+                <label className="text-gray-500 text-xs mb-1.5 block font-medium">Department Code</label>
+                <input
+                  name="code"
+                  defaultValue={modal.dept?.code}
+                  placeholder="e.g. CS"
+                  required
+                  className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50"
+                />
+              </div>
+              <div>
+                <label className="text-gray-500 text-xs mb-1.5 block font-medium">Description</label>
+                <textarea
+                  name="description"
+                  defaultValue={modal.dept?.description || ""}
+                  placeholder="Description..."
+                  className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModal(null)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-700 text-sm hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#2F2FE4] to-[#4F6FE4] text-black text-sm font-semibold hover:opacity-90"
+                >
+                  {modal.mode === "add" ? "Create" : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

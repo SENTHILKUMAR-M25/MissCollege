@@ -63,19 +63,19 @@ export default function LeaveClient({ initialLeaves, facultyUserId }: { initialL
   const LeaveCard = ({ l }: { l: LeaveRequest }) => (
     <div className={`rounded-2xl border p-5 transition-all ${
       l.status === "PENDING"
-        ? "bg-slate-800/60 border-amber-500/20"
+        ? "bg-gray-50 border-amber-500/20"
         : l.status === "APPROVED"
-        ? "bg-slate-800/40 border-emerald-500/10"
-        : "bg-slate-800/40 border-red-500/10"
+        ? "bg-white border-emerald-500/10"
+        : "bg-white border-red-500/10"
     }`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2F2FE4] to-[#4F6FE4] flex items-center justify-center text-white font-bold text-sm shrink-0">
             {l.faculty.user.name?.charAt(0) || "?"}
           </div>
           <div>
-            <h3 className="text-white font-semibold text-sm">{l.faculty.user.name}</h3>
-            <p className="text-slate-400 text-xs mt-0.5">
+            <h3 className="text-black font-semibold text-sm">{l.faculty.user.name}</h3>
+            <p className="text-gray-500 text-xs mt-0.5">
               {l.faculty.facultyId} • {l.faculty.designation} • {l.department.name}
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function LeaveClient({ initialLeaves, facultyUserId }: { initialL
           </span>
           <button
             onClick={() => setExpanded(expanded === l.id ? null : l.id)}
-            className="text-slate-500 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-black transition-colors"
           >
             {expanded === l.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
@@ -101,46 +101,46 @@ export default function LeaveClient({ initialLeaves, facultyUserId }: { initialL
 
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-semibold">Leave Type</p>
-          <p className="text-white text-sm mt-0.5 font-medium">{l.leaveType}</p>
+          <p className="text-gray-400 text-[10px] uppercase font-semibold">Leave Type</p>
+          <p className="text-black text-sm mt-0.5 font-medium">{l.leaveType}</p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-semibold">From</p>
-          <p className="text-white text-sm mt-0.5">{new Date(l.startDate).toLocaleDateString("en-IN")}</p>
+          <p className="text-gray-400 text-[10px] uppercase font-semibold">From</p>
+          <p className="text-black text-sm mt-0.5">{new Date(l.startDate).toLocaleDateString("en-IN")}</p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-semibold">To</p>
-          <p className="text-white text-sm mt-0.5">{new Date(l.endDate).toLocaleDateString("en-IN")}</p>
+          <p className="text-gray-400 text-[10px] uppercase font-semibold">To</p>
+          <p className="text-black text-sm mt-0.5">{new Date(l.endDate).toLocaleDateString("en-IN")}</p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-semibold">Applied On</p>
-          <p className="text-white text-sm mt-0.5">{new Date(l.createdAt).toLocaleDateString("en-IN")}</p>
+          <p className="text-gray-400 text-[10px] uppercase font-semibold">Applied On</p>
+          <p className="text-black text-sm mt-0.5">{new Date(l.createdAt).toLocaleDateString("en-IN")}</p>
         </div>
       </div>
 
       {expanded === l.id && (
-        <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+        <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
           <div>
-            <p className="text-slate-500 text-[10px] uppercase font-semibold">Reason</p>
-            <p className="text-slate-300 text-sm mt-1">{l.reason}</p>
+            <p className="text-gray-400 text-[10px] uppercase font-semibold">Reason</p>
+            <p className="text-gray-700 text-sm mt-1">{l.reason}</p>
           </div>
           {l.reviewRemarks && (
             <div>
-              <p className="text-slate-500 text-[10px] uppercase font-semibold">Remarks</p>
-              <p className="text-slate-400 text-sm mt-1">{l.reviewRemarks}</p>
+              <p className="text-gray-400 text-[10px] uppercase font-semibold">Remarks</p>
+              <p className="text-gray-500 text-sm mt-1">{l.reviewRemarks}</p>
             </div>
           )}
         </div>
       )}
 
       {l.status === "PENDING" && (
-        <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+        <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
           <textarea
             value={remarks[l.id] || ""}
             onChange={(e) => setRemarks((prev) => ({ ...prev, [l.id]: e.target.value }))}
             placeholder="Add remarks (required for rejection)..."
             rows={2}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-violet-500/50 resize-none"
+            className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#2F2FE4]/50 resize-none"
           />
           <div className="flex gap-2">
             <button
@@ -184,7 +184,7 @@ export default function LeaveClient({ initialLeaves, facultyUserId }: { initialL
       {/* Pending */}
       {pending.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-white font-bold text-sm uppercase tracking-wider">Pending Requests</h2>
+          <h2 className="text-black font-bold text-sm uppercase tracking-wider">Pending Requests</h2>
           {pending.map((l) => <LeaveCard key={l.id} l={l} />)}
         </div>
       )}
@@ -192,14 +192,14 @@ export default function LeaveClient({ initialLeaves, facultyUserId }: { initialL
       {/* Processed */}
       {processed.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-slate-400 font-bold text-sm uppercase tracking-wider">Past Requests</h2>
+          <h2 className="text-gray-500 font-bold text-sm uppercase tracking-wider">Past Requests</h2>
           {processed.map((l) => <LeaveCard key={l.id} l={l} />)}
         </div>
       )}
 
       {leaves.length === 0 && (
-        <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-16 text-center">
-          <p className="text-slate-400 text-sm">No leave requests found for your department.</p>
+        <div className="rounded-2xl bg-white border border-gray-200 p-16 text-center">
+          <p className="text-gray-500 text-sm">No leave requests found for your department.</p>
         </div>
       )}
     </div>

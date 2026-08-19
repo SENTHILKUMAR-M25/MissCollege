@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "motion/react"
 import { X, ChevronRight, ChevronLeft, CheckCircle, User, Mail, Phone, BookOpen, FileText, GraduationCap, Upload } from 'lucide-react'
 import { courses } from '../courses/data'
+import { submitCourseApplication } from '@/actions/admissions'
 
 const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS']
 const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say']
@@ -69,6 +70,7 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
   }, [isOpen])
 
   const selectedCourse = courses.find(c => c.slug === form.courseSlug)
+  const course = selectedCourse || {}
 
   const set = (key, val) => {
     setForm(f => ({ ...f, [key]: val }))
@@ -104,15 +106,32 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
 
   async function submit() {
     if (!validate()) return
-    
     setIsSubmitting(true)
     try {
-      const appId = `MISS-${Date.now().toString().slice(-6)}`
-      setApplicationId(appId)
-      setSubmitted(true)
+      const res = await submitCourseApplication({
+        name: `${form.firstName} ${form.lastName}`.trim(),
+        email: form.email,
+        phone: form.phone,
+        dob: form.dob,
+        gender: form.gender,
+        address: [form.address, form.city, form.state].filter(Boolean).join(', ') || undefined,
+        courseApplied: course.name,
+        department: course.department,
+        previousSchool: form.twelfthBoard || undefined,
+        previousBoard: form.twelfthBoard || undefined,
+        previousPercent: form.twelfthPercent || undefined,
+        qualification: form.twelfthStream || undefined,
+        source: 'course_modal',
+        message: form.message,
+      })
+      if (res.success) {
+        setApplicationId(res.applicationNo)
+        setSubmitted(true)
+      } else {
+        setErrors({ submit: res.error || 'Failed to submit' })
+      }
     } catch (error) {
-      console.error('Submission error:', error)
-      setErrors({ submit: 'Failed to submit application. Please try again.' })
+      setErrors({ submit: 'Failed to submit. Please try again.' })
     } finally {
       setIsSubmitting(false)
     }
@@ -133,23 +152,13 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-primary-navy/60 backdrop-blur-sm z-[100]"
-            onClick={onClose}
-          />
-
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            onClick={e => e.stopPropagation()}
-          >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        >
             <div className="bg-white rounded-2xl shadow-elevated w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
 
               {/* ── Header ── */}
@@ -469,8 +478,7 @@ export default function ApplyModal({ isOpen, onClose, preselectedCourse = null }
 
             </div>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
   )
 }

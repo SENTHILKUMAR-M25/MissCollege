@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
 import { Section, SectionTitle, Container } from '../components/UI'
 import HeroBanner from '../components/HeroBanner'
 import { StatisticCard } from '../components/Cards'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 
 export default function Placements() {
   return (

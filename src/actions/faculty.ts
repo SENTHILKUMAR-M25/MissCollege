@@ -1,5 +1,6 @@
 "use server"
 
+import { requireAcademicAdmin } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -28,7 +29,7 @@ const facultySchema = z.object({
   experience: z.coerce.number().optional(),
   joiningDate: z.string().optional().transform(v => v ? new Date(v) : undefined),
   password: z.string().optional(),
-  accountStatus: z.string().optional().transform(v => v === "false" ? false : true),
+  accountStatus: z.string().optional().transform(v => v === "false" ? "SUSPENDED" : "ACTIVE"),
   assignedSemesters: z.string().optional(),
   assignedSections: z.string().optional(),
   profilePhoto: z.string().optional(),
@@ -53,18 +54,28 @@ function getDesignationPrefix(designation: string): string {
 
 async function nextFacultyId(tx: any, designation: string): Promise<string> {
   const prefix = `MISS-${getDesignationPrefix(designation)}-`
-  const latest = await tx.faculty.findFirst({
-    where: { facultyId: { startsWith: prefix } },
-    orderBy: { facultyId: "desc" },
-    select: { facultyId: true },
-  })
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const latest = await tx.faculty.findFirst({
+      where: { facultyId: { startsWith: prefix } },
+      orderBy: { facultyId: "desc" },
+      select: { facultyId: true },
+    })
 
-  const latestSequence = latest?.facultyId
-    ? Number.parseInt(latest.facultyId.slice(prefix.length), 10)
-    : 0
-  const nextSequence = Number.isFinite(latestSequence) ? latestSequence + 1 : 1
+    const latestSequence = latest?.facultyId
+      ? Number.parseInt(latest.facultyId.slice(prefix.length), 10)
+      : 0
+    const nextSequence = Number.isFinite(latestSequence) ? latestSequence + 1 : 1
+    const candidate = `${prefix}${String(nextSequence).padStart(3, "0")}`
 
-  return `${prefix}${String(nextSequence).padStart(3, "0")}`
+    const exists = await tx.faculty.findUnique({ where: { facultyId: candidate }, select: { id: true } })
+    if (!exists) return candidate
+  }
+
+  const fallback = `${prefix}${Date.now().toString(36).slice(-3).toUpperCase()}`
+  const stillExists = await tx.faculty.findUnique({ where: { facultyId: fallback }, select: { id: true } })
+  if (!stillExists) return fallback
+
+  return `${prefix}${Math.random().toString(36).slice(2, 5).toUpperCase()}`
 }
 
 function parseSubjectIds(value?: string) {
@@ -116,12 +127,13 @@ async function parseFormData(formData: FormData) {
   return rawData
 }
 
-function getAccountStatus(data: FacultyData) {
-  return data.accountStatus ?? true
+function getAccountStatus(data: FacultyData): "ACTIVE" | "SUSPENDED" {
+  return data.accountStatus
 }
 
 export async function addFaculty(formData: FormData) {
   try {
+    await requireAcademicAdmin()
     const rawData = await parseFormData(formData)
     const parsed = facultySchema.safeParse(rawData)
     if (!parsed.success) {
@@ -154,7 +166,7 @@ export async function addFaculty(formData: FormData) {
           email: data.email,
           password: hashedPassword,
           role: "FACULTY",
-          isActive: accountStatus,
+          isActive: accountStatus === "ACTIVE",
         },
       })
 
@@ -209,6 +221,7 @@ export async function addFaculty(formData: FormData) {
 
 export async function updateFaculty(formData: FormData) {
   try {
+    await requireAcademicAdmin()
     const rawData = await parseFormData(formData)
     const parsed = facultySchema.safeParse(rawData)
     if (!parsed.success) {
@@ -246,16 +259,21 @@ export async function updateFaculty(formData: FormData) {
     const userUpdateData: any = {
       name: `${data.firstName.trim()} ${data.lastName.trim()}`.trim(),
       email: data.email,
-      isActive: getAccountStatus(data),
     }
     if (data.password && data.password.length >= 6) {
       userUpdateData.password = await bcrypt.hash(data.password, 10)
     }
 
+    const accountStatus = getAccountStatus(data)
+    const userIsActive = accountStatus !== "SUSPENDED"
+
     await prisma.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: faculty.userId },
-        data: userUpdateData,
+        data: {
+          ...userUpdateData,
+          isActive: userIsActive,
+        },
       })
 
       await tx.faculty.update({
@@ -265,7 +283,7 @@ export async function updateFaculty(formData: FormData) {
           designation: data.designation,
           qualification: data.qualification,
           phone: data.phone,
-          accountStatus: getAccountStatus(data),
+          accountStatus: accountStatus,
           gender: data.gender,
           dateOfBirth: data.dateOfBirth,
           ...(data.profilePhoto && { profilePhoto: data.profilePhoto }),
@@ -316,6 +334,7 @@ export async function updateFaculty(formData: FormData) {
 
 export async function suspendFaculty(id: string) {
   try {
+    await requireAcademicAdmin()
     const faculty = await prisma.faculty.findUnique({
       where: { id },
       include: { user: true },
@@ -324,7 +343,7 @@ export async function suspendFaculty(id: string) {
       return { success: false, error: "Faculty not found" }
     }
 
-    const newStatus = !faculty.accountStatus
+    const newStatus = faculty.accountStatus === "ACTIVE" ? "SUSPENDED" : "ACTIVE"
 
     await prisma.$transaction(async (tx) => {
       await tx.faculty.update({
@@ -333,7 +352,7 @@ export async function suspendFaculty(id: string) {
       })
       await tx.user.update({
         where: { id: faculty.userId },
-        data: { isActive: newStatus },
+        data: { isActive: newStatus === "ACTIVE" },
       })
     })
 
@@ -347,6 +366,7 @@ export async function suspendFaculty(id: string) {
 
 export async function deleteFaculty(id: string) {
   try {
+    await requireAcademicAdmin()
     const faculty = await prisma.faculty.findUnique({ where: { id } })
     if (faculty) {
       await prisma.user.delete({ where: { id: faculty.userId } })
@@ -358,3 +378,4 @@ export async function deleteFaculty(id: string) {
     return { success: false, error: "Failed to delete faculty" }
   }
 }
+

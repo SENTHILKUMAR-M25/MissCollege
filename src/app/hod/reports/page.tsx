@@ -32,7 +32,7 @@ export default async function HodReportsPage() {
     {
       title: "Faculty Overview",
       icon: Users,
-      color: "from-blue-500/20 to-indigo-500/10 text-blue-400 border-blue-500/10",
+      color: "from-[#2F2FE4]/10 to-[#2F2FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Total Faculty", value: facultyCount },
         { label: "Subjects Covered", value: subjectsWithFaculty },
@@ -43,7 +43,7 @@ export default async function HodReportsPage() {
     {
       title: "Student Overview",
       icon: GraduationCap,
-      color: "from-emerald-500/20 to-teal-500/10 text-emerald-400 border-emerald-500/10",
+      color: "from-[#2F2FE4]/10 to-[#2F2FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Total Students", value: studentCount },
         { label: "Department", value: me.department.code },
@@ -54,7 +54,7 @@ export default async function HodReportsPage() {
     {
       title: "Leave Summary",
       icon: Calendar,
-      color: "from-amber-500/20 to-orange-500/10 text-amber-400 border-amber-500/10",
+      color: "from-[#2F2FE4]/10 to-[#2F2FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Total Requests", value: totalLeaves },
         { label: "Pending", value: pendingLeaves },
@@ -65,7 +65,7 @@ export default async function HodReportsPage() {
     {
       title: "Curriculum",
       icon: BookOpen,
-      color: "from-violet-500/20 to-purple-500/10 text-violet-400 border-violet-500/10",
+      color: "from-[#2F2FE4]/10 to-[#4F6FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Total Subjects", value: subjectCount },
         { label: "Assigned", value: subjectsWithFaculty },
@@ -76,7 +76,7 @@ export default async function HodReportsPage() {
     {
       title: "Timetable",
       icon: Activity,
-      color: "from-cyan-500/20 to-sky-500/10 text-cyan-400 border-cyan-500/10",
+      color: "from-[#2F2FE4]/10 to-[#2F2FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Classes/Week", value: timetableCount },
         { label: "Faculty", value: facultyCount },
@@ -87,7 +87,7 @@ export default async function HodReportsPage() {
     {
       title: "Attendance",
       icon: TrendingUp,
-      color: "from-rose-500/20 to-pink-500/10 text-rose-400 border-rose-500/10",
+      color: "from-[#2F2FE4]/10 to-[#2F2FE4]/5 text-[#2F2FE4] border-[#2F2FE4]/10",
       stats: [
         { label: "Students", value: studentCount },
         { label: "Faculty", value: facultyCount },
@@ -100,19 +100,19 @@ export default async function HodReportsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <TrendingUp size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Reports &amp; Analytics</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Department of {me.department.name} — Overview</p>
+          <h1 className="text-black text-2xl font-bold">Reports &amp; Analytics</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Department of {me.department.name} — Overview</p>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-r from-violet-500/10 to-purple-500/5 border border-violet-500/20 p-5 flex items-center justify-between gap-4">
+      <div className="rounded-2xl bg-white border border-gray-200 p-5 flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-white font-bold">{me.department.name}</h2>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h2 className="text-black font-bold">{me.department.name}</h2>
+          <p className="text-gray-500 text-sm mt-0.5">
             {facultyCount} faculty • {studentCount} students • {subjectCount} subjects
           </p>
         </div>
@@ -133,7 +133,7 @@ export default async function HodReportsPage() {
             <a
               key={card.title}
               href={card.href}
-              className={`rounded-2xl bg-gradient-to-br border p-5 hover:scale-[1.02] transition-all group ${card.color}`}
+              className={`rounded-2xl bg-white border p-5 hover:scale-[1.02] transition-all group ${card.color}`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
@@ -145,7 +145,7 @@ export default async function HodReportsPage() {
               <div className="grid grid-cols-3 gap-2">
                 {card.stats.map((stat, i) => (
                   <div key={i} className="text-center">
-                    <p className="text-white text-lg font-bold">{stat.value}</p>
+                    <p className="text-black text-lg font-bold">{stat.value}</p>
                     <p className="text-[10px] opacity-60 mt-0.5">{stat.label}</p>
                   </div>
                 ))}

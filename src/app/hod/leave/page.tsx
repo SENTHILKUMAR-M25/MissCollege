@@ -50,12 +50,12 @@ export default async function HodLeavePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <FileText size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Leave Requests</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Department of {faculty.department.name}</p>
+          <h1 className="text-black text-2xl font-bold">Leave Requests</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Department of {faculty.department.name}</p>
         </div>
       </div>
 

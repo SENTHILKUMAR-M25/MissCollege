@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import {
   LayoutDashboard, User, BookOpen, ClipboardCheck, FileText,
   Award, CalendarDays, LogOut, ChevronLeft, GraduationCap, Bell,
@@ -39,22 +39,22 @@ export default function StudentLayoutClient({
   const pathname = usePathname()
 
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
-    <div className={cn("flex flex-col bg-slate-900 border-r border-white/5 h-full", mobile ? "w-64" : collapsed ? "w-16" : "w-60")}>
+    <div className={cn("flex flex-col bg-white border-r border-gray-200 h-full", mobile ? "w-64" : collapsed ? "w-16" : "w-60")}>
       {/* Logo */}
-      <div className="flex items-center justify-between px-4 py-5 border-b border-white/5">
+      <div className="flex items-center justify-between px-4 py-5 border-b border-gray-100">
         {(!collapsed || mobile) && (
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center shadow-lg">
+            <div className="w-9 h-9 rounded-xl bg-[#2F2FE4] flex items-center justify-center shadow-lg">
               <GraduationCap size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-sm leading-tight">MISS COLLEGE</p>
-              <p className="text-teal-400 text-[10px] font-semibold tracking-widest">STUDENT PORTAL</p>
+              <p className="text-black font-bold text-sm leading-tight">MISS COLLEGE</p>
+              <p className="text-[#2F2FE4] text-[10px] font-semibold tracking-widest">STUDENT PORTAL</p>
             </div>
           </div>
         )}
         {!mobile && (
-          <button onClick={() => setCollapsed(v => !v)} className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all shrink-0">
+          <button onClick={() => setCollapsed(v => !v)} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-black transition-all shrink-0">
             <motion.div animate={{ rotate: collapsed ? 180 : 0 }}><ChevronLeft size={14} /></motion.div>
           </button>
         )}
@@ -70,9 +70,9 @@ export default function StudentLayoutClient({
               onClick={() => setMobileOpen(false)}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative group",
-                isActive ? "bg-teal-500/20 text-teal-400" : "text-slate-400 hover:bg-white/5 hover:text-white"
+                isActive ? "bg-[#2F2FE4]/10 text-[#2F2FE4]" : "text-gray-500 hover:bg-gray-100 hover:text-black"
               )}>
-              {isActive && <motion.div layoutId="student-active" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-teal-400 rounded-full" />}
+              {isActive && <motion.div layoutId="student-active" className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#2F2FE4] rounded-full" />}
               <Icon size={18} className="shrink-0" />
               {(!collapsed || mobile) && <span className="truncate">{item.label}</span>}
             </Link>
@@ -81,19 +81,19 @@ export default function StudentLayoutClient({
       </nav>
 
       {/* User footer */}
-      <div className="p-3 border-t border-white/5">
-        <div className={cn("flex items-center gap-3 px-2 py-2 rounded-xl", (!collapsed || mobile) && "bg-white/5")}>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+      <div className="p-3 border-t border-gray-100">
+        <div className={cn("flex items-center gap-3 px-2 py-2 rounded-xl", (!collapsed || mobile) && "bg-gray-50")}>
+          <div className="w-8 h-8 rounded-full bg-[#2F2FE4] flex items-center justify-center text-white text-xs font-bold shrink-0">
             {studentName?.charAt(0) || "S"}
           </div>
           {(!collapsed || mobile) && (
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{studentName}</p>
-              <p className="text-slate-500 text-[10px] truncate">{registerNumber}</p>
+              <p className="text-black text-xs font-semibold truncate">{studentName}</p>
+              <p className="text-gray-400 text-[10px] truncate">{registerNumber}</p>
             </div>
           )}
           {(!collapsed || mobile) && (
-            <button onClick={() => signOut({ callbackUrl: "/student-login" })} className="text-slate-500 hover:text-red-400 transition-colors" title="Logout">
+            <button onClick={() => signOut({ callbackUrl: "/student-login" })} className="text-gray-400 hover:text-red-400 transition-colors" title="Logout">
               <LogOut size={15} />
             </button>
           )}
@@ -103,7 +103,7 @@ export default function StudentLayoutClient({
   )
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-white">
       {/* Desktop sidebar */}
       <motion.aside animate={{ width: collapsed ? 64 : 240 }} transition={{ duration: 0.3 }} className="hidden md:block shrink-0 z-40">
         <Sidebar />
@@ -126,24 +126,24 @@ export default function StudentLayoutClient({
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 bg-slate-900/80 border-b border-white/5 shrink-0">
+        <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="md:hidden text-slate-400 hover:text-white">
+            <button onClick={() => setMobileOpen(true)} className="md:hidden text-gray-500 hover:text-black">
               <Menu size={20} />
             </button>
             <div>
-              <p className="text-white font-semibold text-sm">{departmentName}</p>
-              <p className="text-slate-500 text-xs">{registerNumber}</p>
+              <p className="text-black font-semibold text-sm">{departmentName}</p>
+              <p className="text-gray-400 text-xs">{registerNumber}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-[#2F2FE4] flex items-center justify-center text-white text-xs font-bold">
               {studentName?.charAt(0) || "S"}
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 bg-white text-black">
           {children}
         </main>
       </div>

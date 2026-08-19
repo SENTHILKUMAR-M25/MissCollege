@@ -19,7 +19,7 @@ export async function getWorkAllocationData(userId: string) {
 
     const [facultyList, subjects, classAdvisors, studentSections] = await Promise.all([
       prisma.faculty.findMany({
-        where: { departmentId: deptId, accountStatus: true },
+        where: { departmentId: deptId, accountStatus: "ACTIVE" },
         include: {
           user: { select: { name: true, email: true } },
           facultySubjects: {

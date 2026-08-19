@@ -23,7 +23,30 @@ export async function requireRole(allowedRoles: Role[]) {
 }
 
 export async function requireAdmin() {
-  return requireRole([Role.ADMIN])
+  return requireRole([Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN])
+}
+
+export async function requireAcademicAdmin() {
+  return requireRole([Role.ADMIN, Role.ACADEMIC_ADMIN])
+}
+
+export async function requireExamAdmin() {
+  return requireRole([Role.ADMIN, Role.EXAM_ADMIN])
+}
+
+export async function isSuperAdmin(): Promise<boolean> {
+  const session = await getSession()
+  return session?.user?.role === Role.ADMIN
+}
+
+export async function isAcademicAdmin(): Promise<boolean> {
+  const session = await getSession()
+  return session?.user?.role === Role.ACADEMIC_ADMIN || session?.user?.role === Role.ADMIN
+}
+
+export async function isExamAdmin(): Promise<boolean> {
+  const session = await getSession()
+  return session?.user?.role === Role.EXAM_ADMIN || session?.user?.role === Role.ADMIN
 }
 
 export async function requireHod() {
@@ -59,6 +82,11 @@ export async function hasRole(allowedRoles: Role[]): Promise<boolean> {
     return false
   }
   return allowedRoles.includes(session.user.role)
+}
+
+export async function getUserId(): Promise<string | null> {
+  const session = await getSession()
+  return session?.user?.id || null
 }
 
 export async function isHodOfDepartment(departmentId: string): Promise<boolean> {

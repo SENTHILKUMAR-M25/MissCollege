@@ -1,158 +1,149 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from "motion/react"
 import {
   Search, X, ArrowRight, Users, BookOpen, FlaskConical,
   Trophy, ChevronRight, GraduationCap, Briefcase, Star
 } from 'lucide-react'
 import Image from 'next/image'
 
-const departments = [
-  {
-    id: 'social-work',
-    name: 'Department of Social Work',
-    image: null,
-    short: 'SW',
-    color: 'from-blue-600 to-cyan-500',
-    category: 'Social Sciences',
-    hod: 'Dr. Name Here',
-    faculty: 12,
-    students: 480,
-    established: 1980,
-    description: 'A pioneering department offering professional social work education focused on community development, counselling, and social welfare.',
-    courses: [
-      'Master of Philosophy in Social Work (SF)',
-      'Ph.D – Social Work (SF)',
-      'Bachelor of Social Work (SF)',
-      'Master of Social Work (SF)',
-    ],
-    highlights: ['Community Field Work', 'Counselling Centre', 'NGO Tie-ups', 'Research Publications'],
-    research: 'Community Development, Social Welfare Policy, Counselling & Mental Health',
-  },
-  {
-    id: 'computer-science',
-    name: 'Department of Computer Science',
-    image: '/department/Computer-Science.jpg',
-    short: 'CS',
-    color: 'from-indigo-600 to-blue-500',
-    category: 'Science & Technology',
-    hod: 'Dr. A. Rajkumar',
-    faculty: 10,
-    students: 360,
-    established: 1995,
-    description: 'Offering cutting-edge undergraduate programs in Computer Science and Information Technology with modern labs and industry exposure.',
-    courses: [
-      'Bachelor of Computer Science',
-      'Bachelor of Information Technology',
-    ],
-    highlights: ['Programming Labs', 'Industry Internships', 'Hackathons', 'Placement Support'],
-    research: 'Artificial Intelligence, Data Science, Networking',
-  },
-  {
-    id: 'commerce',
-    name: 'Department of Commerce',
-    image: '/department/Commerce.jpg',
-    short: 'COM',
-    color: 'from-emerald-600 to-teal-500',
-    category: 'Commerce & Management',
-    hod: 'Prof. R. Kumar',
-    faculty: 10,
-    students: 400,
-    established: 1980,
-    description: 'Comprehensive commerce education with focus on accounting, finance, taxation, and computer applications in business.',
-    courses: [
-      'Bachelor of Commerce',
-      'Bachelor of Commerce (Computer Applications)',
-    ],
-    highlights: ['Tally ERP Lab', 'GST Certification', 'CA Foundation', 'Bank Tie-ups'],
-    research: 'Financial Markets, Taxation Policy, Corporate Governance',
-  },
-  {
-    id: 'management',
-    name: 'Department of Management Studies',
-    image: '/department/Management-Studies.jpg',
-    short: 'MGT',
-    color: 'from-amber-500 to-orange-500',
-    category: 'Commerce & Management',
-    hod: 'Dr. Name Here',
-    faculty: 8,
-    students: 240,
-    established: 2000,
-    description: 'Developing future business leaders through the Bachelor of Business Administration program with strategic and analytical focus.',
-    courses: [
-      'Bachelor of Business Administration',
-    ],
-    highlights: ['Business Incubator', 'Case Study Lab', 'Industry Mentors', 'Leadership Programs'],
-    research: 'Strategic Management, Organisational Behaviour, Entrepreneurship',
-  },
-  {
-    id: 'english',
-    name: 'Department of English',
-    image: '/department/English.jpg',
-    short: 'ENG',
-    color: 'from-pink-600 to-rose-500',
-    category: 'Arts & Humanities',
-    hod: 'Dr. Name Here',
-    faculty: 7,
-    students: 180,
-    established: 1980,
-    description: 'Developing communication, literary analysis, and critical thinking skills through the Bachelor of English program.',
-    courses: [
-      'Bachelor of English',
-    ],
-    highlights: ['Language Lab', 'Literary Festival', 'Debate Club', 'Creative Writing'],
-    research: 'Post-Colonial Literature, Linguistics, Cultural Studies',
-  },
-  {
-    id: 'psychology',
-    name: 'Department of Psychology',
-    image: '/department/Psychology.jpg',
-    short: 'PSY',
-    color: 'from-violet-600 to-purple-500',
-    category: 'Social Sciences',
-    hod: 'Dr. Name Here',
-    faculty: 6,
-    students: 160,
-    established: 1998,
-    description: 'Understanding human behaviour and mental processes through the Bachelor of Psychology program with counselling and research focus.',
-    courses: [
-      'Bachelor of Psychology',
-    ],
-    highlights: ['Psychology Lab', 'Counselling Clinic', 'Behaviour Research', 'Community Outreach'],
-    research: 'Clinical Psychology, Counselling, Cognitive Behaviour Therapy',
-  },
-  {
-    id: 'pg-diploma',
-    name: 'PG Diploma Programmes',
-    image: '/department/Diploma.png',
-    short: 'PGD',
-    color: 'from-slate-600 to-gray-500',
-    category: 'Professional Programmes',
-    hod: 'Dr. Name Here',
-    faculty: 8,
-    students: 120,
-    established: 1990,
-    description: 'Short-term postgraduate diploma programmes in Counselling, Personnel Management, and Computer Applications for working professionals.',
-    courses: [
-      'PG Diploma in Counselling',
-      'PG Diploma in Personnel Management and Industrial Relations',
-      'PG Diploma in Computer Applications',
-    ],
-    highlights: ['Flexible Schedule', 'Industry Experts', 'Practical Training', 'Certificate of Excellence'],
-    research: 'Applied Counselling, HR Practices, Computer Applications',
-  },
-]
+const CATEGORIES = ['All', 'Science & Technology', 'Commerce & Management', 'Arts & Sciences', 'Professional Programmes']
 
-const CATEGORIES = ['All', 'Social Sciences', 'Science & Technology', 'Commerce & Management', 'Arts & Humanities', 'Professional Programmes']
+const CATEGORY_MAP = {
+  IT: 'Science & Technology',
+  CSE: 'Science & Technology',
+  AI: 'Science & Technology',
+  CY: 'Science & Technology',
+  ECE: 'Science & Technology',
+  EEE: 'Science & Technology',
+  ME: 'Science & Technology',
+  CE: 'Science & Technology',
+  MBA: 'Commerce & Management',
+  MATH: 'Arts & Sciences',
+  PHY: 'Arts & Sciences',
+  CHEM: 'Arts & Sciences',
+  ENG: 'Arts & Sciences',
+}
+
+const COLOR_MAP = {
+  IT: 'from-blue-600 to-cyan-500',
+  CSE: 'from-indigo-600 to-blue-500',
+  AI: 'from-purple-600 to-violet-500',
+  CY: 'from-red-600 to-orange-500',
+  ECE: 'from-teal-600 to-green-500',
+  EEE: 'from-amber-600 to-yellow-500',
+  ME: 'from-slate-600 to-zinc-500',
+  CE: 'from-emerald-600 to-teal-500',
+  MBA: 'from-orange-600 to-amber-500',
+  MATH: 'from-pink-600 to-rose-500',
+  PHY: 'from-cyan-600 to-sky-500',
+  CHEM: 'from-lime-600 to-green-500',
+  ENG: 'from-fuchsia-600 to-pink-500',
+}
+
+const ESTABLISHED_MAP = {
+  IT: 1999,
+  CSE: 1995,
+  AI: 2020,
+  CY: 2015,
+  ECE: 1998,
+  EEE: 1997,
+  ME: 2005,
+  CE: 2003,
+  MBA: 2001,
+  MATH: 1985,
+  PHY: 1982,
+  CHEM: 1988,
+  ENG: 1980,
+}
+
+const HIGHLIGHTS_MAP = {
+  IT: ['Modern Labs', 'Industry Internships', 'Hackathons', 'Placement Support'],
+  CSE: ['Programming Labs', 'Industry Internships', 'Hackathons', 'Placement Support'],
+  AI: ['ML Research Lab', 'Industry Internships', 'Hackathons', 'Placement Support'],
+  CY: ['Security Lab', 'Industry Internships', 'Hackathons', 'Placement Support'],
+  ECE: ['Electronics Lab', 'Industry Internships', 'Projects', 'Placement Support'],
+  EEE: ['Electrical Lab', 'Industry Internships', 'Projects', 'Placement Support'],
+  ME: ['Workshop', 'Industry Internships', 'Projects', 'Placement Support'],
+  CE: ['Survey Lab', 'Industry Internships', 'Projects', 'Placement Support'],
+  MBA: ['Industry Mentors', 'Leadership Programs', 'Business Incubator', 'Case Study Lab'],
+  MATH: ['Research Lab', 'Math Olympiad', 'Seminars', 'Publications'],
+  PHY: ['Physics Lab', 'Research Projects', 'Seminars', 'Publications'],
+  CHEM: ['Chemistry Lab', 'Research Projects', 'Seminars', 'Publications'],
+  ENG: ['Language Lab', 'Literary Festival', 'Debate Club', 'Creative Writing'],
+}
+
+const RESEARCH_MAP = {
+  IT: 'Software Engineering, Web Technologies, System Administration',
+  CSE: 'Artificial Intelligence, Data Science, Networking',
+  AI: 'Machine Learning, Deep Learning, Natural Language Processing',
+  CY: 'Network Security, Cryptography, Ethical Hacking',
+  ECE: 'VLSI Design, Signal Processing, Wireless Communication',
+  EEE: 'Power Systems, Renewable Energy, Control Systems',
+  ME: 'Thermodynamics, Manufacturing, Robotics',
+  CE: 'Structural Engineering, Environmental Engineering, Transportation',
+  MBA: 'Strategic Management, Organisational Behaviour, Entrepreneurship',
+  MATH: 'Applied Mathematics, Statistics, Algebra',
+  PHY: 'Material Science, Nanotechnology, Optics',
+  CHEM: 'Organic Chemistry, Analytical Chemistry, Environmental Chemistry',
+  ENG: 'Post-Colonial Literature, Linguistics, Cultural Studies',
+}
+
+function transformDepartment(dbDept) {
+  const code = dbDept.code || ''
+  const name = dbDept.name || ''
+  return {
+    id: dbDept.id,
+    name: `Department of ${name}`,
+    image: `/department/${name.replace(/[^a-zA-Z]/g, '')}.jpg`,
+    short: code,
+    color: COLOR_MAP[code] || 'from-slate-600 to-gray-500',
+    category: CATEGORY_MAP[code] || 'Professional Programmes',
+    hod: dbDept.hodAssignments && dbDept.hodAssignments[0] && dbDept.hodAssignments[0].faculty && dbDept.hodAssignments[0].faculty.user && dbDept.hodAssignments[0].faculty.user.name ? dbDept.hodAssignments[0].faculty.user.name : 'Dr. Name Here',
+    faculty: dbDept._count && dbDept._count.faculty ? dbDept._count.faculty : 0,
+    students: dbDept._count && dbDept._count.students ? dbDept._count.students : 0,
+    established: ESTABLISHED_MAP[code] || 2000,
+    description: dbDept.description || `${name} department at MISS College.`,
+    courses: (dbDept.courses || []).map((c) => c.name),
+    highlights: HIGHLIGHTS_MAP[code] || ['Excellence', 'Research', 'Placements', 'Industry Links'],
+    research: RESEARCH_MAP[code] || `${name} studies and research`,
+  }
+}
 
 export default function Departments() {
+  const [rawDepartments, setRawDepartments] = useState([])
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
   const [selected, setSelected] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch('/api/public/departments')
+        if (!cancelled && res.ok) {
+          const json = await res.json()
+          setRawDepartments((json.departments || []).map(transformDepartment))
+        }
+      } catch (err) {
+        console.error('Failed to load departments', err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  const departments = rawDepartments
+  const totalFaculty = departments.reduce((a, d) => a + d.faculty, 0)
+  const totalStudents = departments.reduce((a, d) => a + d.students, 0)
+  const totalCourses = departments.reduce((a, d) => a + d.courses.length, 0)
 
   const visible = departments.filter(d => {
     const matchCat = activeCategory === 'All' || d.category === activeCategory
@@ -177,7 +168,7 @@ export default function Departments() {
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="text-white/70 text-lg mb-10 max-w-xl mx-auto">
-          {departments.length} departments · {departments.reduce((a, d) => a + d.faculty, 0)}+ faculty · {departments.reduce((a, d) => a + d.students, 0).toLocaleString()}+ students
+          {departments.length} departments · {totalFaculty}+ faculty · {totalStudents.toLocaleString()}+ students
           </motion.p>
 
           {/* Search */}
@@ -202,9 +193,9 @@ export default function Departments() {
       <div className="bg-white border-b border-neutral-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           {[
-            { icon: GraduationCap, value: '12', label: 'Departments' },
-            { icon: Users, value: '163+', label: 'Faculty Members' },
-            { icon: BookOpen, value: '50+', label: 'Programs Offered' },
+            { icon: GraduationCap, value: departments.length, label: 'Departments' },
+            { icon: Users, value: `${totalFaculty}+`, label: 'Faculty Members' },
+            { icon: BookOpen, value: `${totalCourses}+`, label: 'Programs Offered' },
             { icon: Trophy, value: '95%+', label: 'Placement Rate' },
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="flex items-center justify-center gap-2">
@@ -238,25 +229,39 @@ export default function Departments() {
       </div>
 
       {/* ── Department Grid ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        {visible.length === 0 ? (
-          <div className="text-center py-24 text-slate-400">
-            <p className="text-5xl mb-4">🔍</p>
-            <p className="text-lg font-semibold">No departments found</p>
-            <button onClick={() => { setQuery(''); setActiveCategory('All') }} className="mt-3 text-sm text-primary-blue hover:underline">Clear filters</button>
-          </div>
-        ) : (
+      {loading ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visible.map((dept, i) => (
-              <motion.div key={dept.id}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.06 }}>
-                <DeptCard dept={dept} onClick={() => setSelected(dept)} />
-              </motion.div>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="bg-white rounded-2xl border border-neutral-gray shadow-soft p-5 animate-pulse">
+                <div className="h-44 bg-gray-200 rounded-xl mb-4" />
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-full" />
+              </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          {visible.length === 0 ? (
+            <div className="text-center py-24 text-slate-400">
+              <p className="text-5xl mb-4">🔍</p>
+              <p className="text-lg font-semibold">No departments found</p>
+              <button onClick={() => { setQuery(''); setActiveCategory('All') }} className="mt-3 text-sm text-primary-blue hover:underline">Clear filters</button>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {visible.map((dept, i) => (
+                <motion.div key={dept.id}
+                  initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }} transition={{ delay: i * 0.06 }}>
+                  <DeptCard dept={dept} onClick={() => setSelected(dept)} />
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Features Section ── */}
       <div className="bg-neutral-light py-16">
@@ -305,8 +310,8 @@ export default function Departments() {
                     <X size={16} className="text-white" />
                   </button>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-4xl flex-shrink-0">
-                      {selected.icon}
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-2xl flex-shrink-0">
+                      {selected.short}
                     </div>
                     <div>
                       <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">{selected.category}</span>
@@ -339,8 +344,8 @@ export default function Departments() {
                       <BookOpen size={13} /> Programs Offered
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {selected.courses.map(c => (
-                        <span key={c} className="bg-blue-50 text-primary-blue text-xs font-semibold px-3 py-1.5 rounded-full border border-primary-blue/20">
+                      {selected.courses.map((c, idx) => (
+                        <span key={idx} className="bg-blue-50 text-primary-blue text-xs font-semibold px-3 py-1.5 rounded-full border border-primary-blue/20">
                           {c}
                         </span>
                       ))}
@@ -399,7 +404,7 @@ function DeptCard({ dept, onClick }) {
       className="group bg-white rounded-2xl border border-neutral-gray shadow-soft hover:shadow-elevated transition-all duration-300 overflow-hidden cursor-pointer">
 
       {/* Card top – image banner or gradient fallback */}
-      {dept.image ? (
+      {dept.image && dept.image !== '/department/.jpg' ? (
         <div className="relative h-44 overflow-hidden">
           <Image
             src={dept.image}
@@ -429,7 +434,7 @@ function DeptCard({ dept, onClick }) {
         <div className={`bg-gradient-to-br ${dept.color} p-5 relative overflow-hidden`}>
           <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />
           <div className="flex items-start justify-between">
-            <span className="text-4xl">{dept.icon}</span>
+            <span className="text-4xl font-black text-white/90">{dept.short}</span>
             <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
               {dept.category}
             </span>
@@ -455,8 +460,8 @@ function DeptCard({ dept, onClick }) {
 
         {/* Course pills */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {dept.courses.slice(0, 3).map(c => (
-            <span key={c} className="bg-blue-50 text-primary-blue text-[10px] font-semibold px-2 py-1 rounded-full">
+          {dept.courses.slice(0, 3).map((c, idx) => (
+            <span key={idx} className="bg-blue-50 text-primary-blue text-[10px] font-semibold px-2 py-1 rounded-full">
               {c}
             </span>
           ))}

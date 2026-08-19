@@ -9,7 +9,7 @@ export async function getHodDashboardData(departmentId: string) {
       where: { id: departmentId },
       include: {
         faculty: {
-          where: { accountStatus: true },
+          where: { accountStatus: "ACTIVE" },
           include: {
             user: { select: { name: true, email: true, createdAt: true } },
             subjects: true,

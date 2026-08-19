@@ -170,6 +170,7 @@ export default function Footer() {
                   principal@misscollege.edu.in
                 </a>
               </li>
+                
             </ul>
           </div>
         </div>
@@ -182,6 +183,12 @@ export default function Footer() {
             © 2026 MISS College. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
+            <Link href="/Faculty-login" className="text-gray-400 hover:text-secondary-gold transition-colors">
+              Faculty Login
+            </Link>
+            <Link href="/hod-login" className="text-gray-400 hover:text-secondary-gold transition-colors">
+              HOD Login
+            </Link>
             <Link href="/privacy" className="text-gray-400 hover:text-secondary-gold transition-colors">
               Privacy Policy
             </Link>

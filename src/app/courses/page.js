@@ -1,21 +1,43 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ApplyModal from '../components/ApplyModal'
-import { courses } from './data'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 import { Clock, Users, ArrowRight, Search } from 'lucide-react'
 
 const TYPES = ['All', 'Undergraduate', 'Postgraduate']
 
 export default function CoursesPage() {
+  const [courses, setCourses] = useState([])
   const [filter, setFilter] = useState('All')
   const [query, setQuery] = useState('')
   const [applyOpen, setApplyOpen] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch('/api/public/courses')
+        if (!cancelled && res.ok) {
+          const json = await res.json()
+          setCourses(json.courses || [])
+        }
+      } catch (err) {
+        console.error('Failed to load courses', err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  const uniqueDepts = [...new Set(courses.map(c => c.department))]
 
   const visible = courses.filter((c) => {
     const matchType = filter === 'All' || c.type === filter
@@ -52,7 +74,7 @@ export default function CoursesPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="text-white/80 text-lg mb-8 max-w-xl mx-auto"
           >
-            {courses.length} programs across {[...new Set(courses.map(c => c.department))].length} departments
+            {courses.length} programs across {uniqueDepts.length} departments
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -93,6 +115,21 @@ export default function CoursesPage() {
       </div>
 
       {/* Grid */}
+      {loading ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="bg-white rounded-2xl border border-neutral-gray shadow-soft p-6 animate-pulse">
+                <div className="h-32 bg-gray-200 rounded-xl mb-4" />
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-1/2 mb-4" />
+                <div className="h-3 bg-gray-200 rounded w-full mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-2/3" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         {visible.length === 0 ? (
           <div className="text-center py-24 text-slate-400">
@@ -111,22 +148,24 @@ export default function CoursesPage() {
                 transition={{ delay: i * 0.07 }}
               >
                 <div className="bg-white rounded-2xl border border-neutral-gray shadow-soft hover:shadow-elevated transition-all duration-300 overflow-hidden h-full flex flex-col group">
-                  {/* Card top */}
-                  <div className={`bg-gradient-to-br ${course.color} p-6 relative overflow-hidden`}>
-                    <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />
+                  <Link href={`/courses/${course.slug}`} className={`relative p-6 h-44  overflow-hidden ${course.bgImage ? 'bg-cover bg-center' : `bg-gradient-to-br ${course.color}`}`} style={course.bgImage ? { backgroundImage: `url(${course.bgImage})` } : undefined}>
+                    {course.bgImage && <div className="absolute inset-0  bg-primary-navy/60" />}
+                    {!course.bgImage && <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />}
                     <span className="text-4xl">{course.icon}</span>
                     <span className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
                       {course.type}
                     </span>
-                  </div>
+                  </Link>
 
                   {/* Card body */}
                   <div className="p-6 flex flex-col flex-1">
                     <p className="text-xs font-semibold text-primary-blue uppercase tracking-wider mb-1">{course.department}</p>
-                    <h3 className="text-lg font-bold text-primary-navy mb-1">
-                      {course.name}
-                    </h3>
-                    <p className="text-slate-500 text-sm mb-3">{course.degree}</p>
+                    <Link href={`/courses/${course.slug}`} className="block">
+                      <h3 className="text-lg font-bold text-primary-navy mb-1 group-hover:text-primary-blue transition-colors">
+                        {course.name}
+                      </h3>
+                    </Link>
+                    <p className="text-slate-500 text-sm mb-3">{course.degree || course.name}</p>
                     <p className="text-slate-600 text-sm leading-relaxed line-clamp-2 flex-1">{course.overview}</p>
 
                     <div className="flex items-center gap-4 mt-5 pt-4 border-t border-neutral-gray text-xs text-slate-500">
@@ -157,6 +196,7 @@ export default function CoursesPage() {
           </div>
         )}
       </div>
+      )}
 
       <Footer />
     </>

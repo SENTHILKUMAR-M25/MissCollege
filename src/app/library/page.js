@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { Section, SectionTitle, Container } from '../components/UI'
 import HeroBanner from '../components/HeroBanner'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 import { Clock, BookOpen, Monitor, ExternalLink, CheckCircle, ChevronDown } from 'lucide-react'
 
 const timings = [

@@ -32,8 +32,8 @@ const TABS = ["Allocation Table", "Assign Subject", "Assign Class Advisor", "Wor
 type Tab = typeof TABS[number]
 
 const TYPE_COLOR: Record<string, string> = {
-  THEORY: "bg-blue-500/10 text-blue-400",
-  LAB: "bg-violet-500/10 text-violet-400",
+  THEORY: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
+  LAB: "bg-[#2F2FE4]/10 text-[#2F2FE4]",
   ELECTIVE: "bg-amber-500/10 text-amber-400",
   PROJECT: "bg-emerald-500/10 text-emerald-400",
 }
@@ -48,14 +48,14 @@ function Toast({ t, onClose }: { t: { type: "success" | "error"; msg: string }; 
   )
 }
 
-function StatCard({ label, value, color = "text-white", icon: Icon }: { label: string; value: number; color?: string; icon: React.ElementType }) {
+function StatCard({ label, value, color = "text-black", icon: Icon }: { label: string; value: number; color?: string; icon: React.ElementType }) {
   return (
-    <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 flex items-center justify-between">
+    <div className="rounded-2xl bg-white border border-gray-200 p-4 flex items-center justify-between">
       <div>
-        <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">{label}</p>
+        <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">{label}</p>
         <p className={`text-2xl font-bold mt-1 ${color}`}>{value}</p>
       </div>
-      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400">
+      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
         <Icon size={18} />
       </div>
     </div>
@@ -190,18 +190,18 @@ export default function WorkAllocationClient({
     })
   }
 
-  const inp = "bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-violet-500/50"
+  const inp = "bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-black text-sm focus:outline-none focus:border-[#2F2FE4]/50"
 
   return (
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <Briefcase size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Faculty Work Allocation</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Department of {departmentName}</p>
+          <h1 className="text-black text-2xl font-bold">Faculty Work Allocation</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Department of {departmentName}</p>
         </div>
       </div>
 
@@ -211,18 +211,18 @@ export default function WorkAllocationClient({
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <StatCard label="Total Faculty" value={stats.totalFaculty} icon={Users} />
         <StatCard label="Subjects Assigned" value={stats.totalSubjectsAssigned} color="text-emerald-400" icon={BookOpen} />
-        <StatCard label="Class Advisors" value={stats.totalClassAdvisors} color="text-violet-400" icon={UserCheck} />
-        <StatCard label="Unassigned Subjects" value={stats.unassignedSubjects} color={stats.unassignedSubjects > 0 ? "text-amber-400" : "text-white"} icon={AlertCircle} />
-        <StatCard label="Unassigned Classes" value={stats.unassignedClasses} color={stats.unassignedClasses > 0 ? "text-red-400" : "text-white"} icon={GraduationCap} />
+        <StatCard label="Class Advisors" value={stats.totalClassAdvisors} color="text-[#2F2FE4]" icon={UserCheck} />
+        <StatCard label="Unassigned Subjects" value={stats.unassignedSubjects} color={stats.unassignedSubjects > 0 ? "text-amber-400" : "text-black"} icon={AlertCircle} />
+        <StatCard label="Unassigned Classes" value={stats.unassignedClasses} color={stats.unassignedClasses > 0 ? "text-red-400" : "text-black"} icon={GraduationCap} />
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-900/50 rounded-xl p-1 border border-white/5 overflow-x-auto">
+      <div className="flex gap-1 bg-gray-50 rounded-xl p-1 border border-gray-100 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${activeTab === tab ? "bg-violet-500 text-white shadow" : "text-slate-400 hover:text-white"}`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${activeTab === tab ? "bg-[#2F2FE4] text-white shadow" : "text-gray-500 hover:text-black"}`}
           >
             {tab}
           </button>
@@ -233,9 +233,9 @@ export default function WorkAllocationClient({
       {activeTab === "Allocation Table" && (
         <div className="space-y-4">
           {/* Filters */}
-          <div className="flex flex-wrap gap-3 p-4 rounded-xl bg-slate-800/50 border border-white/5">
+          <div className="flex flex-wrap gap-3 p-4 rounded-xl bg-white border border-gray-200">
             <div className="relative flex-1 min-w-[180px]">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input value={filterSearch} onChange={(e) => setFilterSearch(e.target.value)} placeholder="Search faculty..." className={`${inp} pl-8 w-full`} />
             </div>
             <select value={filterSem} onChange={(e) => setFilterSem(e.target.value)} className={inp}>
@@ -249,36 +249,36 @@ export default function WorkAllocationClient({
           </div>
 
           {/* Table */}
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
+          <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-gray-100">
                     {["Faculty ID", "Faculty Name", "Designation", "Assigned Subjects", "Subject Codes", "Semester", "Section", "Class Advisor", "Workload (hrs/wk)", "Status"].map((h) => (
-                      <th key={h} className="text-left px-4 py-3 text-slate-400 text-xs font-semibold whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left px-4 py-3 text-gray-500 text-xs font-semibold whitespace-nowrap">{h}</th>
                     ))}
-                    <th className="px-4 py-3 text-slate-400 text-xs font-semibold text-right">Actions</th>
+                    <th className="px-4 py-3 text-gray-500 text-xs font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredFaculty.length === 0 ? (
-                    <tr><td colSpan={11} className="text-center py-10 text-slate-500">No faculty match filters.</td></tr>
+                    <tr><td colSpan={11} className="text-center py-10 text-gray-400">No faculty match filters.</td></tr>
                   ) : filteredFaculty.map((f) => (
-                    <tr key={f.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                      <td className="px-4 py-3 text-slate-300 text-xs font-mono whitespace-nowrap">{f.facultyId}</td>
+                    <tr key={f.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-700 text-xs font-mono whitespace-nowrap">{f.facultyId}</td>
                       <td className="px-4 py-3">
-                        <p className="text-white text-sm font-medium whitespace-nowrap">{f.name}</p>
-                        <p className="text-slate-500 text-[10px]">{f.email}</p>
+                        <p className="text-black text-sm font-medium whitespace-nowrap">{f.name}</p>
+                        <p className="text-gray-400 text-[10px]">{f.email}</p>
                       </td>
-                      <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{f.designation}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{f.designation}</td>
                       <td className="px-4 py-3">
                         {f.subjects.length === 0 ? (
-                          <span className="text-slate-600 text-xs">—</span>
+                          <span className="text-gray-400 text-xs">—</span>
                         ) : (
                           <div className="space-y-1">
                             {f.subjects.map((s) => (
                               <div key={s.allocationId} className="flex items-center gap-1 group">
-                                <span className="text-white text-xs truncate max-w-[140px]">{s.name}</span>
+                                <span className="text-black text-xs truncate max-w-[140px]">{s.name}</span>
                                 <button
                                   onClick={() => handleRemoveSubject(s.allocationId)}
                                   className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity"
@@ -286,7 +286,7 @@ export default function WorkAllocationClient({
                                 ><X size={11} /></button>
                                 <button
                                   onClick={() => setTransferTarget({ allocationId: s.allocationId, newFacultyId: "" })}
-                                  className="opacity-0 group-hover:opacity-100 text-blue-400 hover:text-blue-300 transition-opacity"
+                                  className="opacity-0 group-hover:opacity-100 text-[#2F2FE4] hover:text-[#2525c5] transition-opacity"
                                   title="Transfer subject"
                                 ><RefreshCw size={11} /></button>
                               </div>
@@ -297,21 +297,21 @@ export default function WorkAllocationClient({
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {f.subjects.map((s) => (
-                            <span key={s.allocationId} className="text-[10px] bg-violet-500/10 text-violet-400 px-1.5 py-0.5 rounded font-mono">{s.code}</span>
+                            <span key={s.allocationId} className="text-[10px] bg-[#2F2FE4]/10 text-[#2F2FE4] px-1.5 py-0.5 rounded font-mono">{s.code}</span>
                           ))}
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {Array.from(new Set(f.subjects.map((s) => s.semester))).map((sem) => (
-                            <span key={sem} className="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">Sem {sem}</span>
+                            <span key={sem} className="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded">Sem {sem}</span>
                           ))}
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {f.classAdvisorFor.map((ca) => (
-                            <span key={ca.id} className="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">Sec {ca.section}</span>
+                            <span key={ca.id} className="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded">Sec {ca.section}</span>
                           ))}
                         </div>
                       </td>
@@ -328,20 +328,20 @@ export default function WorkAllocationClient({
                                 ><X size={11} /></button>
                                 <button
                                   onClick={() => setChangeAdvisorTarget({ id: ca.id, newFacultyId: "" })}
-                                  className="opacity-0 group-hover:opacity-100 text-blue-400 hover:text-blue-300 transition-opacity"
+                                  className="opacity-0 group-hover:opacity-100 text-[#2F2FE4] hover:text-[#2525c5] transition-opacity"
                                   title="Change advisor"
                                 ><RefreshCw size={11} /></button>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-slate-600 text-xs">—</span>
+                          <span className="text-gray-400 text-xs">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <Clock size={12} className="text-slate-500" />
-                          <span className={`text-sm font-bold ${f.totalWeeklyHours >= 18 ? "text-red-400" : f.totalWeeklyHours >= 12 ? "text-amber-400" : "text-white"}`}>
+                          <Clock size={12} className="text-gray-400" />
+                          <span className={`text-sm font-bold ${f.totalWeeklyHours >= 18 ? "text-red-400" : f.totalWeeklyHours >= 12 ? "text-amber-400" : "text-black"}`}>
                             {f.totalWeeklyHours}h
                           </span>
                         </div>
@@ -350,7 +350,7 @@ export default function WorkAllocationClient({
                         {f.subjects.length > 0 || f.isClassAdvisor ? (
                           <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-semibold">Allocated</span>
                         ) : (
-                          <span className="text-[10px] bg-slate-700 text-slate-400 px-2 py-0.5 rounded-full font-semibold">Unallocated</span>
+                          <span className="text-[10px] bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full font-semibold">Unallocated</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -358,12 +358,12 @@ export default function WorkAllocationClient({
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => { setActiveTab("Assign Subject"); setAsFacultyId(f.id) }}
-                            className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors"
+                            className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15 transition-colors"
                             title="Assign Subject"
                           ><BookOpen size={13} /></button>
                           <button
                             onClick={() => { setActiveTab("Assign Class Advisor"); setAcaFacultyId(f.id) }}
-                            className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 transition-colors"
+                            className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15 transition-colors"
                             title="Assign Class Advisor"
                           ><UserCheck size={13} /></button>
                         </div>
@@ -380,18 +380,18 @@ export default function WorkAllocationClient({
       {/* ── TAB: Assign Subject ── */}
       {activeTab === "Assign Subject" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-4">
-            <h3 className="text-white font-bold flex items-center gap-2"><BookOpen size={15} className="text-violet-400" /> Assign Subject</h3>
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-4">
+            <h3 className="text-black font-bold flex items-center gap-2"><BookOpen size={15} className="text-[#2F2FE4]" /> Assign Subject</h3>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Semester</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Semester</label>
               <select value={asSem} onChange={(e) => { setAsSem(e.target.value); setAsSubjectId("") }} className={`${inp} w-full`}>
                 {semesters.map((s) => <option key={s} value={s.toString()}>Semester {s}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Subject</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Subject</label>
               <select value={asSubjectId} onChange={(e) => setAsSubjectId(e.target.value)} className={`${inp} w-full`}>
                 <option value="">Select Subject</option>
                 {semSubjects.map((s) => (
@@ -401,7 +401,7 @@ export default function WorkAllocationClient({
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Faculty Member</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Faculty Member</label>
               <select value={asFacultyId} onChange={(e) => setAsFacultyId(e.target.value)} className={`${inp} w-full`}>
                 <option value="">Select Faculty</option>
                 {facultyList.map((f) => (
@@ -411,35 +411,35 @@ export default function WorkAllocationClient({
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Hours per Week (optional)</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Hours per Week (optional)</label>
               <input type="number" min="0" max="30" value={asHours} onChange={(e) => setAsHours(e.target.value)} placeholder="e.g. 4" className={`${inp} w-full`} />
             </div>
 
             <button
               onClick={handleAssignSubject}
               disabled={isPending || !asSubjectId || !asFacultyId}
-              className="w-full py-2.5 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {isPending ? "Assigning..." : <><Plus size={14} /> Assign Subject</>}
             </button>
           </div>
 
           {/* Current allocations for selected faculty */}
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-3">
-            <h3 className="text-white font-bold text-sm">Current Subject Allocations</h3>
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-3">
+            <h3 className="text-black font-bold text-sm">Current Subject Allocations</h3>
             <div className="space-y-2 max-h-[460px] overflow-y-auto">
               {facultyList.map((f) =>
                 f.subjects.length === 0 ? null : (
-                  <div key={f.id} className="p-3 rounded-xl bg-slate-900/50 border border-white/5 space-y-1.5">
-                    <p className="text-white text-xs font-semibold">{f.name} <span className="text-slate-500 font-normal">({f.facultyId})</span></p>
+                  <div key={f.id} className="p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-1.5">
+                    <p className="text-black text-xs font-semibold">{f.name} <span className="text-gray-400 font-normal">({f.facultyId})</span></p>
                     {f.subjects.map((s) => (
                       <div key={s.allocationId} className="flex items-center justify-between pl-2">
                         <div>
-                          <span className="text-slate-300 text-xs">{s.code} – {s.name}</span>
-                          <span className="text-slate-500 text-[10px] ml-2">Sem {s.semester}</span>
+                          <span className="text-gray-700 text-xs">{s.code} – {s.name}</span>
+                          <span className="text-gray-400 text-[10px] ml-2">Sem {s.semester}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setTransferTarget({ allocationId: s.allocationId, newFacultyId: "" })} className="p-1 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Transfer"><RefreshCw size={11} /></button>
+                          <button onClick={() => setTransferTarget({ allocationId: s.allocationId, newFacultyId: "" })} className="p-1 rounded bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15" title="Transfer"><RefreshCw size={11} /></button>
                           <button onClick={() => handleRemoveSubject(s.allocationId)} className="p-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Remove"><Trash2 size={11} /></button>
                         </div>
                       </div>
@@ -448,7 +448,7 @@ export default function WorkAllocationClient({
                 )
               )}
               {facultyList.every((f) => f.subjects.length === 0) && (
-                <p className="text-slate-500 text-sm text-center py-6">No subject allocations yet.</p>
+                <p className="text-gray-400 text-sm text-center py-6">No subject allocations yet.</p>
               )}
             </div>
           </div>
@@ -458,23 +458,23 @@ export default function WorkAllocationClient({
       {/* ── TAB: Assign Class Advisor ── */}
       {activeTab === "Assign Class Advisor" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-4">
-            <h3 className="text-white font-bold flex items-center gap-2"><UserCheck size={15} className="text-teal-400" /> Assign Class Advisor</h3>
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-4">
+            <h3 className="text-black font-bold flex items-center gap-2"><UserCheck size={15} className="text-[#2F2FE4]" /> Assign Class Advisor</h3>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Academic Year</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Academic Year</label>
               <input value={acaYear} onChange={(e) => setAcaYear(e.target.value)} placeholder="e.g. 2024-2025" className={`${inp} w-full`} />
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Semester</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Semester</label>
               <select value={acaSem} onChange={(e) => setAcaSem(e.target.value)} className={`${inp} w-full`}>
                 {semesters.map((s) => <option key={s} value={s.toString()}>Semester {s}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Section</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Section</label>
               <select value={acaSection} onChange={(e) => setAcaSection(e.target.value)} className={`${inp} w-full`}>
                 <option value="">Select Section</option>
                 {allSections.filter((s) => s.semester.toString() === acaSem).map((s) => (
@@ -484,7 +484,7 @@ export default function WorkAllocationClient({
             </div>
 
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Faculty Member</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Faculty Member</label>
               <select value={acaFacultyId} onChange={(e) => setAcaFacultyId(e.target.value)} className={`${inp} w-full`}>
                 <option value="">Select Faculty</option>
                 {facultyList.map((f) => (
@@ -504,28 +504,28 @@ export default function WorkAllocationClient({
             <button
               onClick={handleAssignAdvisor}
               disabled={isPending || !acaFacultyId || !acaSem || !acaSection}
-              className="w-full py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {isPending ? "Assigning..." : <><Plus size={14} /> Assign Class Advisor</>}
             </button>
           </div>
 
           {/* Current advisors */}
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-3">
-            <h3 className="text-white font-bold text-sm">Current Class Advisors</h3>
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-3">
+            <h3 className="text-black font-bold text-sm">Current Class Advisors</h3>
             {classAdvisors.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center py-6">No class advisors assigned yet.</p>
+              <p className="text-gray-400 text-sm text-center py-6">No class advisors assigned yet.</p>
             ) : (
               <div className="space-y-2 max-h-[460px] overflow-y-auto">
                 {classAdvisors.map((ca) => (
-                  <div key={ca.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-white/5">
+                  <div key={ca.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <div>
-                      <p className="text-white text-sm font-medium">{ca.faculty.user.name}</p>
-                      <p className="text-slate-500 text-xs">{ca.faculty.facultyId} · Sem {ca.semester} · Sec {ca.section}</p>
-                      <p className="text-slate-600 text-[10px]">{ca.academicYear}</p>
+                      <p className="text-black text-sm font-medium">{ca.faculty.user.name}</p>
+                      <p className="text-gray-400 text-xs">{ca.faculty.facultyId} · Sem {ca.semester} · Sec {ca.section}</p>
+                      <p className="text-gray-400 text-[10px]">{ca.academicYear}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setChangeAdvisorTarget({ id: ca.id, newFacultyId: "" })} className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20" title="Change"><RefreshCw size={13} /></button>
+                      <button onClick={() => setChangeAdvisorTarget({ id: ca.id, newFacultyId: "" })} className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15" title="Change"><RefreshCw size={13} /></button>
                       <button onClick={() => handleRemoveAdvisor(ca.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Remove"><Trash2 size={13} /></button>
                     </div>
                   </div>
@@ -539,40 +539,40 @@ export default function WorkAllocationClient({
       {/* ── TAB: Workload Dashboard ── */}
       {activeTab === "Workload Dashboard" && (
         <div className="space-y-4">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 overflow-hidden">
-            <div className="p-4 border-b border-white/5">
-              <h3 className="text-white font-bold flex items-center gap-2"><BarChart3 size={15} className="text-violet-400" /> Faculty Workload Distribution</h3>
+          <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-100">
+              <h3 className="text-black font-bold flex items-center gap-2"><BarChart3 size={15} className="text-[#2F2FE4]" /> Faculty Workload Distribution</h3>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-gray-100">
               {facultyList.map((f) => {
                 const pct = Math.min(100, (f.totalWeeklyHours / 20) * 100)
                 const barColor = f.totalWeeklyHours >= 18 ? "bg-red-400" : f.totalWeeklyHours >= 12 ? "bg-amber-400" : "bg-emerald-400"
                 return (
                   <div key={f.id} className="p-4 grid grid-cols-1 md:grid-cols-[200px_1fr_120px_120px] gap-4 items-center">
                     <div>
-                      <p className="text-white text-sm font-medium">{f.name}</p>
-                      <p className="text-slate-500 text-xs">{f.facultyId} · {f.designation}</p>
+                      <p className="text-black text-sm font-medium">{f.name}</p>
+                      <p className="text-gray-400 text-xs">{f.facultyId} · {f.designation}</p>
                     </div>
                     <div>
                       <div className="flex flex-wrap gap-1 mb-1.5">
                         {f.subjects.map((s) => (
-                          <span key={s.allocationId} className="text-[10px] bg-violet-500/10 text-violet-400 px-1.5 py-0.5 rounded">{s.code}</span>
+                          <span key={s.allocationId} className="text-[10px] bg-[#2F2FE4]/10 text-[#2F2FE4] px-1.5 py-0.5 rounded">{s.code}</span>
                         ))}
-                        {f.subjects.length === 0 && <span className="text-slate-600 text-xs">No subjects</span>}
+                        {f.subjects.length === 0 && <span className="text-gray-400 text-xs">No subjects</span>}
                       </div>
-                      <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Clock size={12} className="text-slate-500" />
-                      <span className={`text-sm font-bold ${f.totalWeeklyHours >= 18 ? "text-red-400" : f.totalWeeklyHours >= 12 ? "text-amber-400" : "text-white"}`}>{f.totalWeeklyHours}h/wk</span>
+                      <Clock size={12} className="text-gray-400" />
+                      <span className={`text-sm font-bold ${f.totalWeeklyHours >= 18 ? "text-red-400" : f.totalWeeklyHours >= 12 ? "text-amber-400" : "text-black"}`}>{f.totalWeeklyHours}h/wk</span>
                     </div>
                     <div>
                       {f.isClassAdvisor ? (
-                        <span className="text-[10px] bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-semibold">Class Advisor</span>
+                        <span className="text-[10px] bg-[#2F2FE4]/10 text-[#2F2FE4] px-2 py-0.5 rounded-full font-semibold">Class Advisor</span>
                       ) : (
-                        <span className="text-[10px] bg-slate-700 text-slate-500 px-2 py-0.5 rounded-full">No Class</span>
+                        <span className="text-[10px] bg-gray-200 text-gray-400 px-2 py-0.5 rounded-full">No Class</span>
                       )}
                     </div>
                   </div>
@@ -586,8 +586,8 @@ export default function WorkAllocationClient({
       {/* ── TAB: Unassigned ── */}
       {activeTab === "Unassigned" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-3">
-            <h3 className="text-white font-bold flex items-center gap-2">
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-3">
+            <h3 className="text-black font-bold flex items-center gap-2">
               <BookOpen size={15} className="text-amber-400" /> Unassigned Subjects
               <span className="ml-auto text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-semibold">{unassignedSubjects.length}</span>
             </h3>
@@ -596,15 +596,15 @@ export default function WorkAllocationClient({
             ) : (
               <div className="space-y-2 max-h-[440px] overflow-y-auto">
                 {unassignedSubjects.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-amber-500/10">
+                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-amber-500/10">
                     <div>
-                      <p className="text-white text-sm font-medium">{s.code}</p>
-                      <p className="text-slate-400 text-xs">{s.name}</p>
-                      <p className="text-slate-500 text-[10px]">Sem {s.semester} · {s.subjectType}</p>
+                      <p className="text-black text-sm font-medium">{s.code}</p>
+                      <p className="text-gray-500 text-xs">{s.name}</p>
+                      <p className="text-gray-400 text-[10px]">Sem {s.semester} · {s.subjectType}</p>
                     </div>
                     <button
                       onClick={() => { setActiveTab("Assign Subject"); setAsSem(s.semester.toString()); setAsSubjectId(s.id) }}
-                      className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15 transition-colors"
                       title="Assign now"
                     ><Plus size={14} /></button>
                   </div>
@@ -613,8 +613,8 @@ export default function WorkAllocationClient({
             )}
           </div>
 
-          <div className="rounded-2xl bg-slate-800/50 border border-white/5 p-5 space-y-3">
-            <h3 className="text-white font-bold flex items-center gap-2">
+          <div className="rounded-2xl bg-white border border-gray-200 p-5 space-y-3">
+            <h3 className="text-black font-bold flex items-center gap-2">
               <GraduationCap size={15} className="text-red-400" /> Unassigned Classes
               <span className="ml-auto text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full font-semibold">{unassignedSections.length}</span>
             </h3>
@@ -623,14 +623,14 @@ export default function WorkAllocationClient({
             ) : (
               <div className="space-y-2 max-h-[440px] overflow-y-auto">
                 {unassignedSections.map((s) => (
-                  <div key={`${s.semester}-${s.section}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-red-500/10">
+                  <div key={`${s.semester}-${s.section}`} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-red-500/10">
                     <div>
-                      <p className="text-white text-sm font-medium">Semester {s.semester} — Section {s.section}</p>
-                      <p className="text-slate-500 text-xs">No Class Advisor assigned</p>
+                      <p className="text-black text-sm font-medium">Semester {s.semester} — Section {s.section}</p>
+                      <p className="text-gray-400 text-xs">No Class Advisor assigned</p>
                     </div>
                     <button
                       onClick={() => { setActiveTab("Assign Class Advisor"); setAcaSem(s.semester.toString()); setAcaSection(s.section) }}
-                      className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-[#2F2FE4]/10 text-[#2F2FE4] hover:bg-[#2F2FE4]/15 transition-colors"
                       title="Assign advisor"
                     ><Plus size={14} /></button>
                   </div>
@@ -643,11 +643,11 @@ export default function WorkAllocationClient({
 
       {/* ── Transfer Subject Modal ── */}
       {transferTarget && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setTransferTarget(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-white font-bold">Transfer Subject</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setTransferTarget(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-black font-bold">Transfer Subject</h3>
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">Transfer to Faculty</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">Transfer to Faculty</label>
               <select
                 value={transferTarget.newFacultyId}
                 onChange={(e) => setTransferTarget({ ...transferTarget, newFacultyId: e.target.value })}
@@ -658,8 +658,8 @@ export default function WorkAllocationClient({
               </select>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setTransferTarget(null)} className="flex-1 py-2 rounded-xl bg-slate-800 border border-white/5 text-slate-300 text-sm">Cancel</button>
-              <button onClick={handleTransferSubject} disabled={isPending || !transferTarget.newFacultyId} className="flex-1 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold disabled:opacity-50">
+              <button onClick={() => setTransferTarget(null)} className="flex-1 py-2 rounded-xl bg-white border border-gray-100 text-gray-700 text-sm">Cancel</button>
+              <button onClick={handleTransferSubject} disabled={isPending || !transferTarget.newFacultyId} className="flex-1 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50">
                 {isPending ? "Transferring..." : "Transfer"}
               </button>
             </div>
@@ -669,11 +669,11 @@ export default function WorkAllocationClient({
 
       {/* ── Change Advisor Modal ── */}
       {changeAdvisorTarget && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setChangeAdvisorTarget(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-white font-bold">Change Class Advisor</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setChangeAdvisorTarget(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-black font-bold">Change Class Advisor</h3>
             <div>
-              <label className="text-slate-400 text-xs mb-1.5 block">New Class Advisor</label>
+              <label className="text-gray-500 text-xs mb-1.5 block">New Class Advisor</label>
               <select
                 value={changeAdvisorTarget.newFacultyId}
                 onChange={(e) => setChangeAdvisorTarget({ ...changeAdvisorTarget, newFacultyId: e.target.value })}
@@ -684,8 +684,8 @@ export default function WorkAllocationClient({
               </select>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setChangeAdvisorTarget(null)} className="flex-1 py-2 rounded-xl bg-slate-800 border border-white/5 text-slate-300 text-sm">Cancel</button>
-              <button onClick={handleChangeAdvisor} disabled={isPending || !changeAdvisorTarget.newFacultyId} className="flex-1 py-2 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold disabled:opacity-50">
+              <button onClick={() => setChangeAdvisorTarget(null)} className="flex-1 py-2 rounded-xl bg-white border border-gray-100 text-gray-700 text-sm">Cancel</button>
+              <button onClick={handleChangeAdvisor} disabled={isPending || !changeAdvisorTarget.newFacultyId} className="flex-1 py-2 rounded-xl bg-[#2F2FE4] hover:bg-[#2525c5] text-white text-sm font-semibold disabled:opacity-50">
                 {isPending ? "Changing..." : "Change Advisor"}
               </button>
             </div>

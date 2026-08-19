@@ -25,7 +25,7 @@ export default async function HodSubjectsPage() {
       orderBy: [{ semester: "asc" }, { code: "asc" }],
     }),
     prisma.faculty.findMany({
-      where: { departmentId: deptId, accountStatus: true },
+      where: { departmentId: deptId, accountStatus: "ACTIVE" },
       include: { user: { select: { name: true, email: true } } },
       orderBy: { facultyId: "asc" },
     }),

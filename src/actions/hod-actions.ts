@@ -62,7 +62,7 @@ export async function hodLogin(facultyId: string, dateOfBirth: string) {
       return { success: false, error: "Your account is deactivated. Contact Admin." }
     }
 
-    if (!faculty.accountStatus) {
+    if (faculty.accountStatus !== "ACTIVE") {
       return { success: false, error: "Your faculty account is suspended. Contact Admin." }
     }
 
@@ -146,7 +146,7 @@ export async function getHodDashboardStats(departmentId: string) {
     const facultyCount = await prisma.faculty.count({
       where: {
         departmentId,
-        accountStatus: true,
+        accountStatus: "ACTIVE",
       },
     })
 
@@ -190,7 +190,7 @@ export async function getHodDashboardStats(departmentId: string) {
     const facultyList = await prisma.faculty.findMany({
       where: {
         departmentId,
-        accountStatus: true,
+        accountStatus: "ACTIVE",
       },
       include: {
         user: true,

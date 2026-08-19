@@ -30,12 +30,12 @@ export default async function FacultyTimetablePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+        <div className="w-10 h-10 rounded-xl bg-[#2F2FE4]/10 border border-[#2F2FE4]/20 flex items-center justify-center text-[#2F2FE4]">
           <CalendarDays size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Timetable</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Weekly schedule overview</p>
+          <h1 className="text-black text-2xl font-bold">Timetable</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Weekly schedule overview</p>
         </div>
       </div>
 
@@ -44,18 +44,18 @@ export default async function FacultyTimetablePage() {
           const dayNum = i + 1
           const dayEntries = grouped[dayNum] || []
           return (
-            <div key={day} className="rounded-2xl bg-slate-800/50 border border-white/5 p-4 space-y-3">
-              <h3 className="text-white font-bold text-sm text-center pb-2 border-b border-white/5">{day}</h3>
+            <div key={day} className="rounded-2xl bg-white border border-gray-200 p-4 space-y-3">
+              <h3 className="text-black font-bold text-sm text-center pb-2 border-b border-gray-100">{day}</h3>
               {dayEntries.length === 0 ? (
-                <p className="text-slate-500 text-xs text-center py-4">No classes</p>
+                <p className="text-gray-400 text-xs text-center py-4">No classes</p>
               ) : (
                 <div className="space-y-2">
                   {dayEntries.map((t, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1">
-                      <p className="text-white text-xs font-semibold">{t.subject?.name || "Class"}</p>
-                      <p className="text-slate-400 text-[10px]">Class {t.className} - {t.section}</p>
-                      <p className="text-teal-400 text-[10px]">{t.startTime} - {t.endTime}</p>
-                      <p className="text-slate-500 text-[10px]">{t.classroom}</p>
+                    <div key={idx} className="p-3 rounded-xl bg-gray-100 border border-gray-100 space-y-1">
+                      <p className="text-black text-xs font-semibold">{t.subject?.name || "Class"}</p>
+                      <p className="text-gray-500 text-[10px]">Class {t.className} - {t.section}</p>
+                      <p className="text-[#2F2FE4] text-[10px]">{t.startTime} - {t.endTime}</p>
+                      <p className="text-gray-400 text-[10px]">{t.classroom}</p>
                     </div>
                   ))}
                 </div>

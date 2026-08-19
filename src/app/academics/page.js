@@ -7,7 +7,7 @@ import { Section, SectionTitle, Container, Accordion, Button } from '../componen
 import HeroBanner from '../components/HeroBanner'
 import { GlassCard } from '../components/Cards'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion } from "motion/react"
 import { BookOpen, Users, Award, Target } from 'lucide-react'
 
 export default function Academics() {
@@ -60,7 +60,7 @@ export default function Academics() {
         title="Academics at MISS College"
         subtitle="Comprehensive Programs Designed for Excellence and Innovation"
         cta1Text="Apply Now"
-        cta1Link="/admissions/apply"
+        cta1Link="/apply"
         cta2Text="View Programs"
         cta2Link="#programs"
       />
@@ -261,7 +261,7 @@ export default function Academics() {
             <p className="text-xl text-gray-100 mb-8 max-w-2xl mx-auto">
               Apply now and become part of our thriving academic community.
             </p>
-            <Link href="/admissions/apply">
+            <Link href="/apply">
               <Button variant="secondary" size="lg">
                 Apply Now
               </Button>

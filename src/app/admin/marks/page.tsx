@@ -29,8 +29,8 @@ export default async function AdminMarksPage() {
           <Award size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">Internal Marks Overview</h1>
-          <p className="text-slate-400 text-sm mt-0.5">All departments</p>
+          <h1 className="text-black text-2xl font-bold">Internal Marks Overview</h1>
+          <p className="text-gray-500 text-sm mt-0.5">All departments</p>
         </div>
       </div>
 

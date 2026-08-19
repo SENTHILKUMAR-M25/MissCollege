@@ -43,7 +43,7 @@ export async function getFacultyProfile(facultyFacultyId: string) {
     const faculty = await prisma.faculty.findUnique({
       where: { facultyId: facultyFacultyId },
       include: {
-        user: { select: { name: true, email: true, createdAt: true } },
+        user: { select: { name: true, email: true, createdAt: true, avatar: true } },
         department: { select: { name: true, code: true } },
         subjects: { select: { id: true, name: true, code: true, credits: true, semester: true } },
       },
@@ -89,26 +89,8 @@ export async function getFacultyStudents(facultyId: string) {
   }
 }
 
-export async function getFacultyAttendanceRecords(facultyId: string, startDate?: string, endDate?: string) {
-  try {
-    const where: any = { facultyId }
-    if (startDate) where.date = { ...where.date, gte: new Date(startDate) }
-    if (endDate) where.date = { ...where.date, lte: new Date(endDate) }
-
-    const records = await prisma.attendance.findMany({
-      where,
-      include: {
-        student: { include: { user: { select: { name: true } } } },
-        subject: { select: { name: true, code: true } },
-      },
-      orderBy: { date: "desc" },
-      take: 200,
-    })
-    return { success: true, data: records }
-  } catch (error) {
-    console.error("Error fetching attendance records:", error)
-    return { success: false, error: "Failed to fetch attendance records" }
-  }
+export async function getFacultyAttendanceRecordsLegacy() {
+  return { success: false, error: "Legacy endpoint removed" }
 }
 
 export async function markAttendance(formData: FormData) {
@@ -116,17 +98,42 @@ export async function markAttendance(formData: FormData) {
     const facultyId = formData.get("facultyId") as string
     const subjectId = formData.get("subjectId") as string
     const dateStr = formData.get("date") as string
+    const periodNumber = Number(formData.get("periodNumber") || 0)
+    const startTime = (formData.get("startTime") as string) || null
+    const endTime = (formData.get("endTime") as string) || null
     const recordsRaw = formData.get("records") as string
 
     const records = JSON.parse(recordsRaw) as { studentId: string; status: string }[]
 
     const attendanceDate = new Date(dateStr)
+
     await prisma.$transaction(
       records.map((r) =>
         prisma.attendance.upsert({
-          where: { studentId_subjectId_date: { studentId: r.studentId, subjectId, date: attendanceDate } },
-          update: { status: r.status as "PRESENT" | "ABSENT" },
-          create: { studentId: r.studentId, subjectId, facultyId, date: attendanceDate, status: r.status as "PRESENT" | "ABSENT" },
+          where: {
+            studentId_subjectId_date_periodNumber: {
+              studentId: r.studentId,
+              subjectId,
+              date: attendanceDate,
+              periodNumber,
+            },
+          },
+          update: {
+            status: r.status as "PRESENT" | "ABSENT" | "OD" | "LEAVE",
+            facultyId,
+            startTime: startTime ?? undefined,
+            endTime: endTime ?? undefined,
+          },
+          create: {
+            studentId: r.studentId,
+            subjectId,
+            facultyId,
+            date: attendanceDate,
+            periodNumber,
+            startTime,
+            endTime,
+            status: r.status as "PRESENT" | "ABSENT" | "OD" | "LEAVE",
+          },
         })
       )
     )
@@ -142,28 +149,17 @@ export async function getFacultyTimetable(facultyId: string) {
   try {
     const timetable = await prisma.timetable.findMany({
       where: { facultyId },
-      include: { subject: { select: { name: true, code: true } } },
+      include: {
+        subject: { select: { id: true, name: true, code: true } },
+        department: { select: { id: true, name: true, code: true } },
+        course: { select: { id: true, name: true, code: true } },
+      },
       orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
     })
     return { success: true, data: timetable }
   } catch (error) {
     console.error("Error fetching timetable:", error)
     return { success: false, error: "Failed to fetch timetable" }
-  }
-}
-
-export async function getFacultyNotices() {
-  try {
-    const notices = await prisma.notice.findMany({
-      where: { OR: [{ targetAudience: "ALL" }, { targetAudience: "FACULTY" }] },
-      include: { creator: { select: { name: true, role: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    })
-    return { success: true, data: notices }
-  } catch (error) {
-    console.error("Error fetching notices:", error)
-    return { success: false, error: "Failed to fetch notices" }
   }
 }
 
@@ -183,6 +179,132 @@ export async function getFacultySubjects(facultyId: string) {
   } catch (error) {
     console.error("Error fetching faculty subjects:", error)
     return { success: false, error: "Failed to fetch subjects" }
+  }
+}
+
+export async function getFacultyAttendanceRecords(facultyId: string, startDate?: string, endDate?: string) {
+  try {
+    const where: any = { facultyId }
+    if (startDate) where.date = { ...where.date, gte: new Date(startDate) }
+    if (endDate) where.date = { ...where.date, lte: new Date(endDate) }
+
+    const records = await prisma.attendance.findMany({
+      where,
+      include: {
+        student: {
+          include: {
+            user: { select: { name: true } },
+            course: { select: { name: true, code: true } },
+            department: { select: { name: true, code: true } },
+          },
+        },
+        subject: { select: { id: true, name: true, code: true, semester: true } },
+      },
+      orderBy: { date: "desc" },
+      take: 200,
+    })
+    return { success: true, data: records }
+  } catch (error) {
+    console.error("Error fetching attendance records:", error)
+    return { success: false, error: "Failed to fetch attendance records" }
+  }
+}
+
+export async function getPeriods() {
+  try {
+    const periods = await prisma.period.findMany({ orderBy: { periodNumber: "asc" } })
+    return { success: true, data: periods }
+  } catch (error) {
+    console.error("Error fetching periods:", error)
+    return { success: false, error: "Failed to fetch periods" }
+  }
+}
+
+export async function getClassStudents(departmentId: string, courseId: string, semester: number, section: string) {
+  try {
+    const students = await prisma.student.findMany({
+      where: { departmentId, courseId, semester, section },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { registerNumber: "asc" },
+    })
+    return { success: true, data: students }
+  } catch (error) {
+    console.error("Error fetching class students:", error)
+    return { success: false, error: "Failed to fetch students" }
+  }
+}
+
+export async function getAttendanceSummary(facultyId: string) {
+  try {
+    const records = await prisma.attendance.findMany({
+      where: { facultyId },
+      include: { subject: { select: { code: true, name: true } }, student: { include: { user: { select: { name: true } } } } },
+      orderBy: { date: "desc" },
+      take: 200,
+    })
+
+    const bySubject = new Map<string, { code: string; present: number; absent: number; od: number; leave: number; total: number }>()
+    const byPeriod = new Map<number, { present: number; absent: number; od: number; leave: number; total: number }>()
+    const byMonth = new Map<string, { present: number; absent: number; od: number; leave: number; total: number }>()
+    const byStudent = new Map<string, { name: string; present: number; total: number }>()
+    const bySection = new Map<string, { present: number; total: number }>()
+
+    for (const r of records) {
+      const month = new Date(r.date).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
+      const subjectKey = r.subject.code
+      bySubject.set(subjectKey, {
+        code: subjectKey,
+        present: (bySubject.get(subjectKey)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
+        absent: (bySubject.get(subjectKey)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
+        od: (bySubject.get(subjectKey)?.od || 0) + (r.status === "OD" ? 1 : 0),
+        leave: (bySubject.get(subjectKey)?.leave || 0) + (r.status === "LEAVE" ? 1 : 0),
+        total: (bySubject.get(subjectKey)?.total || 0) + 1,
+      })
+      byPeriod.set(r.periodNumber, {
+        periodNumber: r.periodNumber,
+        present: (byPeriod.get(r.periodNumber)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
+        absent: (byPeriod.get(r.periodNumber)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
+        od: (byPeriod.get(r.periodNumber)?.od || 0) + (r.status === "OD" ? 1 : 0),
+        leave: (byPeriod.get(r.periodNumber)?.leave || 0) + (r.status === "LEAVE" ? 1 : 0),
+        total: (byPeriod.get(r.periodNumber)?.total || 0) + 1,
+      })
+      byMonth.set(month, {
+        month,
+        present: (byMonth.get(month)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
+        absent: (byMonth.get(month)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
+        od: (byMonth.get(month)?.od || 0) + (r.status === "OD" ? 1 : 0),
+        leave: (byMonth.get(month)?.leave || 0) + (r.status === "LEAVE" ? 1 : 0),
+        total: (byMonth.get(month)?.total || 0) + 1,
+      })
+
+      const studentName = r.student.user.name || "Unknown"
+      byStudent.set(r.studentId, {
+        name: studentName,
+        present: (byStudent.get(r.studentId)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
+        total: (byStudent.get(r.studentId)?.total || 0) + 1,
+      })
+
+      const sectionKey = `${r.student.department?.code || ""}-${r.student.section || ""}`
+      bySection.set(sectionKey, {
+        section: sectionKey,
+        present: (bySection.get(sectionKey)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
+        total: (bySection.get(sectionKey)?.total || 0) + 1,
+      })
+    }
+
+    return {
+      success: true,
+      data: {
+        subjectWise: Array.from(bySubject.values()),
+        periodWise: Array.from(byPeriod.values()),
+        monthWise: Array.from(byMonth.values()),
+        studentWise: Array.from(byStudent.entries()).map(([id, v]) => ({ id, ...v })),
+        sectionWise: Array.from(bySection.entries()).map(([id, v]) => ({ id, ...v })),
+      },
+    }
+  } catch (error) {
+    console.error("Error fetching attendance summary:", error)
+    return { success: false, error: "Failed to fetch attendance summary" }
   }
 }
 
@@ -243,201 +365,5 @@ export async function getFacultyInternalMarks(facultyId: string) {
   } catch (error) {
     console.error("Error fetching internal marks:", error)
     return { success: false, error: "Failed to fetch marks" }
-  }
-}
-
-export async function changeFacultyPassword(userId: string, newPassword: string) {
-  try {
-    if (!newPassword || newPassword.length < 6) {
-      return { success: false, error: "Password must be at least 6 characters" }
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user) return { success: false, error: "User not found" }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword, passwordChanged: true },
-    })
-
-    revalidatePath("/faculty/profile")
-    return { success: true }
-  } catch (error) {
-    console.error("Error changing faculty password:", error)
-    return { success: false, error: "Failed to change password" }
-  }
-}
-
-export async function updateFacultyProfile(facultyId: string, data: {
-  name?: string
-  phone?: string
-  alternateNumber?: string
-  address?: string
-  specialization?: string
-  experience?: number
-  joiningDate?: string | undefined
-  gender?: string
-  qualification?: string
-}) {
-  try {
-    const faculty = await prisma.faculty.findUnique({
-      where: { facultyId },
-      include: { user: true },
-    })
-    if (!faculty) return { success: false, error: "Faculty not found" }
-
-    const facultyUpdate: Record<string, any> = {}
-    if (data.phone !== undefined) facultyUpdate.phone = data.phone
-    if (data.alternateNumber !== undefined) facultyUpdate.alternateNumber = data.alternateNumber
-    if (data.address !== undefined) facultyUpdate.address = data.address
-    if (data.specialization !== undefined) facultyUpdate.specialization = data.specialization
-    if (data.experience !== undefined) facultyUpdate.experience = data.experience
-    if (data.joiningDate !== undefined) facultyUpdate.joiningDate = data.joiningDate ? new Date(data.joiningDate) : undefined
-    if (data.gender !== undefined) facultyUpdate.gender = data.gender
-    if (data.qualification !== undefined) facultyUpdate.qualification = data.qualification
-
-    await prisma.$transaction(async (tx) => {
-      if (data.name) {
-        await tx.user.update({ where: { id: faculty.userId }, data: { name: data.name } })
-      }
-      if (Object.keys(facultyUpdate).length > 0) {
-        await tx.faculty.update({ where: { id: faculty.id }, data: facultyUpdate })
-      }
-    })
-
-    revalidatePath("/faculty/profile")
-    return { success: true }
-  } catch (error) {
-    console.error("Error updating profile:", error)
-    return { success: false, error: "Failed to update profile" }
-  }
-}
-
-export async function applyFacultyLeave(formData: FormData) {
-  try {
-    const facultyId = formData.get("facultyId") as string
-    const departmentId = formData.get("departmentId") as string
-    const leaveType = formData.get("leaveType") as string
-    const startDateStr = formData.get("startDate") as string
-    const endDateStr = formData.get("endDate") as string
-    const reason = formData.get("reason") as string
-
-    if (!facultyId || !departmentId || !leaveType || !startDateStr || !endDateStr || !reason) {
-      return { success: false, error: "All fields are required" }
-    }
-
-    await prisma.leaveRequest.create({
-      data: {
-        facultyId,
-        departmentId,
-        leaveType,
-        startDate: new Date(startDateStr),
-        endDate: new Date(endDateStr),
-        reason,
-        status: "PENDING",
-      },
-    })
-
-    revalidatePath("/faculty/leave")
-    return { success: true }
-  } catch (error) {
-    console.error("Error applying for leave:", error)
-    return { success: false, error: "Failed to apply for leave" }
-  }
-}
-
-export async function getFacultyLeaveHistory(facultyId: string) {
-  try {
-    const leaveRequests = await prisma.leaveRequest.findMany({
-      where: { facultyId },
-      include: { department: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
-    })
-    return { success: true, data: leaveRequests }
-  } catch (error) {
-    console.error("Error fetching leave history:", error)
-    return { success: false, error: "Failed to fetch leave history" }
-  }
-}
-
-export async function createAssignment(data: {
-  title: string
-  description: string
-  subjectId: string
-  facultyId: string
-  className: string
-  section: string
-  dueDate: string
-  totalMarks: number
-  priority: string
-}) {
-  try {
-    await prisma.assignment.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        subjectId: data.subjectId,
-        facultyId: data.facultyId,
-        className: data.className,
-        section: data.section,
-        dueDate: new Date(data.dueDate),
-        totalMarks: data.totalMarks,
-        priority: data.priority,
-        status: "PENDING",
-      },
-    })
-    revalidatePath("/faculty/assignments")
-    return { success: true }
-  } catch (error) {
-    console.error("Error creating assignment:", error)
-    return { success: false, error: "Failed to create assignment" }
-  }
-}
-
-export async function getFacultyAssignments(facultyId: string) {
-  try {
-    const assignments = await prisma.assignment.findMany({
-      where: { facultyId },
-      include: {
-        subject: { select: { name: true, code: true } },
-        submissions: { select: { id: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    })
-    return { success: true, data: assignments }
-  } catch (error) {
-    console.error("Error fetching assignments:", error)
-    return { success: false, error: "Failed to fetch assignments" }
-  }
-}
-
-export async function getAssignmentSubmissions(assignmentId: string) {
-  try {
-    const submissions = await prisma.assignmentSubmission.findMany({
-      where: { assignmentId },
-      include: {
-        student: { include: { user: { select: { name: true } } } },
-      },
-      orderBy: { submittedAt: "desc" },
-    })
-    return { success: true, data: submissions }
-  } catch (error) {
-    console.error("Error fetching submissions:", error)
-    return { success: false, error: "Failed to fetch submissions" }
-  }
-}
-
-export async function gradeAssignment(submissionId: string, grade: number, feedback: string) {
-  try {
-    await prisma.assignmentSubmission.update({
-      where: { id: submissionId },
-      data: { grade, feedback, gradedAt: new Date() },
-    })
-    revalidatePath("/faculty/assignments")
-    return { success: true }
-  } catch (error) {
-    console.error("Error grading assignment:", error)
-    return { success: false, error: "Failed to grade assignment" }
   }
 }

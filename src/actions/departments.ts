@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { requireAcademicAdmin } from "@/lib/permissions"
 
 const departmentSchema = z.object({
   id: z.string().optional(),
@@ -13,11 +14,13 @@ const departmentSchema = z.object({
 
 export async function addDepartment(formData: FormData) {
   try {
-    const data = departmentSchema.parse({
+    await requireAcademicAdmin()
+    const payload = {
       name: formData.get("name"),
       code: formData.get("code"),
       description: formData.get("description"),
-    })
+    }
+    const data = departmentSchema.parse(payload)
 
     await prisma.department.create({
       data: {
@@ -29,19 +32,22 @@ export async function addDepartment(formData: FormData) {
 
     revalidatePath("/admin/departments")
     return { success: true }
-  } catch (error) {
-    return { success: false, error: "Failed to add department" }
+  } catch (error: any) {
+    const message = error?.errors?.map((e: any) => e.message).join(", ") || error?.message || "Failed to add department"
+    return { success: false, error: message }
   }
 }
 
 export async function updateDepartment(formData: FormData) {
   try {
-    const data = departmentSchema.parse({
+    await requireAcademicAdmin()
+    const payload = {
       id: formData.get("id"),
       name: formData.get("name"),
       code: formData.get("code"),
       description: formData.get("description"),
-    })
+    }
+    const data = departmentSchema.parse(payload)
 
     if (!data.id) throw new Error("ID is required")
 
@@ -56,20 +62,22 @@ export async function updateDepartment(formData: FormData) {
 
     revalidatePath("/admin/departments")
     return { success: true }
-  } catch (error) {
-    return { success: false, error: "Failed to update department" }
+  } catch (error: any) {
+    const message = error?.errors?.map((e: any) => e.message).join(", ") || error?.message || "Failed to update department"
+    return { success: false, error: message }
   }
 }
 
 export async function deleteDepartment(id: string) {
   try {
+    await requireAcademicAdmin()
     await prisma.department.delete({
       where: { id },
     })
 
     revalidatePath("/admin/departments")
     return { success: true }
-  } catch (error) {
-    return { success: false, error: "Failed to delete department" }
+  } catch (error: any) {
+    return { success: false, error: error?.message || "Failed to delete department" }
   }
 }

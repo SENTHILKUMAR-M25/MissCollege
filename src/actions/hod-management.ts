@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { requireAcademicAdmin } from "@/lib/permissions"
 
 const FACULTY_PREFIXES: Record<string, string> = {
   Professor: "P",
@@ -103,7 +104,7 @@ export async function getAvailableFaculty(departmentId: string) {
     const faculty = await prisma.faculty.findMany({
       where: {
         departmentId,
-        accountStatus: true,
+        accountStatus: "ACTIVE",
         user: { isActive: true },
         hodAssignments: {
           none: { isActive: true },
@@ -125,6 +126,7 @@ export async function getAvailableFaculty(departmentId: string) {
 
 export async function assignHod(formData: FormData) {
   try {
+    await requireAcademicAdmin()
     const data = assignHodSchema.parse({
       facultyId: formData.get("facultyId"),
       departmentId: formData.get("departmentId"),
@@ -195,17 +197,29 @@ export async function assignHod(formData: FormData) {
       })
     }
 
-    const latestHodFaculty = await prisma.faculty.findFirst({
-      where: { facultyId: { startsWith: "MISS-HOD-" } },
-      orderBy: { facultyId: "desc" },
-      select: { facultyId: true },
-    })
+    let hodId: string
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const latestHodFaculty = await prisma.faculty.findFirst({
+        where: { facultyId: { startsWith: "MISS-HOD-" } },
+        orderBy: { facultyId: "desc" },
+        select: { facultyId: true },
+      })
 
-    const latestSequence = latestHodFaculty?.facultyId
-      ? parseInt(latestHodFaculty.facultyId.slice("MISS-HOD-".length), 10)
-      : 0
-    const nextSeq = isNaN(latestSequence) ? 1 : latestSequence + 1
-    const hodId = `MISS-HOD-${String(nextSeq).padStart(3, "0")}`
+      const latestSequence = latestHodFaculty?.facultyId
+        ? parseInt(latestHodFaculty.facultyId.slice("MISS-HOD-".length), 10)
+        : 0
+      const nextSeq = isNaN(latestSequence) ? 1 : latestSequence + 1
+      const candidate = `MISS-HOD-${String(nextSeq).padStart(3, "0")}`
+
+      const exists = await prisma.faculty.findUnique({ where: { facultyId: candidate }, select: { id: true } })
+      if (!exists) { hodId = candidate; break }
+    }
+
+    if (!hodId) {
+      hodId = `MISS-HOD-${Date.now().toString(36).slice(-3).toUpperCase()}`
+      const stillExists = await prisma.faculty.findUnique({ where: { facultyId: hodId }, select: { id: true } })
+      if (stillExists) hodId = `MISS-HOD-${Math.random().toString(36).slice(2, 5).toUpperCase()}`
+    }
 
     const plainPassword = faculty.dateOfBirth
       ? new Date(faculty.dateOfBirth).toISOString().slice(0, 10).replace(/-/g, "")
@@ -291,13 +305,8 @@ export async function removeHod(formData: FormData) {
       return { success: false, error: "This HOD assignment is already inactive" }
     }
 
-    await prisma.hodAssignment.update({
+    await prisma.hodAssignment.delete({
       where: { id: data.assignmentId },
-      data: {
-        isActive: false,
-        removedAt: new Date(),
-        removalReason: data.removalReason || null,
-      },
     })
 
     const prefix = `MISS-${getDesignationPrefix(assignment.faculty.designation)}-`

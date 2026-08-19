@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
         orderBy: [{ semester: "asc" }, { code: "asc" }],
       }),
       prisma.faculty.findMany({
-        where: { departmentId: hod.departmentId, accountStatus: true },
+        where: { departmentId: hod.departmentId, accountStatus: "ACTIVE" },
         select: { id: true, facultyId: true, user: { select: { name: true, email: true } }, designation: true },
         orderBy: { facultyId: "asc" },
       }),

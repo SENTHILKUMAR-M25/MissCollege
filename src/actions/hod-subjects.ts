@@ -37,7 +37,7 @@ export async function getHodSubjectStats(facultyId: string) {
       prisma.subject.count({ where: { departmentId: deptId, isActive: true } }),
       prisma.subject.count({ where: { departmentId: deptId, isActive: true, facultyId: { not: null } } }),
       prisma.subject.count({ where: { departmentId: deptId, isActive: true, facultyId: null } }),
-      prisma.faculty.count({ where: { departmentId: deptId, accountStatus: true } }),
+      prisma.faculty.count({ where: { departmentId: deptId, accountStatus: "ACTIVE" } }),
     ])
 
     const semCounts: Record<number, number> = {}
@@ -82,7 +82,7 @@ export async function getHodSubjects(facultyId: string, filters?: { semester?: n
         faculty: { include: { user: { select: { name: true, email: true } } } },
         facultySubjects: {
           where: { isActive: true },
-          include: { faculty: { include: { user: { select: { name: true, email: true, facultyId: true } } } } },
+          include: { faculty: { include: { user: { select: { name: true, email: true } } } } },
         },
       },
       orderBy: [{ semester: "asc" }, { code: "asc" }],
@@ -104,7 +104,7 @@ export async function getHodDepartmentFaculty(facultyId: string) {
     if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
 
     const faculty = await prisma.faculty.findMany({
-      where: { departmentId: hod.departmentId, accountStatus: true },
+      where: { departmentId: hod.departmentId, accountStatus: "ACTIVE" },
       include: { user: { select: { name: true, email: true } } },
       orderBy: { facultyId: "asc" },
     })
@@ -178,6 +178,8 @@ export async function createSubject(facultyId: string, data: {
 
 export async function updateSubject(subjectId: string, facultyId: string, data: {
   name?: string
+  code?: string
+  semester?: number
   credits?: number
   totalHoursPerWeek?: number
   subjectType?: string
@@ -202,6 +204,8 @@ export async function updateSubject(subjectId: string, facultyId: string, data: 
       where: { id: subjectId },
       data: {
         ...(data.name !== undefined && { name: data.name }),
+        ...(data.code !== undefined && { code: data.code }),
+        ...(data.semester !== undefined && { semester: data.semester }),
         ...(data.credits !== undefined && { credits: data.credits }),
         ...(data.totalHoursPerWeek !== undefined && { totalHoursPerWeek: data.totalHoursPerWeek }),
         ...(data.subjectType !== undefined && { subjectType: data.subjectType }),
@@ -392,7 +396,7 @@ export async function getHodFacultyWorkload(facultyId: string) {
     if (!hod?.hodAssignments[0]) return { success: false, error: "Not authorized" }
 
     const facultyList = await prisma.faculty.findMany({
-      where: { departmentId: hod.departmentId, accountStatus: true },
+      where: { departmentId: hod.departmentId, accountStatus: "ACTIVE" },
       include: {
         user: { select: { name: true, email: true } },
         facultySubjects: { where: { isActive: true }, include: { subject: true } },

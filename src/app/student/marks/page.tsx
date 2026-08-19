@@ -18,8 +18,8 @@ export default async function StudentMarksPage() {
           <Award size={20} />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-bold">My Marks</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Internal assessment marks</p>
+          <h1 className="text-black text-2xl font-bold">My Marks</h1>
+          <p className="text-gray-500 text-sm mt-0.5">Internal assessment marks</p>
         </div>
       </div>
 

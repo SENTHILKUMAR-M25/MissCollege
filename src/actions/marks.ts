@@ -1,5 +1,6 @@
 "use server"
 
+import { requireAcademicAdmin } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -82,6 +83,7 @@ export async function upsertMark(data: {
   assignment: number
 }) {
   try {
+    await requireAcademicAdmin()
     const { studentId, subjectId, cat1, cat2, assignment } = data
 
     const subject = await prisma.subject.findUnique({
