@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth"
 import { Role } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
-const EXAM_ROLES = [Role.ADMIN, Role.EXAM_ADMIN]
+const EXAM_ROLES: Role[] = [Role.ADMIN, Role.EXAM_ADMIN]
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,7 +2,7 @@ import { requireAdmin } from "@/lib/permissions"
 import { redirect } from "next/navigation"
 import { getForm } from "@/actions/forms"
 import prisma from "@/lib/prisma"
-import FormRenderer from "./FormRenderer"
+import FormRenderer from "@/app/forms/[formId]/FormRenderer"
 
 export default async function AdminFormEditPage({ params }: { params: Promise<{ formId: string }> }) {
   const user = await requireAdmin()

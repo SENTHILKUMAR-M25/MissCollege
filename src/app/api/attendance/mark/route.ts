@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     const allowedStatuses = ["PRESENT", "ABSENT", "OD", "LEAVE"] as const
     const sanitized = records.map((r: { studentId: string; status: string }) => {
-      const status = allowedStatuses.includes(r.status) ? r.status : "ABSENT"
+      const status = (allowedStatuses.includes(r.status as typeof allowedStatuses[number]) ? r.status : "ABSENT") as typeof allowedStatuses[number]
       return { studentId: r.studentId, status }
     })
 

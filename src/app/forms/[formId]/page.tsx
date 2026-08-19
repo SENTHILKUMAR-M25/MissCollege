@@ -1,6 +1,6 @@
 import { getForm } from "@/actions/forms"
 import { notFound } from "next/navigation"
-import PublicFormPage from "./PublicFormPage"
+import PublicFormPage from "./FormRenderer"
 
 export default async function PublicFormWrapper({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = await params

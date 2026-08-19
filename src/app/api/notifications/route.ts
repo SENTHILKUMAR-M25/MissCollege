@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     const notice = await prisma.notice.findUnique({
       where: { id: noticeId },
-      select: { id: true, targetAudience: true, departmentId: true },
+      select: { id: true, title: true, targetAudience: true, departmentId: true },
     })
 
     if (!notice) {
@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
         const deptUsers = await prisma.user.findMany({
           where: {
             OR: [
-              { student: { some: { departmentId: notice.departmentId } } },
-              { faculty: { some: { departmentId: notice.departmentId } } },
+              { student: { departmentId: notice.departmentId } },
+              { faculty: { departmentId: notice.departmentId } },
             ],
           },
           select: { id: true },

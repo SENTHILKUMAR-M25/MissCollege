@@ -21,6 +21,7 @@ export async function GET() {
   try {
     const rows = await prisma.course.findMany({
       orderBy: { createdAt: "desc" },
+      include: { department: { select: { name: true } } },
     })
     const courses = rows.map((c) => {
       const defaults = deriveDefaults(c.code, c.department?.name ?? null)

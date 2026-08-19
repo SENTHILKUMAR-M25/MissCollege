@@ -12,7 +12,7 @@ const ASSESSMENTS = [
   { id: "3", name: "Semester End Exam", weightage: 50, maxMarks: 50, description: "Final semester examination" },
 ]
 
-export default function AssessmentSetupClient() {
+export default function AssessmentSetupClient({ userRole }: { userRole?: string }) {
   const [assessments, setAssessments] = useState(ASSESSMENTS)
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)

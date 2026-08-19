@@ -238,7 +238,7 @@ export async function getAttendanceSummary(facultyId: string) {
   try {
     const records = await prisma.attendance.findMany({
       where: { facultyId },
-      include: { subject: { select: { code: true, name: true } }, student: { include: { user: { select: { name: true } } } } },
+      include: { subject: { select: { code: true, name: true } }, student: { include: { user: { select: { name: true } }, department: { select: { code: true } } } } },
       orderBy: { date: "desc" },
       take: 200,
     })
@@ -261,7 +261,6 @@ export async function getAttendanceSummary(facultyId: string) {
         total: (bySubject.get(subjectKey)?.total || 0) + 1,
       })
       byPeriod.set(r.periodNumber, {
-        periodNumber: r.periodNumber,
         present: (byPeriod.get(r.periodNumber)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
         absent: (byPeriod.get(r.periodNumber)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
         od: (byPeriod.get(r.periodNumber)?.od || 0) + (r.status === "OD" ? 1 : 0),
@@ -269,7 +268,6 @@ export async function getAttendanceSummary(facultyId: string) {
         total: (byPeriod.get(r.periodNumber)?.total || 0) + 1,
       })
       byMonth.set(month, {
-        month,
         present: (byMonth.get(month)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
         absent: (byMonth.get(month)?.absent || 0) + (r.status === "ABSENT" ? 1 : 0),
         od: (byMonth.get(month)?.od || 0) + (r.status === "OD" ? 1 : 0),
@@ -286,7 +284,6 @@ export async function getAttendanceSummary(facultyId: string) {
 
       const sectionKey = `${r.student.department?.code || ""}-${r.student.section || ""}`
       bySection.set(sectionKey, {
-        section: sectionKey,
         present: (bySection.get(sectionKey)?.present || 0) + (r.status === "PRESENT" ? 1 : 0),
         total: (bySection.get(sectionKey)?.total || 0) + 1,
       })
@@ -296,7 +293,7 @@ export async function getAttendanceSummary(facultyId: string) {
       success: true,
       data: {
         subjectWise: Array.from(bySubject.values()),
-        periodWise: Array.from(byPeriod.values()),
+        periodWise: Array.from(byPeriod.entries()).map(([periodNumber, v]) => ({ periodNumber, ...v })),
         monthWise: Array.from(byMonth.values()),
         studentWise: Array.from(byStudent.entries()).map(([id, v]) => ({ id, ...v })),
         sectionWise: Array.from(bySection.entries()).map(([id, v]) => ({ id, ...v })),
@@ -365,5 +362,129 @@ export async function getFacultyInternalMarks(facultyId: string) {
   } catch (error) {
     console.error("Error fetching internal marks:", error)
     return { success: false, error: "Failed to fetch marks" }
+  }
+}
+
+// ---- PASSWORD ----
+export async function changeFacultyPassword(userId: string, newPassword: string) {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return { success: false, error: "User not found" }
+
+    const hashed = await bcrypt.hash(newPassword, 12)
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    })
+    return { success: true }
+  } catch (error) {
+    console.error("Error changing faculty password:", error)
+    return { success: false, error: "Failed to change password" }
+  }
+}
+
+// ---- NOTICES ----
+export async function getFacultyNotices() {
+  try {
+    const notices = await prisma.notice.findMany({
+      where: {
+        isActive: true,
+        OR: [{ targetAudience: "ALL" }, { targetAudience: "FACULTY" }],
+      },
+      include: {
+        creator: { select: { name: true, role: true } },
+        department: { select: { name: true, code: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    })
+    return { success: true, data: notices }
+  } catch (error) {
+    console.error("Error fetching faculty notices:", error)
+    return { success: false, error: "Failed to fetch notices" }
+  }
+}
+
+// ---- LEAVE ----
+export async function applyFacultyLeave(formData: FormData) {
+  try {
+    const facultyId = formData.get("facultyId") as string
+    const departmentId = formData.get("departmentId") as string
+    const leaveType = formData.get("leaveType") as string
+    const startDate = formData.get("startDate") as string
+    const endDate = formData.get("endDate") as string
+    const reason = formData.get("reason") as string
+
+    if (!facultyId || !departmentId || !leaveType || !startDate || !endDate || !reason) {
+      return { success: false, error: "All fields are required" }
+    }
+
+    await prisma.leaveRequest.create({
+      data: {
+        facultyId,
+        departmentId,
+        leaveType,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        reason,
+      },
+    })
+    revalidatePath("/faculty/leaves")
+    return { success: true }
+  } catch (error) {
+    console.error("Error applying for leave:", error)
+    return { success: false, error: "Failed to apply for leave" }
+  }
+}
+
+// ---- ASSIGNMENT SUBMISSIONS ----
+export async function getAssignmentSubmissions(assignmentId: string) {
+  try {
+    const submissions = await prisma.assignmentSubmission.findMany({
+      where: { assignmentId },
+      include: {
+        student: {
+          include: {
+            user: { select: { name: true, email: true } },
+          },
+        },
+        assignment: { select: { title: true, totalMarks: true } },
+      },
+      orderBy: { submittedAt: "desc" },
+    })
+    return { success: true, data: submissions }
+  } catch (error) {
+    console.error("Error fetching assignment submissions:", error)
+    return { success: false, error: "Failed to fetch submissions" }
+  }
+}
+
+// ---- GRADING ----
+export async function gradeAssignment(submissionId: string, grade: number, feedback: string) {
+  try {
+    if (grade < 0 || grade > 100) {
+      return { success: false, error: "Grade must be between 0 and 100" }
+    }
+
+    const submission = await prisma.assignmentSubmission.findUnique({
+      where: { id: submissionId },
+      include: { assignment: { select: { totalMarks: true } } },
+    })
+    if (!submission) return { success: false, error: "Submission not found" }
+
+    await prisma.assignmentSubmission.update({
+      where: { id: submissionId },
+      data: {
+        grade,
+        feedback: feedback || null,
+        gradedAt: new Date(),
+        status: "GRADED",
+      },
+    })
+    revalidatePath("/faculty/assignments")
+    return { success: true }
+  } catch (error) {
+    console.error("Error grading assignment:", error)
+    return { success: false, error: "Failed to grade assignment" }
   }
 }

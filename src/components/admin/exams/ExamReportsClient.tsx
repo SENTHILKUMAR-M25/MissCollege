@@ -10,7 +10,7 @@ const REPORTS = [
   { id: "3", name: "Pass Percentage Report", type: "XLSX", generatedAt: "2026-06-10", size: "120 KB" },
 ]
 
-export default function ExamReportsClient() {
+export default function ExamReportsClient({ userRole }: { userRole?: string }) {
   const [reports] = useState(REPORTS)
   const [filter, setFilter] = useState("all")
 

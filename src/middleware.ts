@@ -3,7 +3,7 @@ import { Role } from "@prisma/client"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const ADMIN_ROLES = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
+const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
 
 export async function middleware(request: NextRequest) {
   const session = await auth()

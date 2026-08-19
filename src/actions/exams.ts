@@ -4,32 +4,18 @@ import prisma from "@/lib/prisma"
 
 export async function getExamDashboardStats() {
   try {
-    const [
-      totalExamTypes,
-      totalExamSchedule,
-      totalHalls,
-      totalInvigilators,
-      totalStudents,
-      totalResults,
-      publishedResults,
-    ] = await Promise.all([
-      prisma.examType.count(),
-      prisma.examSchedule.count(),
-      prisma.examHall.count(),
-      prisma.examInvigilator.count(),
-      prisma.student.count(),
-      prisma.examResult.count(),
-      prisma.examResult.count({ where: { status: "PUBLISHED" } }),
-    ])
+    const totalStudents = await prisma.student.count()
+    const totalInternalMarks = await prisma.internalMark.count()
+    const totalSemesterResults = await prisma.semesterResult.count()
 
     return {
-      totalExamTypes,
-      totalExamSchedule,
-      totalHalls,
-      totalInvigilators,
+      totalExamTypes: 0,
+      totalExamSchedule: 0,
+      totalHalls: 0,
+      totalInvigilators: 0,
       totalStudents,
-      totalResults,
-      publishedResults,
+      totalResults: totalInternalMarks + totalSemesterResults,
+      publishedResults: totalSemesterResults,
     }
   } catch (error) {
     console.error("Error fetching exam dashboard stats:", error)

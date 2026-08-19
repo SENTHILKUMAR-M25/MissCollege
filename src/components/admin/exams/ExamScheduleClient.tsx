@@ -11,7 +11,7 @@ const SCHEDULES = [
   { id: "2", examType: "Semester End", date: "2026-06-01", startTime: "09:00", endTime: "12:00", className: "I", section: "B" },
 ]
 
-export default function ExamScheduleClient() {
+export default function ExamScheduleClient({ userRole }: { userRole?: string }) {
   const [schedules, setSchedules] = useState(SCHEDULES)
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)

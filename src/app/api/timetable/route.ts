@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     if (action === "faculty") {
       const faculty = await prisma.faculty.findMany({
-        where: { departmentId: hod.departmentId, accountStatus: true },
+        where: { departmentId: hod.departmentId, accountStatus: "ACTIVE" },
         include: { user: { select: { id: true, name: true } } },
         orderBy: { facultyId: "asc" },
       })

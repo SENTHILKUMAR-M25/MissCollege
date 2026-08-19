@@ -4,12 +4,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    middlewareClientMaxBodySize: '20mb',
-    serverActions: {
-      bodySizeLimit: '20mb',
-    },
-  },
 }
 
 module.exports = nextConfig

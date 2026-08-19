@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
 import { auth } from "@/lib/auth"
 import { Role } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
-const ADMIN_ROLES = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
+const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,8 +27,8 @@ export async function GET(request: NextRequest) {
     if (departmentId && ADMIN_ROLES.includes(session.user.role as Role)) {
       where.departmentId = departmentId
     } else if (session.user.role === "HOD") {
-      const hodAssignment = await prisma.hodAssignment.findUnique({
-        where: { facultyId: session.user.id },
+      const hodAssignment = await prisma.hodAssignment.findFirst({
+        where: { facultyId: session.user.id, isActive: true },
         select: { departmentId: true },
       })
       if (hodAssignment) {
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
     const notice = await prisma.notice.create({
       data: {
         title,
-        content,
+        description: content,
         targetAudience: targetAudience || "ALL",
         departmentId: departmentId || null,
         priority: priority || "MEDIUM",

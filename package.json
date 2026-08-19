@@ -17,6 +17,7 @@
     "file-saver": "^2.0.5",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
+    "json2csv": "^5.0.7",
     "lucide-react": "^0.294.0",
     "motion": "^12.42.2",
     "next": "^15.5.19",

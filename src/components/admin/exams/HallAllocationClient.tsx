@@ -11,7 +11,7 @@ const HALLS = [
   { id: "2", name: "Hall B", capacity: 45, building: "Main Block", floor: "2nd" },
 ]
 
-export default function HallAllocationClient() {
+export default function HallAllocationClient({ userRole }: { userRole?: string }) {
   const [halls, setHalls] = useState(HALLS)
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)

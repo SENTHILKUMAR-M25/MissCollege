@@ -12,7 +12,7 @@ const PENDING_MARKS = [
   { id: "3", student: "Bob Johnson", regNo: "22CS003", subject: "Data Structures", examType: "Mid-term", marks: null, maxMarks: 30 },
 ]
 
-export default function MarksVerificationClient() {
+export default function MarksVerificationClient({ userRole }: { userRole?: string }) {
   const [marks, setMarks] = useState(PENDING_MARKS)
   const [verifyModal, setVerifyModal] = useState<{ open: boolean; record: typeof PENDING_MARKS[0] | null }>({ open: false, record: null })
   const [markValue, setMarkValue] = useState("")

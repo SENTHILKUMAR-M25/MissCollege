@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           facultyId,
           date: attendanceDate,
           periodNumber,
-          status: record.status,
+          status: record.status as "PRESENT" | "ABSENT" | "OD" | "LEAVE",
           startTime: startTime || null,
           endTime: endTime || null,
         })),

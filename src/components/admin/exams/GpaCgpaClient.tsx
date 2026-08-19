@@ -10,7 +10,7 @@ const GPA_DATA = [
   { regNo: "22CS003", name: "Bob Johnson", semester: 3, gpa: 7.8, cgpa: 7.9 },
 ]
 
-export default function GpaCgpaClient() {
+export default function GpaCgpaClient({ userRole }: { userRole?: string }) {
   const [semester, setSemester] = useState("all")
   const [gpaData] = useState(GPA_DATA)
 

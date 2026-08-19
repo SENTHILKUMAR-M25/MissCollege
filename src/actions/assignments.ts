@@ -46,7 +46,7 @@ export async function createAssignment(data: z.infer<typeof createAssignmentSche
 
     const subject = await prisma.subject.findUnique({
       where: { id: d.subjectId },
-      select: { id: true, departmentId: true, name: true, code: true },
+      select: { id: true, departmentId: true, name: true, code: true, semester: true },
     })
     if (!subject) return { success: false, error: "Subject not found" }
     if (subject.departmentId !== faculty.departmentId) {

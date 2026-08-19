@@ -11,7 +11,7 @@ const RESULTS = [
   { id: "3", regNo: "22CS003", name: "Bob Johnson", examType: "Mid-term", marks: 22, maxMarks: 30, grade: "B+", status: "DRAFT" },
 ]
 
-export default function ResultsClient() {
+export default function ResultsClient({ userRole }: { userRole?: string }) {
   const [results, setResults] = useState(RESULTS)
   const [selectedResult, setSelectedResult] = useState<string | null>(null)
 

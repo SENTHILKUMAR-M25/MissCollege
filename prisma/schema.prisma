@@ -130,6 +130,8 @@ model Subject {
   facultySubjects   FacultySubject[]
   internalMarks     InternalMark[]
   semesterResults   SemesterResult[]
+  examResults       ExamResult[]
+  exams             Exam[]
   department        Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   faculty           Faculty?         @relation(fields: [facultyId], references: [id])
   timetables        Timetable[]
@@ -228,6 +230,8 @@ model Faculty {
   subjects                  Subject[]
   suspensionRecords         SuspensionRecord[]
   timetables                Timetable[]
+  exams                     Exam[]
+  examInvigilators          ExamInvigilator[]
 }
 
 model Student {
@@ -249,6 +253,7 @@ model Student {
   attendance      Attendance[]
   internalMarks   InternalMark[]
   semesterResults SemesterResult[]
+  examResults     ExamResult[]
   course          Course                 @relation(fields: [courseId], references: [id])
   department      Department             @relation(fields: [departmentId], references: [id])
   user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -321,14 +326,14 @@ model Notice {
 model Notification {
   id        String    @id @default(uuid())
   userId    String
-  noticeId  String
+  noticeId  String?
   type      String    @default("NOTICE")
   message   String
   link      String?
   isRead    Boolean   @default(false)
   readAt    DateTime?
   createdAt DateTime  @default(now())
-  notice    Notice    @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  notice    Notice?   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
@@ -633,6 +638,104 @@ model ApplicationAuditLog {
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@index([applicationId])
+}
+
+model ExamType {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  maxMarks    Int     @default(100)
+  weightage   Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  exams       Exam[]
+  examResults ExamResult[]
+}
+
+model ExamHall {
+  id           String   @id @default(uuid())
+  name         String
+  capacity     Int      @default(30)
+  departmentId String?
+  createdAt    DateTime @default(now())
+  exams        Exam[]
+}
+
+model ExamInvigilator {
+  id           String    @id @default(uuid())
+  facultyId    String
+  departmentId String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  faculty      Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  exams        Exam[]
+}
+
+model Exam {
+  id              String           @id @default(uuid())
+  name            String
+  examTypeId      String
+  subjectId       String
+  facultyId       String
+  departmentId    String?
+  date            DateTime
+  startTime       String
+  endTime         String
+  className       String
+  section         String
+  semester        Int
+  academicYear    String?
+  hallId          String?
+  invigilatorId   String?
+  status          String           @default("SCHEDULED")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  examType        ExamType         @relation(fields: [examTypeId], references: [id], onDelete: Cascade)
+  subject         Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  faculty         Faculty          @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  hall            ExamHall?        @relation(fields: [hallId], references: [id])
+  invigilator     ExamInvigilator? @relation(fields: [invigilatorId], references: [id])
+}
+
+model ExamResult {
+  id          String    @id @default(uuid())
+  studentId   String
+  subjectId   String
+  examTypeId  String
+  marks       Float
+  maxMarks    Int       @default(100)
+  grade       String?
+  status      String    @default("PUBLISHED")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  examType    ExamType  @relation(fields: [examTypeId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([subjectId])
+  @@index([examTypeId])
+}
+
+model Announcement {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  date        DateTime
+  location    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum Role {

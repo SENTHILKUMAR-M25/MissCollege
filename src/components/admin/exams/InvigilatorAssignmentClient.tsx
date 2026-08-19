@@ -15,7 +15,7 @@ const ASSIGNMENTS = [
   { id: "1", faculty: "Dr. Alan Turing", examType: "Mid-term", date: "2026-05-15", time: "09:00 - 12:00", hall: "Hall A" },
 ]
 
-export default function InvigilatorAssignmentClient() {
+export default function InvigilatorAssignmentClient({ userRole }: { userRole?: string }) {
   const [assignments, setAssignments] = useState(ASSIGNMENTS)
   const [showModal, setShowModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")

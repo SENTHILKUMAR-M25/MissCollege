@@ -16,9 +16,8 @@ export async function GET(request: NextRequest) {
     const format = searchParams.get("format") || "json"
 
     const userRole = session.user.role as Role
-    const isAdmin = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN].includes(userRole)
-
-    if (!isAdmin) {
+    const isAdmin: Role[] = [Role.ADMIN, Role.ACADEMIC_ADMIN, Role.EXAM_ADMIN]
+    if (!isAdmin.includes(userRole)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 

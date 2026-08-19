@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { submitFormRecord } from "@/actions/forms"
 import toast from "react-hot-toast"
 
-export default function PublicFormPage({ form }: { form: any }) {
+export default function PublicFormPage({ form, readOnly }: { form: any; readOnly?: boolean }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [values, setValues] = useState<Record<string, any>>({})
@@ -131,6 +131,7 @@ export default function PublicFormPage({ form }: { form: any }) {
           </div>
         </div>
 
+        {!readOnly && (
         <div className="flex items-center justify-end gap-3">
           <button
             type="submit"
@@ -140,6 +141,7 @@ export default function PublicFormPage({ form }: { form: any }) {
             {submitting ? "Submitting..." : "Submit"}
           </button>
         </div>
+        )}
       </form>
     </div>
   )

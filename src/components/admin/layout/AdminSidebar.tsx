@@ -10,7 +10,7 @@ import {
   ClipboardList, BarChart3, Bell, Settings, LogOut, ChevronRight,
   UserCheck, TrendingUp, Library, Shield, ChevronLeft, School,
   Award, Megaphone, CalendarDays, FileBarChart, Crown,
-  ClipboardPenLine, FileSpreadsheet, FileCopy, MessageSquare, FileText,
+  ClipboardEdit, FileSpreadsheet, Copy, MessageSquare, FileText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { signOut } from "next-auth/react"
@@ -23,8 +23,8 @@ interface NavItem {
 }
 
 const EXAM_NAV_ITEMS: NavItem[] = [
-  { label: "Exam Types", href: "/admin/exams/types", icon: FileCopy },
-  { label: "Assessment Setup", href: "/admin/exams/assessment", icon: ClipboardPenLine },
+  { label: "Exam Types", href: "/admin/exams/types", icon: Copy },
+  { label: "Assessment Setup", href: "/admin/exams/assessment", icon: ClipboardEdit },
   { label: "Exam Schedule", href: "/admin/exams/schedule", icon: CalendarDays },
   { label: "Hall Allocation", href: "/admin/exams/halls", icon: Building2 },
   { label: "Invigilators", href: "/admin/exams/invigilators", icon: UserCheck },

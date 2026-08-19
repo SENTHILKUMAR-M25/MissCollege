@@ -4,7 +4,7 @@ import { Role } from "@prisma/client"
 import prisma from "@/lib/prisma"
 import { z } from "zod"
 
-const EXAM_ROLES = [Role.ADMIN, Role.EXAM_ADMIN, Role.ACADEMIC_ADMIN]
+const EXAM_ROLES: Role[] = [Role.ADMIN, Role.EXAM_ADMIN, Role.ACADEMIC_ADMIN]
 
 const examSchema = z.object({
   id: z.string().optional(),
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
           subject: { select: { id: true, name: true, code: true } },
           faculty: { include: { user: { select: { name: true, email: true } } } },
           hall: true,
-          invigilator: { include: { user: { select: { name: true } } } },
+          invigilator: { include: { faculty: { include: { user: { select: { name: true } } } } } },
         },
         orderBy: { date: "asc" },
         skip,

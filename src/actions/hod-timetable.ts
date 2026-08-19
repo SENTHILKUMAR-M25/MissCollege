@@ -57,6 +57,26 @@ const MAX_SAME_SUBJECT_PER_DAY = 2  // theory; lab uses its own block logic
 // ─── Slot key helper ──────────────────────────────────────────────────────
 function slotKey(day: number, periodNum: number) { return `${day}|${periodNum}` }
 
+// ─── Build a timetable entry object ──────────────────────────────────────
+function buildEntry(data: any, subject: any, day: number, pNum: number, nonBreakPeriods: any[], classRoom: string, facultyId: string) {
+  const period = nonBreakPeriods.find((p: any) => p.periodNumber === pNum)
+  return {
+    facultyId,
+    departmentId: data.departmentId,
+    subjectId: subject.id,
+    className: data.className,
+    section: data.section,
+    dayOfWeek: day,
+    periodNumber: pNum,
+    classroom: classRoom,
+    startTime: period?.startTime ?? "",
+    endTime: period?.endTime ?? "",
+    semester: data.semester,
+    courseId: data.courseId || null,
+    academicYear: data.academicYear,
+  }
+}
+
 export async function generateTimetable(data: {
   departmentId: string
   className: string
